@@ -12,6 +12,18 @@ import { ArrowRight } from "../icons";
 import { computeTotals, formatARS } from "@/lib/pricing";
 import { track, getSessionId } from "@/lib/track";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT } from "@/lib/quote-options";
+import {
+  EMPTY_INTAKE,
+  computePreparation,
+  functionalitiesFor,
+  PREP_LABEL,
+  type IntakeData,
+} from "@/lib/intake";
+import {
+  IntakeFunctionalities,
+  IntakeInfra,
+  IntakeMaterial,
+} from "./IntakeSteps";
 import type { LeadFile, LineItem, Microservice, QuoteResult, Service } from "@/lib/types";
 
 const STORAGE_KEY = "run72_quote_v2";
@@ -19,13 +31,16 @@ const STEP_LABELS = [
   "Proyecto",
   "Marca",
   "Servicios",
+  "Funcionalidades",
   "Objetivo",
+  "Lo que ya tenés",
+  "Marca y referencias",
   "Contexto",
   "Datos",
 ];
 const ease = [0.16, 1, 0.3, 1] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LAST_STEP = 5;
+const LAST_STEP = 8;
 
 type Contact = { name: string; company: string; email: string; whatsapp: string };
 
@@ -39,6 +54,7 @@ type State = {
   urgencyNote: string;
   files: LeadFile[];
   contact: Contact;
+  intake: IntakeData;
 };
 
 const INITIAL: State = {
@@ -51,6 +67,7 @@ const INITIAL: State = {
   urgencyNote: "",
   files: [],
   contact: { name: "", company: "", email: "", whatsapp: "" },
+  intake: EMPTY_INTAKE,
 };
 
 export function QuoteConfigurator() {
@@ -169,12 +186,18 @@ export function QuoteConfigurator() {
       case 1:
         return state.brandStatus !== null;
       case 2:
-        return true;
+        return true; // servicios (opcional)
       case 3:
-        return state.objective !== null;
+        return true; // funcionalidades (opcional)
       case 4:
-        return state.timingSelected && state.urgencyNote.trim().length > 0;
+        return state.objective !== null;
       case 5:
+        return true; // lo que ya tenés (opcional)
+      case 6:
+        return true; // marca y referencias (opcional)
+      case 7:
+        return state.timingSelected && state.urgencyNote.trim().length > 0;
+      case 8:
         return (
           state.contact.name.trim().length > 1 &&
           EMAIL_RE.test(state.contact.email.trim()) &&
@@ -184,6 +207,17 @@ export function QuoteConfigurator() {
         return false;
     }
   }, [step, state]);
+
+  function patchIntake(patch: Partial<IntakeData>) {
+    setState((s) => ({ ...s, intake: { ...s.intake, ...patch } }));
+  }
+
+  const functionalityOptions = useMemo(
+    () => functionalitiesFor(state.projectTypes.filter((p) => p !== "unsure")),
+    [state.projectTypes],
+  );
+
+  const prep = useMemo(() => computePreparation(state.intake), [state.intake]);
 
   function go(delta: number) {
     if (delta > 0) track("step_completed", { step, label: STEP_LABELS[step] });
@@ -237,6 +271,8 @@ export function QuoteConfigurator() {
           urgencyNote: state.urgencyNote,
           files: state.files,
           contact: state.contact,
+          intake: state.intake,
+          preparationLevel: prep.level,
           sessionId: getSessionId(),
           funnelStepReached: LAST_STEP + 1,
         }),
@@ -389,6 +425,19 @@ export function QuoteConfigurator() {
               )}
 
               {step === 3 && (
+                <Step
+                  title="¿Qué funcionalidades necesitás?"
+                  subtitle="Opcional · cuanto más definas, más rápido construimos."
+                >
+                  <IntakeFunctionalities
+                    options={functionalityOptions}
+                    intake={state.intake}
+                    onChange={patchIntake}
+                  />
+                </Step>
+              )}
+
+              {step === 4 && (
                 <Step title="¿Cuál es el objetivo del proyecto?" subtitle="Enfocamos la estrategia según lo que querés lograr.">
                   <div className="grid gap-3">
                     {OBJECTIVES.map((o) => (
@@ -403,7 +452,25 @@ export function QuoteConfigurator() {
                 </Step>
               )}
 
-              {step === 4 && (
+              {step === 5 && (
+                <Step
+                  title="Lo que ya tenés disponible"
+                  subtitle="Opcional · si ya tenés infraestructura, la aprovechamos para avanzar más rápido."
+                >
+                  <IntakeInfra intake={state.intake} onChange={patchIntake} />
+                </Step>
+              )}
+
+              {step === 6 && (
+                <Step
+                  title="Tu marca y referencias"
+                  subtitle="Opcional · material, referencias visuales y todo lo que nos ayude a entender tu visión."
+                >
+                  <IntakeMaterial intake={state.intake} onChange={patchIntake} />
+                </Step>
+              )}
+
+              {step === 7 && (
                 <Step title="¿Cuándo querés lanzar?" subtitle="Contanos el contexto y sumá referencias si tenés.">
                   <div className="grid gap-4">
                     <OptionCard
@@ -442,7 +509,7 @@ export function QuoteConfigurator() {
                 </Step>
               )}
 
-              {step === 5 && (
+              {step === 8 && (
                 <Step
                   title="¿A dónde te enviamos la propuesta?"
                   subtitle="Con estos datos generamos tu presupuesto y abrimos tu proyecto."
@@ -496,8 +563,27 @@ export function QuoteConfigurator() {
           </div>
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="lg:sticky lg:top-24 lg:self-start lg:space-y-4">
           <CostPanel lineItems={lineItems} pending={submitting} />
+          <div className="glass rounded-3xl p-5">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium tracking-tight">Nivel de Preparación</span>
+              <span className="text-lg">{PREP_LABEL[prep.level].dot}</span>
+            </div>
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-violet"
+                animate={{ width: `${prep.score}%` }}
+                transition={{ duration: 0.5, ease }}
+              />
+            </div>
+            <p className={`mt-2 text-xs ${PREP_LABEL[prep.level].text}`}>
+              {PREP_LABEL[prep.level].label}
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-faint">
+              Cuanta más información compartas, más rápido y mejor construimos tu proyecto en 72 horas.
+            </p>
+          </div>
         </aside>
       </div>
 

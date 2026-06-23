@@ -148,6 +148,8 @@ export async function POST(req: Request) {
   if (body.sessionId) extraRow.session_id = body.sessionId;
   if (typeof body.funnelStepReached === "number")
     extraRow.funnel_step_reached = body.funnelStepReached;
+  if (body.intake) extraRow.intake = body.intake;
+  if (body.preparationLevel) extraRow.preparation_level = body.preparationLevel;
 
   // Insert resiliente: si una columna nueva no existe todavía, reintenta sin extras.
   let lead: { id: string } | null = null;

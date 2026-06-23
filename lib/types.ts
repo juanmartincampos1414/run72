@@ -94,6 +94,8 @@ export type Lead = {
   scope_accepted: boolean;
   rejection_reason: string | null;
   estimated_delivery_at: string | null;
+  intake: Record<string, unknown> | null;
+  preparation_level: string | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };
@@ -130,6 +132,8 @@ export type QuoteSubmission = {
   previewRating: number | null;
   previewComments: string;
   previewText: string | null;
+  intake?: unknown;
+  preparationLevel?: string;
   sessionId?: string;
   funnelStepReached?: number;
   contact: {

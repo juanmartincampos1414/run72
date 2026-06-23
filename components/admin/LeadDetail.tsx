@@ -244,6 +244,13 @@ export function LeadDetail({ leadId }: { leadId: string }) {
         )}
       </Section>
 
+      {/* Información del cliente (intake) */}
+      {lead.intake && Object.keys(lead.intake).length > 0 && (
+        <Section title="Información del cliente">
+          <IntakeView intake={lead.intake} level={lead.preparation_level} />
+        </Section>
+      )}
+
       {/* Auditoría */}
       <Section title="Auditoría">
         {events.length === 0 ? (
@@ -286,4 +293,86 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Badge({ label, cls }: { label: string; cls: string }) {
   return <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${cls}`}>{label}</span>;
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function IntakeView({ intake, level }: { intake: any; level: string | null }) {
+  const infra = intake.infra ?? {};
+  const social = intake.social ?? {};
+  const activeSocial = Object.entries(social).filter(([, v]: any) => v?.active);
+  const refs = (intake.references ?? []).filter((r: any) => r?.url);
+  const row = (label: string, value: React.ReactNode) =>
+    value ? (
+      <div className="flex gap-2 text-sm">
+        <span className="w-44 shrink-0 text-faint">{label}</span>
+        <span className="text-fg">{value}</span>
+      </div>
+    ) : null;
+
+  const tri = (v: string) => (v === "si" ? "Sí" : v === "no" ? "No" : v === "unsure" ? "No sabe" : "—");
+
+  return (
+    <div className="space-y-4">
+      {level && (
+        <p className="text-xs text-muted">
+          Nivel de preparación: <span className="font-medium text-fg">{level}</span>
+        </p>
+      )}
+
+      <div className="space-y-1">
+        {row("Dominio", infra.domain ? `${tri(infra.domain)}${infra.domainName ? ` · ${infra.domainName}` : ""}${infra.domainProvider ? ` · ${infra.domainProvider}` : ""}${infra.domainAccess ? " · con acceso" : ""}` : null)}
+        {row("Hosting", infra.hosting ? `${tri(infra.hosting)}${infra.hostingProvider ? ` · ${infra.hostingProvider}` : ""}${infra.hostingType ? ` · ${infra.hostingType}` : ""}${infra.hostingAccess ? " · con acceso" : ""}` : null)}
+        {row("Correo corporativo", infra.email ? `${tri(infra.email)}${infra.emailProvider ? ` · ${infra.emailProvider}` : ""}${infra.emailAccounts ? ` · ${infra.emailAccounts} cuentas` : ""}` : null)}
+      </div>
+
+      {activeSocial.length > 0 && (
+        <div>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-faint">Redes</p>
+          <div className="space-y-1">
+            {activeSocial.map(([name, v]: any) => (
+              <div key={name} className="text-sm text-fg">
+                {name}: {v.url || v.user || "—"} {v.access ? "· con acceso" : ""}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {chips("Material disponible", intake.material)}
+      {chips("Funcionalidades", [...(intake.functionalities ?? []), ...(intake.customFunctionalities ?? [])])}
+      {chips("Accesos disponibles", intake.access)}
+
+      {refs.length > 0 && (
+        <div>
+          <p className="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-faint">Referencias que le gustan</p>
+          <div className="space-y-1">
+            {refs.map((r: any, i: number) => (
+              <div key={i} className="text-sm">
+                <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-brand-cyan hover:underline">{r.url}</a>
+                {r.likes?.length ? <span className="text-faint"> — {r.likes.join(", ")}</span> : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {row("A evitar", intake.avoid)}
+      {row("Sitios que no le gustan", intake.dislikeUrls)}
+      {row("Comentarios", intake.comments)}
+    </div>
+  );
+}
+
+function chips(label: string, items?: string[]) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium uppercase tracking-[0.16em] text-faint">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((it) => (
+          <span key={it} className="rounded-full border border-line bg-ink/40 px-2.5 py-1 text-xs text-muted">{it}</span>
+        ))}
+      </div>
+    </div>
+  );
 }
