@@ -8,6 +8,7 @@ import { OptionCard } from "./OptionCard";
 import { CostPanel } from "./CostPanel";
 import { Confirmation } from "./Confirmation";
 import { MicroserviceDrawer } from "./MicroserviceDrawer";
+import { FaqAccordion } from "./FaqAccordion";
 import { ArrowRight } from "../icons";
 import { computeTotals, formatARS } from "@/lib/pricing";
 import { track, getSessionId } from "@/lib/track";
@@ -451,6 +452,7 @@ export function QuoteConfigurator() {
                     contact={state.contact}
                     onChange={(contact) => setState((s) => ({ ...s, contact }))}
                   />
+                  <FaqAccordion />
                 </Step>
               )}
             </motion.div>

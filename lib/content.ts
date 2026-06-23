@@ -33,6 +33,7 @@ export const NAV_LINKS = [
   { label: "Ideal para", href: "#ideal" },
   { label: "Experiencia", href: "#experiencia" },
   { label: "Proyectos", href: "#proyectos" },
+  { label: "FAQ", href: "#faq" },
 ] as const;
 
 export type ServiceCard = {
