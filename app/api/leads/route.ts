@@ -103,9 +103,7 @@ export async function POST(req: Request) {
   const files: LeadFile[] = Array.isArray(body.files) ? body.files.slice(0, 20) : [];
 
   // --- Insertar lead ---
-  const { data: lead, error: insertError } = await supabase
-    .from("leads")
-    .insert({
+  const insertRow: Record<string, unknown> = {
       name,
       company: (contact.company ?? "").trim() || null,
       email,
@@ -120,7 +118,6 @@ export async function POST(req: Request) {
       urgency_note: (body.urgencyNote ?? "").trim() || null,
       files,
       addons: addonServices.map((a) => ({ slug: a.slug, name: a.name, price_ars: a.price_ars })),
-      microservices_selected: selectedMicros,
       line_items: lineItems,
       subtotal_ars: subtotal,
       iva_ars: iva,
@@ -135,7 +132,16 @@ export async function POST(req: Request) {
       preview_rating:
         typeof body.previewRating === "number" ? body.previewRating : null,
       preview_comments: (body.previewComments ?? "").trim() || null,
-    })
+  };
+  // Solo referenciamos la columna nueva si hay microservicios (evita romper
+  // si la migración de Fase A todavía no se corrió).
+  if (selectedMicros.length > 0) {
+    insertRow.microservices_selected = selectedMicros;
+  }
+
+  const { data: lead, error: insertError } = await supabase
+    .from("leads")
+    .insert(insertRow)
     .select("id")
     .single();
 
