@@ -162,6 +162,8 @@ export type Project = {
   name: string;
   category: string;
   description: string;
+  /** Sitio del proyecto (se abre al hacer click en la card). */
+  url: string;
   /** Color stops para el mockup (gradiente de marca por proyecto). */
   accent: [string, string];
 };
@@ -172,6 +174,7 @@ export const PROJECTS: Project[] = [
     category: "SaaS Financiero",
     description:
       "Plataforma de gestión financiera para empresas y emprendedores.",
+    url: "https://aikestar.net",
     accent: ["#22d3ee", "#6366f1"],
   },
   {
@@ -179,6 +182,7 @@ export const PROJECTS: Project[] = [
     category: "Agencia IA",
     description:
       "Marca y presencia digital enfocada en automatización e inteligencia artificial.",
+    url: "https://jcmarketing.digital",
     accent: ["#8b5cf6", "#ec4899"],
   },
   {
@@ -186,12 +190,14 @@ export const PROJECTS: Project[] = [
     category: "Tecnología",
     description:
       "Presencia digital y estructura comercial para crecimiento online.",
+    url: "https://web.poxcom.com",
     accent: ["#38bdf8", "#22d3ee"],
   },
   {
     name: "Margin",
     category: "Consultoría Empresarial",
     description: "Branding, posicionamiento y ecosistema digital.",
+    url: "https://margin.business",
     accent: ["#6366f1", "#a855f7"],
   },
   {
@@ -199,12 +205,14 @@ export const PROJECTS: Project[] = [
     category: "Automotriz",
     description:
       "Experiencia digital para concesionaria y generación de oportunidades comerciales.",
+    url: "https://galantedantonio0km.com",
     accent: ["#f59e0b", "#ef4444"],
   },
   {
     name: "Flips",
     category: "Negocios Digitales",
     description: "Marca y presencia online para lanzamiento comercial.",
+    url: "https://flips.ar",
     accent: ["#10b981", "#38bdf8"],
   },
   {
@@ -212,7 +220,15 @@ export const PROJECTS: Project[] = [
     category: "Real Estate",
     description:
       "Identidad digital y plataforma de presentación para el mercado inmobiliario.",
+    url: "https://theonehouse.net",
     accent: ["#a855f7", "#6366f1"],
+  },
+  {
+    name: "Tips.li",
+    category: "Plataforma Digital",
+    description: "Plataforma y presencia digital lista para operar.",
+    url: "https://tips.li",
+    accent: ["#f43f5e", "#a855f7"],
   },
 ];
 

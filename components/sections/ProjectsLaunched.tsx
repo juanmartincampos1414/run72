@@ -27,8 +27,11 @@ export function ProjectsLaunched() {
 
         <div className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {PROJECTS.map((project, i) => (
-            <motion.article
+            <motion.a
               key={project.name}
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -56,7 +59,7 @@ export function ProjectsLaunched() {
                   Lanzado con RUN72
                 </div>
               </div>
-            </motion.article>
+            </motion.a>
           ))}
         </div>
 
@@ -79,10 +82,7 @@ export function ProjectsLaunched() {
 /** Mockup de navegador con "screenshot" generado a partir del acento del proyecto. */
 function ProjectMockup({ project }: { project: Project }) {
   const [from, to] = project.accent;
-  const slug = project.name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "")
-    .slice(0, 16);
+  const domain = project.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   return (
     <div className="relative border-b border-line bg-ink-soft p-3">
@@ -95,7 +95,7 @@ function ProjectMockup({ project }: { project: Project }) {
             <span className="h-2 w-2 rounded-full bg-white/15" />
           </span>
           <span className="ml-2 flex-1 truncate rounded-md bg-white/[0.04] px-2 py-1 text-[10px] text-faint">
-            {slug}.com
+            {domain}
           </span>
         </div>
 
