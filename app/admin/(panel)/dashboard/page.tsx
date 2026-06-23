@@ -2,8 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { formatARS } from "@/lib/pricing";
+import { SLA_COLOR, type SlaBucket } from "@/lib/sla";
 
 type Dashboard = {
+  stages: {
+    recibidos: number;
+    pendientesPago: number;
+    anticiposConfirmados: number;
+    enDesarrollo: number;
+    entregados: number;
+    vencidosSla: number;
+  };
+  avgRemaining: number | null;
+  upcoming: { id: string; label: string; remainingH: number; pct: number; bucket: SlaBucket; overdue: boolean }[];
   revenue: { total: number; last7: number; last30: number };
   avgTicket: number;
   pipeline: number;
@@ -40,6 +51,59 @@ export default function DashboardPage() {
     <div>
       <h1 className="font-display text-2xl font-semibold tracking-tight">Dashboard</h1>
       <p className="mt-1 text-sm text-muted">Métricas, funnel y revenue del negocio.</p>
+
+      {/* Resumen ejecutivo */}
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
+        <Metric label="Leads recibidos" value={String(d.stages.recibidos)} />
+        <Metric label="Pendientes de pago" value={String(d.stages.pendientesPago)} />
+        <Metric label="Anticipos confirmados" value={String(d.stages.anticiposConfirmados)} />
+        <Metric label="En desarrollo" value={String(d.stages.enDesarrollo)} />
+        <Metric label="Entregados" value={String(d.stages.entregados)} />
+        <Metric
+          label="Vencidos SLA"
+          value={String(d.stages.vencidosSla)}
+          danger={d.stages.vencidosSla > 0}
+        />
+      </div>
+
+      {/* SLA: próximos a vencer */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_2fr]">
+        <div className="rounded-2xl border border-line bg-surface/40 p-5">
+          <p className="text-xs text-faint">Horas restantes promedio</p>
+          <p className="mt-1 font-display text-3xl font-semibold tabular-nums">
+            {d.avgRemaining !== null ? `${d.avgRemaining}h` : "—"}
+          </p>
+          <p className="mt-2 text-xs text-muted">Proyectos en desarrollo dentro del SLA 72h.</p>
+        </div>
+        <div className="rounded-2xl border border-line bg-surface/40 p-5">
+          <p className="mb-3 text-sm font-medium text-muted">Próximos a vencer</p>
+          {d.upcoming.length === 0 ? (
+            <p className="py-2 text-center text-xs text-faint">No hay proyectos activos.</p>
+          ) : (
+            <div className="space-y-2.5">
+              {d.upcoming.map((u) => {
+                const c = SLA_COLOR[u.bucket];
+                return (
+                  <div key={u.id} className="flex items-center gap-3">
+                    <span className="w-40 shrink-0 truncate text-xs" title={u.label}>
+                      {u.label}
+                    </span>
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                      <div
+                        className={`h-full rounded-full bg-gradient-to-r ${c.bar}`}
+                        style={{ width: `${Math.max(4, u.pct)}%` }}
+                      />
+                    </div>
+                    <span className={`w-28 shrink-0 text-right text-[11px] ${c.text}`}>
+                      {u.overdue ? "Fuera de SLA" : `${u.remainingH}h restantes`}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Revenue + métricas clave */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -147,11 +211,25 @@ export default function DashboardPage() {
   );
 }
 
-function Metric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Metric({
+  label,
+  value,
+  accent,
+  danger,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+  danger?: boolean;
+}) {
   return (
-    <div className="rounded-2xl border border-line bg-surface/40 p-4">
+    <div className={`rounded-2xl border bg-surface/40 p-4 ${danger ? "border-red-500/40" : "border-line"}`}>
       <p className="text-xs text-faint">{label}</p>
-      <p className={`mt-1 font-display text-xl font-semibold tabular-nums ${accent ? "text-gradient" : ""}`}>
+      <p
+        className={`mt-1 font-display text-xl font-semibold tabular-nums ${
+          danger ? "text-red-400" : accent ? "text-gradient" : ""
+        }`}
+      >
         {value}
       </p>
     </div>

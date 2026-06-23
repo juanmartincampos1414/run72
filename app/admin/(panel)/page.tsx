@@ -2,6 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { formatARS } from "@/lib/pricing";
+import {
+  ANTICIPO_LABEL,
+  anticipoState,
+  computeSla,
+  saldoState,
+} from "@/lib/sla";
+import { SlaBar } from "@/components/admin/SlaBar";
 import type { Lead, LeadStatus } from "@/lib/types";
 
 const STATUS: { value: LeadStatus; label: string }[] = [
@@ -76,6 +83,20 @@ export default function LeadsPage() {
     }
   }
 
+  // Orden inteligente: SLA vencido → menos tiempo restante → más reciente
+  const sortedLeads = useMemo(() => {
+    if (!leads) return null;
+    return leads
+      .map((l) => ({ l, sla: computeSla(l.production_started_at, l.estimated_delivery_at) }))
+      .sort((a, b) => {
+        if (a.sla.active && b.sla.active) return a.sla.remainingH - b.sla.remainingH;
+        if (a.sla.active) return -1;
+        if (b.sla.active) return 1;
+        return new Date(b.l.created_at).getTime() - new Date(a.l.created_at).getTime();
+      })
+      .map((x) => x.l);
+  }, [leads]);
+
   const metrics = useMemo(() => {
     const list = leads ?? [];
     return {
@@ -133,7 +154,7 @@ export default function LeadsPage() {
                 </td>
               </tr>
             )}
-            {leads?.map((l) => (
+            {sortedLeads?.map((l) => (
               <tr key={l.id} className="border-b border-line/60 align-top">
                 <Td className="whitespace-nowrap text-faint">
                   {new Date(l.created_at).toLocaleDateString("es-AR", {
@@ -197,10 +218,27 @@ export default function LeadsPage() {
                   )}
                 </Td>
                 <Td className="whitespace-nowrap tabular-nums">{formatARS(l.total_ars)}</Td>
-                <Td className="whitespace-nowrap tabular-nums text-muted">
-                  {formatARS(l.deposit_ars)}
-                  {l.payment_status && (
-                    <div className="text-[11px] text-emerald-400">{l.payment_status}</div>
+                <Td className="text-muted">
+                  <div className="tabular-nums">{formatARS(l.deposit_ars)}</div>
+                  <div className="mt-1 flex flex-col gap-1">
+                    <span className={`w-fit rounded-full px-2 py-0.5 text-[10px] font-medium ${ANTICIPO_LABEL[anticipoState(l)].cls}`}>
+                      {ANTICIPO_LABEL[anticipoState(l)].label}
+                    </span>
+                    <span className={`w-fit rounded-full px-2 py-0.5 text-[10px] font-medium ${saldoState(l).cls}`}>
+                      {saldoState(l).label}
+                    </span>
+                  </div>
+                  {l.payment_status === "approved" && (
+                    <div className="mt-1 text-[10px] leading-tight text-emerald-400/80">
+                      MP {l.payment_id ? `#${l.payment_id}` : ""}
+                      {l.production_started_at && (
+                        <span className="block text-faint">
+                          {new Date(l.production_started_at).toLocaleString("es-AR", {
+                            day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
+                          })}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </Td>
                 <Td>
@@ -231,6 +269,15 @@ export default function LeadsPage() {
                       </option>
                     ))}
                   </select>
+                  {l.production_started_at && l.status === "en_produccion" && (
+                    <div className="mt-2">
+                      <SlaBar
+                        startedAt={l.production_started_at}
+                        deadlineAt={l.estimated_delivery_at}
+                        compact
+                      />
+                    </div>
+                  )}
                 </Td>
                 <Td>
                   <div className="flex flex-col items-start gap-1.5">

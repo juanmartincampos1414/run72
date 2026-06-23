@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { anticipoState, computeSla } from "@/lib/sla";
 
 export const dynamic = "force-dynamic";
 
 const PAID = ["adelanto_pagado", "en_produccion", "entregado", "cobrado_completo"];
 
 type LeadRow = {
+  id: string;
   created_at: string;
   status: string;
   total_ars: number;
@@ -18,6 +20,9 @@ type LeadRow = {
   microservices_selected: Array<{ name: string }> | null;
   line_items: Array<{ name: string; price_ars: number }> | null;
   production_started_at: string | null;
+  estimated_delivery_at: string | null;
+  payment_status: string | null;
+  comprobante_status: string | null;
 };
 
 type EventRow = { event_type: string; session_id: string | null; metadata: Record<string, unknown> };
@@ -30,7 +35,7 @@ export async function GET() {
   const { data: leadsData } = await supabase
     .from("leads")
     .select(
-      "created_at, status, total_ars, deposit_ars, hot, project_label, project_type, addons, microservices_selected, line_items, production_started_at",
+      "id, created_at, status, total_ars, deposit_ars, hot, project_label, project_type, addons, microservices_selected, line_items, production_started_at, estimated_delivery_at, payment_status, comprobante_status",
     );
   const leads = (leadsData ?? []) as LeadRow[];
 
@@ -142,7 +147,50 @@ export async function GET() {
       )
     : null;
 
+  // --- Dashboard ejecutivo + SLA ---
+  const active = leads.filter((l) => l.status === "en_produccion" && l.production_started_at);
+  const activeSla = active.map((l) => ({
+    lead: l,
+    sla: computeSla(l.production_started_at, l.estimated_delivery_at),
+  }));
+  const overdue = activeSla.filter((x) => x.sla.overdue);
+  const avgRemaining = active.length
+    ? Math.round(activeSla.reduce((s, x) => s + x.sla.remainingH, 0) / active.length)
+    : null;
+
+  const stageCounts = {
+    recibidos: leads.length,
+    pendientesPago: leads.filter((l) => {
+      const a = anticipoState(l);
+      return a === "pendiente" || a === "comprobante_recibido";
+    }).length,
+    anticiposConfirmados: leads.filter((l) => {
+      const a = anticipoState(l);
+      return a === "confirmado" || a === "mercadopago";
+    }).length,
+    enDesarrollo: active.length,
+    entregados: leads.filter((l) =>
+      ["entregado", "cobrado_completo"].includes(l.status),
+    ).length,
+    vencidosSla: overdue.length,
+  };
+
+  const upcoming = activeSla
+    .sort((a, b) => a.sla.remainingH - b.sla.remainingH)
+    .slice(0, 6)
+    .map((x) => ({
+      id: x.lead.id,
+      label: x.lead.project_label ?? "Proyecto",
+      remainingH: x.sla.remainingH,
+      pct: x.sla.pct,
+      bucket: x.sla.bucket,
+      overdue: x.sla.overdue,
+    }));
+
   return NextResponse.json({
+    stages: stageCounts,
+    avgRemaining,
+    upcoming,
     revenue: { total: revenue, last7: revenue7, last30: revenue30 },
     avgTicket,
     pipeline,
