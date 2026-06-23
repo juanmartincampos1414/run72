@@ -39,8 +39,7 @@ export async function POST(req: Request) {
   if (!name) return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });
   if (!EMAIL_RE.test(email))
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
-  if (whatsapp.length < 6)
-    return NextResponse.json({ error: "El WhatsApp es obligatorio." }, { status: 400 });
+  // WhatsApp es opcional (cotizador v2): si viene, lo guardamos.
 
   const supabase = getSupabaseAdmin();
 
@@ -70,8 +69,11 @@ export async function POST(req: Request) {
     services = (data ?? []) as Service[];
   }
 
+  // Resolvemos por slug (sin exigir type='project'): en el cotizador v2 algunos
+  // tipos (crm/redes/automatizaciones) pueden seguir marcados como 'addon' en la DB.
+  // projectSlugs y addonSlugs son disjuntos, así que no hay riesgo de doble conteo.
   const projectServices = projectSlugs
-    .map((slug) => services.find((s) => s.slug === slug && s.type === "project"))
+    .map((slug) => services.find((s) => s.slug === slug))
     .filter((s): s is Service => Boolean(s));
   const addonServices = addonSlugs
     .map((slug) => services.find((s) => s.slug === slug && s.type === "addon"))
@@ -128,8 +130,8 @@ export async function POST(req: Request) {
       name,
       company: (contact.company ?? "").trim() || null,
       email,
-      whatsapp,
-      phone: whatsapp, // compatibilidad con columna previa
+      whatsapp: whatsapp || null,
+      phone: whatsapp || null, // compatibilidad con columna previa
       project_type:
         [...projectSlugs, ...(unsure ? ["unsure"] : [])].join(",") || null,
       project_label: projectLabel,

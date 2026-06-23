@@ -17,12 +17,13 @@ export const BRAND_STATUS: Option[] = [
   { value: "mejorar", label: "Tengo algo pero quiero mejorarla" },
 ];
 
+// Objetivos del cotizador v2 (deben coincidir con OBJECTIVES_V2 en lib/configurator).
 export const OBJECTIVES: Option[] = [
-  { value: "clientes", label: "Conseguir clientes" },
-  { value: "validar", label: "Validar una idea" },
-  { value: "startup", label: "Lanzar una startup" },
-  { value: "digitalizar", label: "Digitalizar mi empresa" },
-  { value: "otro", label: "Otro" },
+  { value: "vender", label: "Vender más" },
+  { value: "automatizar", label: "Automatizar procesos" },
+  { value: "lanzar", label: "Lanzar rápido" },
+  { value: "profesionalizar", label: "Profesionalizar marca" },
+  { value: "escalar", label: "Escalar" },
 ];
 
 export function labelFor(options: Option[], value: string | null): string | null {

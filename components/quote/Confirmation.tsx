@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
 import { track } from "@/lib/track";
 import { FaqAccordion } from "./FaqAccordion";
-import { DELIVERABLES, TRUST_MESSAGE } from "@/lib/content";
+import { GUARANTEE_V2 } from "@/lib/configurator";
 import type { QuoteResult } from "@/lib/types";
 import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
@@ -32,7 +32,6 @@ export function Confirmation({
   const [payMethod, setPayMethod] = useState<"mp" | "transfer">("mp");
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
-  const [scopeAccepted, setScopeAccepted] = useState(false);
 
   useEffect(() => {
     fetch("/api/config/public")
@@ -155,72 +154,20 @@ export function Confirmation({
         </div>
       </div>
 
-      {/* Qué recibirás al finalizar */}
-      <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
-        <h2 className="font-display text-lg font-semibold tracking-tight">
-          Qué recibirás al finalizar
-        </h2>
-        <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          {DELIVERABLES.map((d) => (
-            <li key={d} className="flex items-start gap-2.5 text-sm text-muted">
-              <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-cyan" strokeWidth={2.5} />
-              {d}
-            </li>
-          ))}
-        </ul>
-        <p className="mt-5 rounded-2xl border border-brand-cyan/20 bg-brand-cyan/[0.05] px-4 py-3 text-xs leading-relaxed text-muted">
-          {TRUST_MESSAGE}
-        </p>
+      {/* Garantía */}
+      <div className="mt-5 flex items-start gap-3 rounded-3xl border border-brand-cyan/25 bg-brand-cyan/[0.06] p-5">
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
+          <CheckIcon className="h-4 w-4" strokeWidth={2.5} />
+        </span>
+        <p className="text-sm font-medium leading-relaxed text-fg">{GUARANTEE_V2}</p>
       </div>
-
-      {/* Validación de alcance */}
-      {hasAmount && (
-        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
-          <h2 className="font-display text-lg font-semibold tracking-tight">
-            Validación de alcance
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">
-            RUN72 está diseñado para lanzar proyectos digitales en un plazo de 72 horas.
-            En algunos casos excepcionales, luego de revisar la información enviada,
-            podríamos determinar que el alcance solicitado requiere una complejidad,
-            volumen de trabajo o nivel de personalización incompatible con nuestro
-            modelo de ejecución rápida.
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-muted">
-            Si esto ocurriera, nos pondremos en contacto para proponer una alternativa.
-            En caso de no avanzar, cualquier pago realizado será reintegrado en su
-            totalidad.
-          </p>
-          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-ink/40 p-4">
-            <input
-              type="checkbox"
-              checked={scopeAccepted}
-              onChange={(e) => setScopeAccepted(e.target.checked)}
-              className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-brand-violet)]"
-            />
-            <span className="text-sm text-fg">
-              He leído y acepto las condiciones de validación de alcance de RUN72.
-            </span>
-          </label>
-        </div>
-      )}
 
       {/* Pago */}
       {hasAmount ? (
-        <div
-          className={`mt-5 rounded-3xl border border-line bg-surface/30 p-6 transition-opacity ${
-            scopeAccepted ? "" : "pointer-events-none opacity-50"
-          }`}
-          aria-disabled={!scopeAccepted}
-        >
+        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
           <h2 className="font-display text-lg font-semibold tracking-tight">
             Iniciá tu proyecto
           </h2>
-          {!scopeAccepted && (
-            <p className="mt-1 text-xs text-brand-cyan">
-              Aceptá las condiciones de validación de alcance para continuar.
-            </p>
-          )}
           <p className="mt-1 text-sm text-muted">
             Aboná el adelanto de{" "}
             <span className="font-medium text-fg">{formatARS(result.deposit)}</span>{" "}
@@ -249,7 +196,7 @@ export function Confirmation({
                 <button
                   type="button"
                   onClick={payWithMP}
-                  disabled={paying || !scopeAccepted}
+                  disabled={paying}
                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3.5 text-[15px] font-semibold text-ink transition-all duration-300 hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-60"
                 >
                   {paying
@@ -268,7 +215,6 @@ export function Confirmation({
                 config={config}
                 amount={result.deposit}
                 leadId={result.leadId}
-                enabled={scopeAccepted}
               />
             )}
           </div>
@@ -325,12 +271,10 @@ function TransferDetails({
   config,
   amount,
   leadId,
-  enabled,
 }: {
   config: PublicConfig | null;
   amount: number;
   leadId: string;
-  enabled: boolean;
 }) {
   const rows = [
     { label: "CBU / CVU", value: config?.bank_cbu },
@@ -344,12 +288,12 @@ function TransferDetails({
       {rows.map((r) => (
         <CopyRow key={r.label} label={r.label} value={r.value} plain={r.plain} />
       ))}
-      <ComprobanteUploader leadId={leadId} enabled={enabled} />
+      <ComprobanteUploader leadId={leadId} />
     </div>
   );
 }
 
-function ComprobanteUploader({ leadId, enabled }: { leadId: string; enabled: boolean }) {
+function ComprobanteUploader({ leadId }: { leadId: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -463,7 +407,7 @@ function ComprobanteUploader({ leadId, enabled }: { leadId: string; enabled: boo
       <button
         type="button"
         onClick={send}
-        disabled={!file || sending || !enabled}
+        disabled={!file || sending}
         className="mt-3 w-full rounded-full bg-white py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-50"
       >
         {sending ? "Enviando…" : "Enviar comprobante"}

@@ -67,11 +67,11 @@ const TIMING_SCORE: Record<string, number> = {
 };
 
 const OBJECTIVE_SCORE: Record<string, number> = {
-  startup: 10,
-  digitalizar: 10,
-  clientes: 5,
-  validar: 5,
-  otro: 3,
+  escalar: 10,
+  automatizar: 10,
+  vender: 6,
+  profesionalizar: 5,
+  lanzar: 5,
 };
 
 /** Umbral para etiquetar un lead como 🔥 caliente. */
