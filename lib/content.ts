@@ -152,8 +152,8 @@ export type Metric = {
 };
 
 export const METRICS: Metric[] = [
-  { value: "+10", label: "Años de experiencia ejecutando" },
-  { value: "+300", label: "Proyectos desarrollados" },
+  { value: "+10", label: "Años de experiencia acumulada del equipo" },
+  { value: "+300", label: "Proyectos desarrollados por el equipo" },
   { value: "12", label: "Industrias atendidas" },
   { value: "72h", label: "Tiempo de entrega" },
 ];
@@ -216,16 +216,19 @@ export const PROJECTS: Project[] = [
   },
 ];
 
-/** Lo que el cliente recibe al finalizar (checkout + landing). */
+/**
+ * Lista ÚNICA y oficial de entregables. Se muestra igual en landing
+ * (Ownership), cotizador (Paso 4) y checkout. No duplicar en otros lados.
+ */
 export const DELIVERABLES = [
-  "Proyecto terminado y funcional",
+  "Proyecto funcional listo para operar",
   "Código fuente completo",
-  "Accesos y credenciales organizadas",
-  "Configuraciones documentadas",
-  "Instrucciones para administrar el proyecto",
-  "Entrega estructurada para que cualquier proveedor pueda continuar el trabajo en el futuro",
-  "Documento maestro con toda la información del proyecto",
-  "Soporte y acompañamiento durante 30 días corridos posteriores a la entrega",
+  "Accesos y credenciales organizados",
+  "Documento maestro con configuraciones",
+  "Entrega preparada para continuidad con cualquier proveedor",
+  "30 días de soporte post-entrega",
+  "Una instancia de revisión",
+  "Capacitación básica de uso (si corresponde)",
 ] as const;
 
 export const OWNERSHIP_TITLE = "Tu proyecto es 100% tuyo";

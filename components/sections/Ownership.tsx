@@ -1,7 +1,7 @@
 import { SectionHeading } from "../ui/SectionHeading";
 import { Reveal } from "../ui/Reveal";
 import { CheckIcon } from "../icons";
-import { OWNERSHIP_TEXT, OWNERSHIP_TITLE, TRUST_MESSAGE } from "@/lib/content";
+import { OWNERSHIP_TEXT, OWNERSHIP_TITLE, TRUST_MESSAGE, DELIVERABLES } from "@/lib/content";
 
 export function Ownership() {
   return (
@@ -30,6 +30,18 @@ export function Ownership() {
               <p className="text-pretty text-base leading-relaxed text-muted">
                 {TRUST_MESSAGE}
               </p>
+            </div>
+
+            <div className="mt-7 border-t border-line pt-7">
+              <p className="text-sm font-medium tracking-tight">Qué recibís al finalizar</p>
+              <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                {DELIVERABLES.map((d) => (
+                  <li key={d} className="flex items-start gap-2.5 text-sm text-muted">
+                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-cyan" strokeWidth={2.5} />
+                    {d}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </Reveal>

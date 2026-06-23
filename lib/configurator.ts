@@ -63,18 +63,15 @@ export function labelOf(list: Choice[], value: string | null): string | null {
   return list.find((c) => c.value === value)?.label ?? value;
 }
 
-/** Entregables finales (pantalla de resumen y pago). */
-export const DELIVERABLES_V2 = [
-  "Proyecto funcional",
-  "Código / sistema entregado",
-  "Accesos y configuraciones organizadas",
-  "Documentación completa",
-  "Preview IA (si aplica)",
-  "30 días de soporte post-entrega",
-] as const;
+/**
+ * Garantía (condicionada, tono positivo). GUARANTEE_TIMING aclara cuándo
+ * arranca el plazo; GUARANTEE_V2 es la promesa de reembolso.
+ */
+export const GUARANTEE_TIMING =
+  "El plazo de 72 horas comienza una vez confirmado el anticipo y recibida toda la información, materiales y accesos necesarios por parte del cliente.";
 
 export const GUARANTEE_V2 =
-  "Si no podemos ejecutar tu proyecto en 72 horas, te devolvemos el 100% del anticipo.";
+  "Si luego de revisar tu proyecto determinamos que no puede ejecutarse dentro del alcance de RUN72, te avisamos antes de comenzar y te devolvemos el 100% del anticipo abonado.";
 
 /** Estructura del intake mínimo (todo opcional salvo lo del Paso 2). */
 export type IntakeV2 = {

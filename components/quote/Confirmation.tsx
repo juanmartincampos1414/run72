@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
 import { track } from "@/lib/track";
 import { FaqAccordion } from "./FaqAccordion";
-import { GUARANTEE_V2 } from "@/lib/configurator";
+import { GUARANTEE_V2, GUARANTEE_TIMING } from "@/lib/configurator";
 import type { QuoteResult } from "@/lib/types";
 import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
@@ -159,7 +159,10 @@ export function Confirmation({
         <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
           <CheckIcon className="h-4 w-4" strokeWidth={2.5} />
         </span>
-        <p className="text-sm font-medium leading-relaxed text-fg">{GUARANTEE_V2}</p>
+        <div>
+          <p className="text-sm font-medium leading-relaxed text-fg">{GUARANTEE_V2}</p>
+          <p className="mt-2 text-xs leading-relaxed text-muted">{GUARANTEE_TIMING}</p>
+        </div>
       </div>
 
       {/* Pago */}
@@ -225,6 +228,13 @@ export function Confirmation({
           el presupuesto final para iniciar.
         </div>
       )}
+
+      <p className="mt-4 text-center text-xs leading-relaxed text-faint">
+        Al abonar el anticipo aceptás los{" "}
+        <a href="/terminos" target="_blank" className="text-muted underline hover:text-fg">Términos y Condiciones</a>{" "}
+        y la{" "}
+        <a href="/privacidad" target="_blank" className="text-muted underline hover:text-fg">Política de Privacidad</a>.
+      </p>
 
       {/* FAQ pre-pago (administrable desde /admin/faqs) */}
       <FaqAccordion />

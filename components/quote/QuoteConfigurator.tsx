@@ -14,13 +14,14 @@ import {
   PROJECT_TYPES,
   STAGES,
   OBJECTIVES_V2,
-  DELIVERABLES_V2,
   GUARANTEE_V2,
+  GUARANTEE_TIMING,
   EMPTY_INTAKE_V2,
   buildSummary,
   type IntakeV2,
   type IconKey,
 } from "@/lib/configurator";
+import { DELIVERABLES } from "@/lib/content";
 import type { LeadFile, LineItem, Microservice, QuoteResult, Service } from "@/lib/types";
 
 const STORAGE_KEY = "run72_quote_v3";
@@ -507,7 +508,7 @@ export function QuoteConfigurator() {
 
                       <div className="mt-5 flex items-center gap-2 rounded-xl border border-brand-cyan/20 bg-brand-cyan/[0.05] px-4 py-2.5 text-sm">
                         <span className="font-medium text-fg">Tiempo de entrega:</span>
-                        <span className="text-brand-cyan">72 horas exactas</span>
+                        <span className="text-brand-cyan">72 horas</span>
                       </div>
                     </div>
 
@@ -519,14 +520,17 @@ export function QuoteConfigurator() {
                       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
                         <CheckIcon className="h-4 w-4" strokeWidth={2.5} />
                       </span>
-                      <p className="text-sm font-medium leading-relaxed text-fg">{GUARANTEE_V2}</p>
+                      <div>
+                        <p className="text-sm font-medium leading-relaxed text-fg">{GUARANTEE_V2}</p>
+                        <p className="mt-2 text-xs leading-relaxed text-muted">{GUARANTEE_TIMING}</p>
+                      </div>
                     </div>
 
                     {/* Entregables */}
                     <div className="rounded-3xl border border-line bg-surface/30 p-6">
                       <p className="text-sm font-medium tracking-tight">Qué recibís al finalizar</p>
                       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                        {DELIVERABLES_V2.map((d) => (
+                        {DELIVERABLES.map((d) => (
                           <li key={d} className="flex items-start gap-2 text-sm text-muted">
                             <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-cyan" strokeWidth={2.5} />
                             {d}
@@ -659,7 +663,7 @@ function ProjectTypeCard({
         <p className="mt-0.5 text-sm leading-relaxed text-muted">{tagline}</p>
       </div>
       <p className={`text-sm font-semibold tabular-nums ${selected ? "text-fg" : "text-muted"}`}>
-        {price === "a definir" ? "a definir" : `Desde ${price}`}
+        {price === "a definir" ? "a definir" : `Desde ${price} + IVA`}
       </p>
     </button>
   );

@@ -69,7 +69,7 @@ export function ProjectsLaunched() {
           className="mx-auto mt-16 max-w-2xl text-balance text-center font-display text-xl font-medium leading-snug tracking-tight text-muted sm:text-2xl"
         >
           Todos comenzaron como una idea.{" "}
-          <span className="text-gradient">Todos fueron ejecutados por RUN72.</span>
+          <span className="text-gradient">Ejecutados por el equipo de RUN72.</span>
         </motion.p>
       </div>
     </section>

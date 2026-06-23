@@ -66,10 +66,14 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 text-xs text-faint sm:flex-row">
           <p>© {new Date().getFullYear()} RUN72. Todos los derechos reservados.</p>
-          <p className="inline-flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet" />
-            Ejecución rápida · Negocios digitales
-          </p>
+          <div className="flex items-center gap-4">
+            <Link href="/terminos" className="transition-colors hover:text-fg">
+              Términos y Condiciones
+            </Link>
+            <Link href="/privacidad" className="transition-colors hover:text-fg">
+              Política de Privacidad
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
