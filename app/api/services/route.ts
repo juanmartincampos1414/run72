@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
-import type { Service } from "@/lib/types";
+import type { Service, Microservice } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -24,5 +24,17 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ services: (data ?? []) as Service[] });
+  // Microservicios activos (tabla puede no existir aún si no se corrió la migración)
+  let microservices: Microservice[] = [];
+  const { data: micros } = await supabase
+    .from("microservices")
+    .select("id, service_slug, group_name, slug, name, description, price_ars, active, default_on, sort_order")
+    .eq("active", true)
+    .order("sort_order", { ascending: true });
+  if (micros) microservices = micros as Microservice[];
+
+  return NextResponse.json({
+    services: (data ?? []) as Service[],
+    microservices,
+  });
 }

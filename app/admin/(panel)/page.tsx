@@ -134,6 +134,11 @@ export default function LeadsPage() {
                       {l.addons.map((a) => a.name).join(", ")}
                     </div>
                   )}
+                  {l.microservices_selected?.length > 0 && (
+                    <div className="mt-0.5 text-xs text-brand-cyan/80">
+                      +{l.microservices_selected.length} microservicios
+                    </div>
+                  )}
                   {(l.objective || l.timing) && (
                     <div className="mt-0.5 text-xs text-faint">
                       {[l.objective, l.timing].filter(Boolean).join(" · ")}

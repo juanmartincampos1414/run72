@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 const LINKS = [
   { href: "/admin", label: "Leads" },
   { href: "/admin/servicios", label: "Servicios" },
+  { href: "/admin/microservicios", label: "Microservicios" },
   { href: "/admin/configuracion", label: "Configuración" },
 ];
 

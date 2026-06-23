@@ -14,6 +14,27 @@ export type Service = {
   sort_order: number;
 };
 
+export type Microservice = {
+  id: string;
+  service_slug: string;
+  group_name: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  price_ars: number;
+  active: boolean;
+  default_on: boolean;
+  sort_order: number;
+};
+
+/** Clave compuesta para identificar un microservicio seleccionado. */
+export type SelectedMicro = {
+  service_slug: string;
+  slug: string;
+  name: string;
+  price_ars: number;
+};
+
 export type LeadStatus =
   | "nuevo"
   | "adelanto_pagado"
@@ -36,6 +57,7 @@ export type Lead = {
   objective: string | null;
   timing: string | null;
   addons: Array<{ slug: string; name: string; price_ars: number }>;
+  microservices_selected: SelectedMicro[];
   line_items: LineItem[];
   whatsapp: string | null;
   urgency_note: string | null;
@@ -65,6 +87,8 @@ export type QuoteSubmission = {
   projectTypes: string[]; // slugs de servicios 'project' (multi-select)
   brandStatus: string | null;
   addons: string[]; // slugs de servicios 'addon'
+  /** claves "service_slug:micro_slug" de microservicios activados */
+  microservices: string[];
   objective: string | null;
   timing: string | null;
   urgencyNote: string;

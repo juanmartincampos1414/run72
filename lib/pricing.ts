@@ -80,6 +80,7 @@ export const HOT_LEAD_THRESHOLD = 50;
 export function computeScore(input: {
   projectTypes: string[];
   addons: string[];
+  microservices?: string[];
   timing: string | null;
   objective: string | null;
   total: number;
@@ -87,6 +88,10 @@ export function computeScore(input: {
   let score = 0;
   for (const p of input.projectTypes) score += PROJECT_SCORE[p] ?? 10;
   for (const a of input.addons) score += ADDON_SCORE[a] ?? 0;
+  // Cada microservicio suma intención; integraciones/automatizaciones valen más
+  for (const m of input.microservices ?? []) {
+    score += /auto|integr|crm|api|suscrip/i.test(m) ? 4 : 2;
+  }
   if (input.timing) score += TIMING_SCORE[input.timing] ?? 0;
   if (input.objective) score += OBJECTIVE_SCORE[input.objective] ?? 0;
   // Bonus por ticket alto
@@ -96,13 +101,15 @@ export function computeScore(input: {
   return { score, hot: score >= HOT_LEAD_THRESHOLD };
 }
 
-/** Arma los line items (snapshot de precios) a partir de servicios de la DB. */
+/** Arma los line items (snapshot de precios) a partir de servicios + microservicios. */
 export function buildLineItems(
   projects: Service[],
   addons: Service[],
+  micros: Array<{ name: string; price_ars: number }> = [],
 ): LineItem[] {
   const items: LineItem[] = [];
   for (const p of projects) items.push({ name: p.name, price_ars: p.price_ars });
   for (const a of addons) items.push({ name: a.name, price_ars: a.price_ars });
+  for (const m of micros) items.push({ name: `↳ ${m.name}`, price_ars: m.price_ars });
   return items;
 }

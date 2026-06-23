@@ -7,10 +7,11 @@ import { Logo } from "../Logo";
 import { OptionCard } from "./OptionCard";
 import { CostPanel } from "./CostPanel";
 import { Confirmation } from "./Confirmation";
+import { MicroserviceDrawer } from "./MicroserviceDrawer";
 import { ArrowRight } from "../icons";
 import { computeTotals, formatARS } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT } from "@/lib/quote-options";
-import type { LeadFile, LineItem, QuoteResult, Service } from "@/lib/types";
+import type { LeadFile, LineItem, Microservice, QuoteResult, Service } from "@/lib/types";
 import type { Preview } from "@/app/api/preview/route";
 import { cn } from "@/lib/cn";
 
@@ -34,6 +35,7 @@ type State = {
   projectTypes: string[];
   brandStatus: string | null;
   addons: string[];
+  microservices: string[]; // claves "service_slug:slug"
   objective: string | null;
   timingSelected: boolean;
   urgencyNote: string;
@@ -47,6 +49,7 @@ const INITIAL: State = {
   projectTypes: [],
   brandStatus: null,
   addons: [],
+  microservices: [],
   objective: null,
   timingSelected: false,
   urgencyNote: "",
@@ -58,6 +61,8 @@ const INITIAL: State = {
 
 export function QuoteConfigurator() {
   const [services, setServices] = useState<Service[] | null>(null);
+  const [allMicros, setAllMicros] = useState<Microservice[]>([]);
+  const [drawerSlug, setDrawerSlug] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [state, setState] = useState<State>(INITIAL);
   const [step, setStep] = useState(0);
@@ -79,7 +84,11 @@ export function QuoteConfigurator() {
         if (!r.ok) throw new Error((await r.json()).error ?? "Error al cargar servicios");
         return r.json();
       })
-      .then((d) => alive && setServices(d.services as Service[]))
+      .then((d) => {
+        if (!alive) return;
+        setServices(d.services as Service[]);
+        setAllMicros((d.microservices ?? []) as Microservice[]);
+      })
       .catch((e) => alive && setLoadError(e.message));
     return () => {
       alive = false;
@@ -128,8 +137,32 @@ export function QuoteConfigurator() {
       const a = addonList.find((s) => s.slug === slug);
       if (a) items.push({ name: a.name, price_ars: a.price_ars });
     }
+    for (const key of state.microservices) {
+      const m = allMicros.find((x) => `${x.service_slug}:${x.slug}` === key);
+      if (m) items.push({ name: `↳ ${m.name}`, price_ars: m.price_ars });
+    }
     return items;
-  }, [state.projectTypes, state.addons, projects, addonList]);
+  }, [state.projectTypes, state.addons, state.microservices, projects, addonList, allMicros]);
+
+  const selectedMicroSet = useMemo(
+    () => new Set(state.microservices),
+    [state.microservices],
+  );
+
+  function microsFor(serviceSlug: string) {
+    return allMicros.filter((m) => m.service_slug === serviceSlug);
+  }
+  function microCountFor(serviceSlug: string) {
+    return state.microservices.filter((k) => k.startsWith(`${serviceSlug}:`)).length;
+  }
+  function toggleMicro(key: string) {
+    setState((s) => ({
+      ...s,
+      microservices: s.microservices.includes(key)
+        ? s.microservices.filter((k) => k !== key)
+        : [...s.microservices, key],
+    }));
+  }
 
   const stepValid = useMemo(() => {
     switch (step) {
@@ -193,12 +226,17 @@ export function QuoteConfigurator() {
   }
 
   function toggle(list: "projectTypes" | "addons", slug: string) {
-    setState((s) => ({
-      ...s,
-      [list]: s[list].includes(slug)
-        ? s[list].filter((x) => x !== slug)
-        : [...s[list], slug],
-    }));
+    setState((s) => {
+      const isOn = s[list].includes(slug);
+      return {
+        ...s,
+        [list]: isOn ? s[list].filter((x) => x !== slug) : [...s[list], slug],
+        // al deseleccionar un servicio, quitamos sus microservicios
+        microservices: isOn
+          ? s.microservices.filter((k) => !k.startsWith(`${slug}:`))
+          : s.microservices,
+      };
+    });
   }
 
   async function uploadFiles(fileList: FileList) {
@@ -226,6 +264,7 @@ export function QuoteConfigurator() {
           projectTypes: state.projectTypes,
           brandStatus: state.brandStatus,
           addons: state.addons,
+          microservices: state.microservices,
           objective: state.objective,
           timing: "asap",
           urgencyNote: state.urgencyNote,
@@ -252,6 +291,7 @@ export function QuoteConfigurator() {
     setStep(0);
     setResult(null);
     setPreview(null);
+    setDrawerSlug(null);
     previewFetched.current = false;
     setDir(-1);
   }
@@ -306,15 +346,23 @@ export function QuoteConfigurator() {
                   <div className="grid gap-3">
                     {!services && <SkeletonCards n={4} />}
                     {projects.map((p) => (
-                      <OptionCard
-                        key={p.slug}
-                        title={p.name}
-                        description={p.description}
-                        price={formatARS(p.price_ars)}
-                        multi
-                        selected={state.projectTypes.includes(p.slug)}
-                        onSelect={() => toggle("projectTypes", p.slug)}
-                      />
+                      <div key={p.slug}>
+                        <OptionCard
+                          title={p.name}
+                          description={p.description}
+                          price={formatARS(p.price_ars)}
+                          multi
+                          selected={state.projectTypes.includes(p.slug)}
+                          onSelect={() => toggle("projectTypes", p.slug)}
+                        />
+                        {state.projectTypes.includes(p.slug) &&
+                          microsFor(p.slug).length > 0 && (
+                            <ConfigureButton
+                              count={microCountFor(p.slug)}
+                              onClick={() => setDrawerSlug(p.slug)}
+                            />
+                          )}
+                      </div>
                     ))}
                     {services && (
                       <OptionCard
@@ -353,15 +401,23 @@ export function QuoteConfigurator() {
                   <div className="grid gap-3 sm:grid-cols-2">
                     {!services && <SkeletonCards n={6} />}
                     {addonList.map((a) => (
-                      <OptionCard
-                        key={a.slug}
-                        title={a.name}
-                        description={a.description}
-                        price={formatARS(a.price_ars)}
-                        multi
-                        selected={state.addons.includes(a.slug)}
-                        onSelect={() => toggle("addons", a.slug)}
-                      />
+                      <div key={a.slug}>
+                        <OptionCard
+                          title={a.name}
+                          description={a.description}
+                          price={formatARS(a.price_ars)}
+                          multi
+                          selected={state.addons.includes(a.slug)}
+                          onSelect={() => toggle("addons", a.slug)}
+                        />
+                        {state.addons.includes(a.slug) &&
+                          microsFor(a.slug).length > 0 && (
+                            <ConfigureButton
+                              count={microCountFor(a.slug)}
+                              onClick={() => setDrawerSlug(a.slug)}
+                            />
+                          )}
+                      </div>
                     ))}
                   </div>
                 </Step>
@@ -494,7 +550,30 @@ export function QuoteConfigurator() {
       </div>
 
       {lineItems.length > 0 && <MobileTotalBar lineItems={lineItems} />}
+
+      <MicroserviceDrawer
+        open={drawerSlug !== null}
+        serviceName={
+          [...projects, ...addonList].find((s) => s.slug === drawerSlug)?.name ?? ""
+        }
+        micros={drawerSlug ? microsFor(drawerSlug) : []}
+        selected={selectedMicroSet}
+        onToggle={toggleMicro}
+        onClose={() => setDrawerSlug(null)}
+      />
     </Shell>
+  );
+}
+
+function ConfigureButton({ count, onClick }: { count: number; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-1.5 ml-1 inline-flex items-center gap-1.5 text-xs font-medium text-brand-cyan transition-colors hover:text-fg"
+    >
+      {count > 0 ? `Configurado · ${count} microservicios` : "Configurar microservicios"} →
+    </button>
   );
 }
 

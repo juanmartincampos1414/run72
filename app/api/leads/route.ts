@@ -66,11 +66,28 @@ export async function POST(req: Request) {
     .map((slug) => services.find((s) => s.slug === slug && s.type === "addon"))
     .filter((s): s is Service => Boolean(s));
 
-  const lineItems = buildLineItems(projectServices, addonServices);
+  // --- Microservicios: resolver precios desde la DB (claves "service_slug:slug") ---
+  const microKeys = Array.isArray(body.microservices) ? body.microservices : [];
+  let selectedMicros: Array<{ service_slug: string; slug: string; name: string; price_ars: number }> = [];
+  if (microKeys.length > 0) {
+    const microSlugs = microKeys.map((k) => k.split(":")[1]).filter(Boolean);
+    const { data: micros } = await supabase
+      .from("microservices")
+      .select("service_slug, slug, name, price_ars")
+      .in("slug", microSlugs)
+      .eq("active", true);
+    const wanted = new Set(microKeys);
+    selectedMicros = (micros ?? []).filter((m) =>
+      wanted.has(`${m.service_slug}:${m.slug}`),
+    );
+  }
+
+  const lineItems = buildLineItems(projectServices, addonServices, selectedMicros);
   const { subtotal, iva, total, deposit, balance } = computeTotals(lineItems, depositPercent);
   const { score, hot } = computeScore({
     projectTypes: (Array.isArray(body.projectTypes) ? body.projectTypes : []).filter(Boolean),
     addons: addonServices.map((a) => a.slug),
+    microservices: selectedMicros.map((m) => m.slug),
     timing: body.timing,
     objective: body.objective,
     total,
@@ -103,6 +120,7 @@ export async function POST(req: Request) {
       urgency_note: (body.urgencyNote ?? "").trim() || null,
       files,
       addons: addonServices.map((a) => ({ slug: a.slug, name: a.name, price_ars: a.price_ars })),
+      microservices_selected: selectedMicros,
       line_items: lineItems,
       subtotal_ars: subtotal,
       iva_ars: iva,
