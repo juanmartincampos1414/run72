@@ -3,6 +3,8 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { buildLineItems, computeComplexity, computeScore, computeTotals } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
 import { logEvent } from "@/lib/audit";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { extractPath } from "@/lib/storage";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +15,14 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase no configurado." }, { status: 503 });
   }
+
+  const limited = await enforceRateLimit({
+    req,
+    supabase: getSupabaseAdmin(),
+    endpoint: "/api/leads",
+    limit: 10,
+  });
+  if (limited) return limited;
 
   let body: QuoteSubmission;
   try {
@@ -107,7 +117,11 @@ export async function POST(req: Request) {
   ];
   const projectLabel = labels.length > 0 ? labels.join(" + ") : null;
 
-  const files: LeadFile[] = Array.isArray(body.files) ? body.files.slice(0, 20) : [];
+  // Persistimos el PATH del objeto (no la URL firmada, que expira). El admin
+  // re-firma al mostrar. Compatibilidad: si llega una URL, extraemos el path.
+  const files: LeadFile[] = (Array.isArray(body.files) ? body.files.slice(0, 20) : []).map(
+    (f) => ({ name: f.name, type: f.type, url: f.path ?? extractPath(f.url) ?? f.url }),
+  );
 
   // --- Insertar lead ---
   const insertRow: Record<string, unknown> = {

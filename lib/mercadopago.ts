@@ -3,7 +3,53 @@
  * El access token se lee de la config (DB), nunca se expone al cliente.
  */
 
+import crypto from "node:crypto";
+
 const MP_API = "https://api.mercadopago.com";
+
+export type SignatureCheck = { valid: boolean; reason?: string };
+
+/**
+ * Valida la firma del webhook de MercadoPago según la guía oficial.
+ * Manifest: `id:<data.id>;request-id:<x-request-id>;ts:<ts>;`
+ * HMAC-SHA256 con la clave secreta → debe coincidir con v1 del header x-signature.
+ */
+export function verifyWebhookSignature(opts: {
+  secret: string;
+  xSignature: string | null;
+  xRequestId: string | null;
+  dataId: string | null;
+}): SignatureCheck {
+  const { secret, xSignature, xRequestId, dataId } = opts;
+  if (!xSignature) return { valid: false, reason: "missing_x_signature" };
+  if (!dataId) return { valid: false, reason: "missing_data_id" };
+
+  // x-signature: "ts=1700000000,v1=abc123..."
+  let ts: string | null = null;
+  let v1: string | null = null;
+  for (const part of xSignature.split(",")) {
+    const [k, v] = part.split("=").map((s) => s.trim());
+    if (k === "ts") ts = v;
+    else if (k === "v1") v1 = v;
+  }
+  if (!ts || !v1) return { valid: false, reason: "malformed_x_signature" };
+
+  // data.id alfanumérico debe ir en minúsculas (recomendación oficial).
+  const id = /^\d+$/.test(dataId) ? dataId : dataId.toLowerCase();
+  const manifest = `id:${id};request-id:${xRequestId ?? ""};ts:${ts};`;
+  const expected = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
+
+  try {
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(v1, "hex");
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+      return { valid: false, reason: "hash_mismatch" };
+    }
+    return { valid: true };
+  } catch {
+    return { valid: false, reason: "compare_error" };
+  }
+}
 
 export type MPPreference = {
   id: string;

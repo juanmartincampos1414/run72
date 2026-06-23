@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { generateLeadPreview } from "@/lib/preview-gen";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -11,6 +12,14 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase no configurado." }, { status: 503 });
   }
+
+  const limited = await enforceRateLimit({
+    req,
+    supabase: getSupabaseAdmin(),
+    endpoint: "/api/preview/generate",
+    limit: 5,
+  });
+  if (limited) return limited;
 
   let leadId: string | undefined;
   try {

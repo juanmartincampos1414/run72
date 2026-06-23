@@ -117,7 +117,14 @@ export type Faq = {
   active: boolean;
 };
 
-export type LeadFile = { name: string; url: string; type: string };
+export type LeadFile = {
+  name: string;
+  /** URL para mostrar (firmada en bucket privado). Al persistir guardamos el path. */
+  url: string;
+  type: string;
+  /** Path del objeto dentro del bucket (para re-firmar). */
+  path?: string;
+};
 
 /** Payload que envía el configurador al crear un lead. */
 export type QuoteSubmission = {

@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
-import { getPayment } from "@/lib/mercadopago";
+import { getPayment, verifyWebhookSignature } from "@/lib/mercadopago";
 import { activateProduction } from "@/lib/activation";
+import { logEvent } from "@/lib/audit";
+import { clientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -12,13 +14,14 @@ export const dynamic = "force-dynamic";
  * Siempre responde 200 para evitar reintentos infinitos.
  */
 export async function POST(req: Request) {
+  const ip = clientIp(req);
   try {
     if (!isSupabaseConfigured()) return NextResponse.json({ ok: true });
 
     const url = new URL(req.url);
+    const dataIdParam = url.searchParams.get("data.id"); // el que firma MercadoPago
     let type = url.searchParams.get("type") ?? url.searchParams.get("topic");
-    let paymentId =
-      url.searchParams.get("data.id") ?? url.searchParams.get("id");
+    let paymentId = dataIdParam ?? url.searchParams.get("id");
 
     // Algunos eventos llegan en el body
     try {
@@ -32,6 +35,31 @@ export async function POST(req: Request) {
     // Solo nos interesan notificaciones de pago
     if (!paymentId || (type && !`${type}`.includes("payment"))) {
       return NextResponse.json({ ok: true });
+    }
+
+    // --- Validación de firma (oficial MP). Solo se activa si hay secreto configurado. ---
+    const secret = process.env.MP_WEBHOOK_SECRET;
+    if (secret) {
+      const xRequestId = req.headers.get("x-request-id");
+      const check = verifyWebhookSignature({
+        secret,
+        xSignature: req.headers.get("x-signature"),
+        xRequestId,
+        dataId: dataIdParam ?? `${paymentId}`,
+      });
+      if (!check.valid) {
+        const supabase = getSupabaseAdmin();
+        await logEvent(supabase, "webhook_signature_invalid", null, {
+          ip,
+          endpoint: "/api/payments/webhook",
+          reason: check.reason,
+          request_id: xRequestId,
+          payment_id: `${paymentId}`,
+        });
+        console.warn(`[webhook] firma inválida (${check.reason}) ip=${ip} payment=${paymentId}`);
+        // Nunca procesamos un pago con firma inválida.
+        return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
+      }
     }
 
     const config = await getConfig();
@@ -53,8 +81,18 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true });
-  } catch {
-    // Nunca devolvemos error: evitamos reintentos en loop de MP
+  } catch (e) {
+    // Registramos el error pero devolvemos 200: evitamos reintentos en loop de MP.
+    try {
+      await logEvent(getSupabaseAdmin(), "unexpected_error", null, {
+        ip,
+        endpoint: "/api/payments/webhook",
+        message: e instanceof Error ? e.message : "error",
+      });
+    } catch {
+      /* logging best-effort */
+    }
+    console.error("[webhook] error inesperado", e);
     return NextResponse.json({ ok: true });
   }
 }

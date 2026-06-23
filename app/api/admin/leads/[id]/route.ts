@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { activateProduction } from "@/lib/activation";
 import { logEvent } from "@/lib/audit";
+import { signOne } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,14 @@ export async function GET(
 
   const { data: lead, error } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
   if (error || !lead) return NextResponse.json({ error: "Lead no encontrado." }, { status: 404 });
+
+  // Bucket privado: firmamos comprobante y adjuntos para que el admin pueda verlos.
+  lead.comprobante_url = await signOne(lead.comprobante_url);
+  if (Array.isArray(lead.files)) {
+    lead.files = await Promise.all(
+      lead.files.map(async (f: { url: string }) => ({ ...f, url: (await signOne(f.url)) ?? f.url })),
+    );
+  }
 
   const { data: versions } = await supabase
     .from("preview_versions")
