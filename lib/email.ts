@@ -31,14 +31,21 @@ export async function sendEmail(opts: {
 }
 
 /** Email automático de inicio de proyecto (72 horas). */
-export async function sendProjectStartedEmail(lead: Lead, startedAt: Date): Promise<boolean> {
+export async function sendProjectStartedEmail(
+  lead: Lead,
+  startedAt: Date,
+  deliveryAt?: Date,
+): Promise<boolean> {
   if (!lead.email) return false;
 
-  const when = startedAt.toLocaleString("es-AR", {
-    dateStyle: "full",
-    timeStyle: "short",
-    timeZone: "America/Argentina/Buenos_Aires",
-  });
+  const fmt = (d: Date) =>
+    d.toLocaleString("es-AR", {
+      dateStyle: "full",
+      timeStyle: "short",
+      timeZone: "America/Argentina/Buenos_Aires",
+    });
+  const when = fmt(startedAt);
+  const delivery = fmt(deliveryAt ?? new Date(startedAt.getTime() + 72 * 60 * 60 * 1000));
 
   const html = `
   <div style="font-family:system-ui,sans-serif;background:#050505;color:#f5f6f8;padding:32px;border-radius:16px;max-width:560px;margin:auto">
@@ -52,6 +59,8 @@ export async function sendProjectStartedEmail(lead: Lead, startedAt: Date): Prom
       <p style="margin:0;font-weight:600">${lead.project_label ?? "Proyecto RUN72"}</p>
       <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Inicio</p>
       <p style="margin:0;font-weight:600">${when}</p>
+      <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Entrega estimada (72 h)</p>
+      <p style="margin:0;font-weight:600">${delivery}</p>
     </div>
     <p style="font-size:18px;font-weight:600;background:linear-gradient(110deg,#38bdf8,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">
       Las 72 horas de ejecución han comenzado.

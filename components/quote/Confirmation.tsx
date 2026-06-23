@@ -29,6 +29,7 @@ export function Confirmation({
   const [payMethod, setPayMethod] = useState<"mp" | "transfer">("mp");
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
+  const [scopeAccepted, setScopeAccepted] = useState(false);
 
   useEffect(() => {
     fetch("/api/config/public")
@@ -150,12 +151,54 @@ export function Confirmation({
         </div>
       </div>
 
+      {/* Validación de alcance */}
+      {hasAmount && (
+        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Validación de alcance
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            RUN72 está diseñado para lanzar proyectos digitales en un plazo de 72 horas.
+            En algunos casos excepcionales, luego de revisar la información enviada,
+            podríamos determinar que el alcance solicitado requiere una complejidad,
+            volumen de trabajo o nivel de personalización incompatible con nuestro
+            modelo de ejecución rápida.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            Si esto ocurriera, nos pondremos en contacto para proponer una alternativa.
+            En caso de no avanzar, cualquier pago realizado será reintegrado en su
+            totalidad.
+          </p>
+          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-ink/40 p-4">
+            <input
+              type="checkbox"
+              checked={scopeAccepted}
+              onChange={(e) => setScopeAccepted(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-brand-violet)]"
+            />
+            <span className="text-sm text-fg">
+              He leído y acepto las condiciones de validación de alcance de RUN72.
+            </span>
+          </label>
+        </div>
+      )}
+
       {/* Pago */}
       {hasAmount ? (
-        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
+        <div
+          className={`mt-5 rounded-3xl border border-line bg-surface/30 p-6 transition-opacity ${
+            scopeAccepted ? "" : "pointer-events-none opacity-50"
+          }`}
+          aria-disabled={!scopeAccepted}
+        >
           <h2 className="font-display text-lg font-semibold tracking-tight">
             Iniciá tu proyecto
           </h2>
+          {!scopeAccepted && (
+            <p className="mt-1 text-xs text-brand-cyan">
+              Aceptá las condiciones de validación de alcance para continuar.
+            </p>
+          )}
           <p className="mt-1 text-sm text-muted">
             Aboná el adelanto de{" "}
             <span className="font-medium text-fg">{formatARS(result.deposit)}</span>{" "}
@@ -184,7 +227,7 @@ export function Confirmation({
                 <button
                   type="button"
                   onClick={payWithMP}
-                  disabled={paying}
+                  disabled={paying || !scopeAccepted}
                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3.5 text-[15px] font-semibold text-ink transition-all duration-300 hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-60"
                 >
                   {paying
@@ -199,7 +242,12 @@ export function Confirmation({
                 </p>
               </div>
             ) : (
-              <TransferDetails config={config} amount={result.deposit} />
+              <TransferDetails
+                config={config}
+                amount={result.deposit}
+                leadId={result.leadId}
+                enabled={scopeAccepted}
+              />
             )}
           </div>
         </div>
@@ -251,9 +299,13 @@ function MethodTab({
 function TransferDetails({
   config,
   amount,
+  leadId,
+  enabled,
 }: {
   config: PublicConfig | null;
   amount: number;
+  leadId: string;
+  enabled: boolean;
 }) {
   const rows = [
     { label: "CBU / CVU", value: config?.bank_cbu },
@@ -267,10 +319,126 @@ function TransferDetails({
       {rows.map((r) => (
         <CopyRow key={r.label} label={r.label} value={r.value} plain={r.plain} />
       ))}
-      <p className="mt-1 rounded-xl border border-brand-cyan/25 bg-brand-cyan/[0.06] px-4 py-3 text-xs leading-relaxed text-fg">
-        Una vez realizada la transferencia, debés enviar el comprobante a{" "}
-        <span className="font-medium">hola@run72.app</span> para iniciar el proyecto.
-      </p>
+      <ComprobanteUploader leadId={leadId} enabled={enabled} />
+    </div>
+  );
+}
+
+function ComprobanteUploader({ leadId, enabled }: { leadId: string; enabled: boolean }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function pick(f: File | null) {
+    setError(null);
+    if (!f) return;
+    const ok = ["image/jpeg", "image/png", "application/pdf"].includes(f.type);
+    if (!ok) {
+      setError("Formato no permitido. Subí JPG, PNG o PDF.");
+      return;
+    }
+    setFile(f);
+    setPreviewUrl(f.type.startsWith("image/") ? URL.createObjectURL(f) : null);
+  }
+
+  async function send() {
+    if (!file) return;
+    setSending(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append("leadId", leadId);
+      form.append("file", file);
+      const res = await fetch("/api/leads/comprobante", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "No se pudo enviar el comprobante.");
+      setSent(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error inesperado.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  if (sent) {
+    return (
+      <div className="mt-2 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+        <CheckIcon className="h-5 w-5 text-emerald-400" strokeWidth={2.5} />
+        <div>
+          <p className="text-sm font-medium text-emerald-300">Comprobante recibido</p>
+          <p className="text-xs text-muted">
+            Lo validamos y, al aprobarlo, tu proyecto entra a producción.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2">
+      <p className="mb-2 text-sm font-medium">Adjuntá tu comprobante</p>
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          pick(e.dataTransfer.files?.[0] ?? null);
+        }}
+        className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border border-dashed px-4 py-6 text-center transition-colors ${
+          dragOver ? "border-brand-cyan bg-brand-cyan/[0.06]" : "border-line-strong bg-surface/40 hover:bg-surface-2/60"
+        }`}
+      >
+        <span className="text-sm font-medium">Arrastrá o hacé clic para subir</span>
+        <span className="text-xs text-faint">JPG, PNG o PDF</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,application/pdf"
+          className="hidden"
+          onChange={(e) => pick(e.target.files?.[0] ?? null)}
+        />
+      </label>
+
+      {file && (
+        <div className="mt-3 flex items-center gap-3 rounded-xl border border-line bg-ink/40 p-3">
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={previewUrl} alt="Comprobante" className="h-12 w-12 rounded-lg object-cover" />
+          ) : (
+            <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-white/[0.06] text-xs text-muted">
+              PDF
+            </span>
+          )}
+          <span className="min-w-0 flex-1 truncate text-sm text-fg">{file.name}</span>
+          <button
+            type="button"
+            onClick={() => {
+              setFile(null);
+              setPreviewUrl(null);
+            }}
+            className="shrink-0 text-xs text-faint hover:text-red-300"
+          >
+            Quitar
+          </button>
+        </div>
+      )}
+
+      {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+
+      <button
+        type="button"
+        onClick={send}
+        disabled={!file || sending || !enabled}
+        className="mt-3 w-full rounded-full bg-white py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-50"
+      >
+        {sending ? "Enviando…" : "Enviar comprobante"}
+      </button>
     </div>
   );
 }

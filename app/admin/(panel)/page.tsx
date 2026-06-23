@@ -6,6 +6,11 @@ import type { Lead, LeadStatus } from "@/lib/types";
 
 const STATUS: { value: LeadStatus; label: string }[] = [
   { value: "nuevo", label: "Nuevo" },
+  { value: "pendiente_validacion", label: "Pendiente de validación" },
+  { value: "validado", label: "Validado" },
+  { value: "rechazado_alcance", label: "Rechazado por alcance" },
+  { value: "esperando_pago", label: "Esperando pago" },
+  { value: "comprobante_recibido", label: "Comprobante recibido" },
   { value: "adelanto_pagado", label: "Adelanto pagado" },
   { value: "en_produccion", label: "En producción" },
   { value: "entregado", label: "Entregado" },
@@ -14,6 +19,11 @@ const STATUS: { value: LeadStatus; label: string }[] = [
 
 const STATUS_COLOR: Record<LeadStatus, string> = {
   nuevo: "text-muted",
+  pendiente_validacion: "text-muted",
+  validado: "text-brand-cyan",
+  rechazado_alcance: "text-red-300",
+  esperando_pago: "text-amber-300",
+  comprobante_recibido: "text-brand-cyan",
   adelanto_pagado: "text-brand-cyan",
   en_produccion: "text-amber-300",
   entregado: "text-violet-300",
@@ -52,6 +62,18 @@ export default function LeadsPage() {
     if (!confirm("¿Eliminar este lead?")) return;
     setLeads((prev) => (prev ? prev.filter((l) => l.id !== id) : prev));
     await fetch(`/api/admin/leads/${id}`, { method: "DELETE" });
+  }
+
+  async function doAction(id: string, action: string, reason?: string) {
+    const r = await fetch(`/api/admin/leads/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, reason }),
+    });
+    if (r.ok) {
+      const { lead } = await r.json();
+      setLeads((prev) => (prev ? prev.map((l) => (l.id === id ? lead : l)) : prev));
+    }
   }
 
   const metrics = useMemo(() => {
@@ -188,6 +210,14 @@ export default function LeadsPage() {
                       🔥
                     </span>
                   )}
+                  {l.requires_manual_review && (
+                    <div
+                      className="mt-1 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-300"
+                      title={`Complexity score: ${l.complexity_score}`}
+                    >
+                      ⚠ Requiere revisión
+                    </div>
+                  )}
                 </Td>
                 <Td>
                   <select
@@ -203,12 +233,59 @@ export default function LeadsPage() {
                   </select>
                 </Td>
                 <Td>
-                  <button
-                    onClick={() => remove(l.id)}
-                    className="text-xs text-faint transition-colors hover:text-red-300"
-                  >
-                    Eliminar
-                  </button>
+                  <div className="flex flex-col items-start gap-1.5">
+                    {l.comprobante_url && (
+                      <a
+                        href={l.comprobante_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-brand-cyan hover:underline"
+                        title={
+                          l.comprobante_uploaded_at
+                            ? new Date(l.comprobante_uploaded_at).toLocaleString("es-AR")
+                            : undefined
+                        }
+                      >
+                        📄 Comprobante{l.comprobante_status ? ` (${l.comprobante_status})` : ""}
+                      </a>
+                    )}
+                    {l.comprobante_status === "recibido" && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => doAction(l.id, "approve_payment")}
+                          className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-medium text-emerald-300 hover:bg-emerald-500/25"
+                        >
+                          Aprobar pago
+                        </button>
+                        <button
+                          onClick={() => doAction(l.id, "reject_payment")}
+                          className="rounded-full bg-red-500/15 px-2.5 py-1 text-[11px] font-medium text-red-300 hover:bg-red-500/25"
+                        >
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
+                    {l.rejection_reason && (
+                      <span className="max-w-[160px] truncate text-[11px] text-red-300" title={l.rejection_reason}>
+                        ⛔ {l.rejection_reason}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => {
+                        const reason = prompt("Motivo del rechazo por alcance:");
+                        if (reason !== null) doAction(l.id, "reject_scope", reason);
+                      }}
+                      className="text-[11px] text-faint hover:text-amber-300"
+                    >
+                      Rechazar por alcance
+                    </button>
+                    <button
+                      onClick={() => remove(l.id)}
+                      className="text-[11px] text-faint transition-colors hover:text-red-300"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </Td>
               </tr>
             ))}

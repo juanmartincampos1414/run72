@@ -22,13 +22,22 @@ export async function activateProduction(
   if (typed.production_started_at) return; // ya activado
 
   const startedAt = new Date();
-  await supabase
-    .from("leads")
-    .update({
-      status: "en_produccion",
-      production_started_at: startedAt.toISOString(),
-    })
-    .eq("id", leadId);
+  const deliveryAt = new Date(startedAt.getTime() + 72 * 60 * 60 * 1000);
 
-  await sendProjectStartedEmail({ ...typed, status: "en_produccion" }, startedAt);
+  // Update resiliente: si estimated_delivery_at no existe aún, actualiza sin ese campo.
+  const full = {
+    status: "en_produccion",
+    production_started_at: startedAt.toISOString(),
+    estimated_delivery_at: deliveryAt.toISOString(),
+    comprobante_status: typed.comprobante_url ? "aprobado" : typed.comprobante_status,
+  };
+  const res = await supabase.from("leads").update(full).eq("id", leadId);
+  if (res.error && /column|does not exist|schema cache/i.test(res.error.message)) {
+    await supabase
+      .from("leads")
+      .update({ status: "en_produccion", production_started_at: startedAt.toISOString() })
+      .eq("id", leadId);
+  }
+
+  await sendProjectStartedEmail({ ...typed, status: "en_produccion" }, startedAt, deliveryAt);
 }

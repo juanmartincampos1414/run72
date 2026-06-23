@@ -101,6 +101,37 @@ export function computeScore(input: {
   return { score, hot: score >= HOT_LEAD_THRESHOLD };
 }
 
+/* ------------------------------------------------------------------ *
+ * Complexity score — independiente del lead score.
+ * Detecta proyectos incompatibles con ejecución realista en 72h.
+ * ------------------------------------------------------------------ */
+export const COMPLEXITY_THRESHOLD = 22;
+
+const COMPLEX_PROJECTS: Record<string, number> = {
+  plataforma: 8,
+  ecommerce: 5,
+  sitio: 2,
+  landing: 1,
+};
+
+export function computeComplexity(input: {
+  projectTypes: string[];
+  addons: string[];
+  microservices: string[]; // slugs
+}): { score: number; requiresReview: boolean } {
+  let score = 0;
+  for (const p of input.projectTypes) score += COMPLEX_PROJECTS[p] ?? 2;
+  score += input.addons.length * 2;
+  score += input.microservices.length; // cada microservicio suma volumen
+  // Integraciones / automatizaciones agregan complejidad técnica
+  for (const m of input.microservices) {
+    if (/integr|api|auto|crm|suscrip|pasarela|sync/i.test(m)) score += 3;
+  }
+  if (input.addons.includes("automatizaciones")) score += 4;
+  if (input.addons.includes("crm")) score += 3;
+  return { score, requiresReview: score > COMPLEXITY_THRESHOLD };
+}
+
 /** Arma los line items (snapshot de precios) a partir de servicios + microservicios. */
 export function buildLineItems(
   projects: Service[],

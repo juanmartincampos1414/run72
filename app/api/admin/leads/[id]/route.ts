@@ -7,13 +7,18 @@ export const dynamic = "force-dynamic";
 
 const STATES = [
   "nuevo",
+  "pendiente_validacion",
+  "validado",
+  "rechazado_alcance",
+  "esperando_pago",
+  "comprobante_recibido",
   "adelanto_pagado",
   "en_produccion",
   "entregado",
   "cobrado_completo",
 ];
 
-/** Cambia el estado del lead en el pipeline. */
+/** Cambia el estado / ejecuta acciones sobre el lead. */
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -23,14 +28,52 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json().catch(() => ({}));
+  const supabase = getSupabaseAdmin();
 
+  // --- Acciones de cobro / alcance ---
+  if (body.action) {
+    if (body.action === "approve_payment") {
+      // Comprobante aprobado → adelanto pagado + producción + email
+      await supabase
+        .from("leads")
+        .update({ comprobante_status: "aprobado" })
+        .eq("id", id);
+      await activateProduction(supabase, id);
+      const { data } = await supabase.from("leads").select("*").eq("id", id).single();
+      return NextResponse.json({ lead: data });
+    }
+    if (body.action === "reject_payment") {
+      const { data, error } = await supabase
+        .from("leads")
+        .update({ comprobante_status: "rechazado", status: "esperando_pago" })
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ lead: data });
+    }
+    if (body.action === "reject_scope") {
+      const { data, error } = await supabase
+        .from("leads")
+        .update({
+          status: "rechazado_alcance",
+          rejection_reason: (body.reason ?? "").trim() || "Alcance incompatible con 72h",
+        })
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ lead: data });
+    }
+    return NextResponse.json({ error: "Acción inválida." }, { status: 400 });
+  }
+
+  // --- Cambio de estado manual ---
   if (!body.status || !STATES.includes(body.status)) {
     return NextResponse.json({ error: "Estado inválido." }, { status: 400 });
   }
 
-  const supabase = getSupabaseAdmin();
-
-  // Transferencia validada por el admin → activar producción (estado + email)
+  // Pasar a producción dispara la activación (estado + email)
   if (body.status === "en_produccion") {
     await activateProduction(supabase, id);
     const { data } = await supabase.from("leads").select("*").eq("id", id).single();

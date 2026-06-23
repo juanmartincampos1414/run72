@@ -37,6 +37,11 @@ export type SelectedMicro = {
 
 export type LeadStatus =
   | "nuevo"
+  | "pendiente_validacion"
+  | "validado"
+  | "rechazado_alcance"
+  | "esperando_pago"
+  | "comprobante_recibido"
   | "adelanto_pagado"
   | "en_produccion"
   | "entregado"
@@ -78,6 +83,16 @@ export type Lead = {
   payment_id: string | null;
   payment_status: string | null;
   production_started_at: string | null;
+  // Fase B
+  comprobante_url: string | null;
+  comprobante_name: string | null;
+  comprobante_status: string | null;
+  comprobante_uploaded_at: string | null;
+  complexity_score: number;
+  requires_manual_review: boolean;
+  scope_accepted: boolean;
+  rejection_reason: string | null;
+  estimated_delivery_at: string | null;
 };
 
 export type LeadFile = { name: string; url: string; type: string };

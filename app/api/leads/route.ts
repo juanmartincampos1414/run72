@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
-import { buildLineItems, computeScore, computeTotals } from "@/lib/pricing";
+import { buildLineItems, computeComplexity, computeScore, computeTotals } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
 
@@ -84,13 +84,19 @@ export async function POST(req: Request) {
 
   const lineItems = buildLineItems(projectServices, addonServices, selectedMicros);
   const { subtotal, iva, total, deposit, balance } = computeTotals(lineItems, depositPercent);
+  const projectSlugsAll = (Array.isArray(body.projectTypes) ? body.projectTypes : []).filter(Boolean);
   const { score, hot } = computeScore({
-    projectTypes: (Array.isArray(body.projectTypes) ? body.projectTypes : []).filter(Boolean),
+    projectTypes: projectSlugsAll,
     addons: addonServices.map((a) => a.slug),
     microservices: selectedMicros.map((m) => m.slug),
     timing: body.timing,
     objective: body.objective,
     total,
+  });
+  const { score: complexityScore, requiresReview } = computeComplexity({
+    projectTypes: projectSlugsAll,
+    addons: addonServices.map((a) => a.slug),
+    microservices: selectedMicros.map((m) => m.slug),
   });
 
   const unsure = (Array.isArray(body.projectTypes) ? body.projectTypes : []).includes("unsure");
@@ -133,17 +139,30 @@ export async function POST(req: Request) {
         typeof body.previewRating === "number" ? body.previewRating : null,
       preview_comments: (body.previewComments ?? "").trim() || null,
   };
-  // Solo referenciamos la columna nueva si hay microservicios (evita romper
-  // si la migración de Fase A todavía no se corrió).
-  if (selectedMicros.length > 0) {
-    insertRow.microservices_selected = selectedMicros;
-  }
+  // Campos de fases nuevas (pueden no existir si la migración no se corrió).
+  const extraRow: Record<string, unknown> = {};
+  if (selectedMicros.length > 0) extraRow.microservices_selected = selectedMicros;
+  extraRow.complexity_score = complexityScore;
+  extraRow.requires_manual_review = requiresReview;
 
-  const { data: lead, error: insertError } = await supabase
-    .from("leads")
-    .insert(insertRow)
-    .select("id")
-    .single();
+  // Insert resiliente: si una columna nueva no existe todavía, reintenta sin extras.
+  let lead: { id: string } | null = null;
+  let insertError: { message: string } | null = null;
+  {
+    const res = await supabase
+      .from("leads")
+      .insert({ ...insertRow, ...extraRow })
+      .select("id")
+      .single();
+    if (res.error && /column|does not exist|schema cache/i.test(res.error.message)) {
+      const retry = await supabase.from("leads").insert(insertRow).select("id").single();
+      lead = retry.data;
+      insertError = retry.error;
+    } else {
+      lead = res.data;
+      insertError = res.error;
+    }
+  }
 
   if (insertError || !lead) {
     return NextResponse.json(
