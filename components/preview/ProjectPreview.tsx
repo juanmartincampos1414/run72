@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Logo } from "../Logo";
-import { CheckIcon, BoltIcon } from "../icons";
+import { CheckIcon, BoltIcon, MailIcon } from "../icons";
 import { cn } from "@/lib/cn";
+import { SITE } from "@/lib/content";
 import type { ProjectPreview as Preview } from "@/lib/types";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -98,10 +99,13 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
         )}
 
         {state === "error" && (
-          <Centered
-            title="No pudimos generar la vista previa"
-            text="Probá recargar la página en un momento. Tu proyecto ya está en marcha igual."
-          />
+          <div className="mx-auto max-w-3xl">
+            <Centered
+              title="Tu proyecto ya está en marcha"
+              text="Estamos terminando de preparar tu vista previa. Si no aparece en un rato, podés recargar la página."
+            />
+            <Reassurance />
+          </div>
         )}
 
         {state === "ready" && preview && (
@@ -120,6 +124,8 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
               </h1>
               <p className="mt-3 max-w-xl text-pretty text-muted">{preview.interpretation}</p>
             </div>
+
+            <Reassurance />
 
             {/* Detectado / incluido */}
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -223,6 +229,37 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
           </motion.div>
         )}
       </main>
+    </div>
+  );
+}
+
+/** Bloque que le da tranquilidad al cliente: está todo ok, no tiene que hacer nada más. */
+function Reassurance() {
+  return (
+    <div className="mt-8 rounded-3xl border border-brand-cyan/25 bg-brand-cyan/[0.06] p-6">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
+          <CheckIcon className="h-4 w-4" strokeWidth={2.5} />
+        </span>
+        <div>
+          <p className="font-display text-lg font-semibold tracking-tight">¡Listo! Recibimos todo.</p>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
+            Tu proyecto ya está en marcha. <span className="text-fg">No tenés que hacer nada más</span>:
+            nuestro equipo se pone a trabajar y, si necesitamos algo, te contactamos al dato que
+            dejaste.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            ¿Tenés alguna duda? Escribinos a{" "}
+            <a
+              href={`mailto:${SITE.email}`}
+              className="inline-flex items-center gap-1.5 font-medium text-brand-cyan hover:underline"
+            >
+              <MailIcon className="h-4 w-4" />
+              {SITE.email}
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -37,8 +37,16 @@ export async function POST(req: Request) {
   const { data: lead } = await supabase.from("leads").select("*").eq("id", leadId).maybeSingle();
   if (!lead) return NextResponse.json({ error: "Proyecto no encontrado." }, { status: 404 });
 
-  const paid = PAID.includes(lead.status) || lead.comprobante_status === "aprobado";
-  if (!paid) return NextResponse.json({ paid: false });
+  // Elegible para ver el preview: pagó por MercadoPago, el comprobante de
+  // transferencia ya fue aprobado, o al menos ya subió el comprobante
+  // (transferencia en validación). Para transferencia no esperamos la
+  // confirmación manual: el cliente ve su preview apenas envía el comprobante.
+  const eligible =
+    PAID.includes(lead.status) ||
+    lead.comprobante_status === "aprobado" ||
+    lead.comprobante_status === "recibido" ||
+    lead.status === "comprobante_recibido";
+  if (!eligible) return NextResponse.json({ paid: false });
 
   try {
     const { preview } = await generateLeadPreview(supabase, lead);
