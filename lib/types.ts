@@ -88,6 +88,7 @@ export type Lead = {
   comprobante_name: string | null;
   comprobante_status: string | null;
   comprobante_uploaded_at: string | null;
+  comprobante_observaciones: string | null;
   complexity_score: number;
   requires_manual_review: boolean;
   scope_accepted: boolean;

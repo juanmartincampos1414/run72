@@ -39,14 +39,21 @@ export async function activateProduction(
       .eq("id", leadId);
   }
 
-  // Evento de funnel: pago completado (para el dashboard)
+  // Eventos de funnel + auditoría
   try {
-    await supabase.from("events").insert({
-      event_type: "payment_completed",
-      session_id: (typed as { session_id?: string }).session_id ?? null,
-      lead_id: leadId,
-      metadata: { deposit_ars: typed.deposit_ars, total_ars: typed.total_ars },
-    });
+    await supabase.from("events").insert([
+      {
+        event_type: "payment_completed",
+        session_id: (typed as { session_id?: string }).session_id ?? null,
+        lead_id: leadId,
+        metadata: { deposit_ars: typed.deposit_ars, total_ars: typed.total_ars },
+      },
+      {
+        event_type: "production_started",
+        lead_id: leadId,
+        metadata: { startedAt: startedAt.toISOString(), deadlineAt: deliveryAt.toISOString() },
+      },
+    ]);
   } catch {
     /* tabla events puede no existir aún */
   }

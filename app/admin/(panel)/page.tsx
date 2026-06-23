@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { formatARS } from "@/lib/pricing";
 import {
   ANTICIPO_LABEL,
@@ -163,7 +164,9 @@ export default function LeadsPage() {
                   })}
                 </Td>
                 <Td>
-                  <div className="font-medium text-fg">{l.name}</div>
+                  <Link href={`/admin/leads/${l.id}`} className="font-medium text-fg hover:text-brand-cyan">
+                    {l.name}
+                  </Link>
                   {l.company && <div className="text-xs text-faint">{l.company}</div>}
                   <div className="text-xs text-muted">{l.email}</div>
                   {l.whatsapp && (

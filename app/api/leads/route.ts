@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { buildLineItems, computeComplexity, computeScore, computeTotals } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
+import { logEvent } from "@/lib/audit";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -173,6 +174,8 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
+
+  await logEvent(supabase, "lead_created", lead.id, { total, projectLabel });
 
   return NextResponse.json({
     leadId: lead.id,

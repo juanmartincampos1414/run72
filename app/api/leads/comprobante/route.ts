@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { logEvent } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,8 @@ export async function POST(req: Request) {
       { status: 503 },
     );
   }
+
+  await logEvent(supabase, "comprobante_uploaded", leadId, { name: file.name });
 
   return NextResponse.json({ ok: true, url });
 }

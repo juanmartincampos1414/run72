@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { activateProduction } from "@/lib/activation";
+import { logEvent } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -18,62 +19,94 @@ const STATES = [
   "cobrado_completo",
 ];
 
-/** Cambia el estado / ejecuta acciones sobre el lead. */
-export async function PATCH(
-  req: Request,
+/** Detalle del lead: lead + historial de previews + timeline de eventos. */
+export async function GET(
+  _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const auth = await requireAdmin();
   if ("response" in auth) return auth.response;
 
   const { id } = await params;
-  const body = await req.json().catch(() => ({}));
   const supabase = getSupabaseAdmin();
 
-  // --- Acciones de cobro / alcance ---
+  const { data: lead, error } = await supabase.from("leads").select("*").eq("id", id).maybeSingle();
+  if (error || !lead) return NextResponse.json({ error: "Lead no encontrado." }, { status: 404 });
+
+  const { data: versions } = await supabase
+    .from("preview_versions")
+    .select("id, prompt, response, preview, files_context, form_snapshot, created_by, created_at")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false });
+
+  const { data: events } = await supabase
+    .from("events")
+    .select("event_type, metadata, created_at")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false });
+
+  return NextResponse.json({ lead, versions: versions ?? [], events: events ?? [] });
+}
+
+/** Cambia estado / ejecuta acciones (aprobar/rechazar pago, rechazar alcance). */
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const auth = await requireAdmin();
+  if ("response" in auth) return auth.response;
+  const actor = auth.user?.email ?? "admin";
+
+  const { id } = await params;
+  const body = await req.json().catch(() => ({}));
+  const supabase = getSupabaseAdmin();
+  const observaciones = (body.observaciones ?? "").trim() || null;
+
   if (body.action) {
     if (body.action === "approve_payment") {
-      // Comprobante aprobado → adelanto pagado + producción + email
       await supabase
         .from("leads")
-        .update({ comprobante_status: "aprobado" })
+        .update({ comprobante_status: "aprobado", comprobante_observaciones: observaciones })
         .eq("id", id);
       await activateProduction(supabase, id);
+      await logEvent(supabase, "comprobante_approved", id, { actor, observaciones });
       const { data } = await supabase.from("leads").select("*").eq("id", id).single();
       return NextResponse.json({ lead: data });
     }
     if (body.action === "reject_payment") {
       const { data, error } = await supabase
         .from("leads")
-        .update({ comprobante_status: "rechazado", status: "esperando_pago" })
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-      return NextResponse.json({ lead: data });
-    }
-    if (body.action === "reject_scope") {
-      const { data, error } = await supabase
-        .from("leads")
         .update({
-          status: "rechazado_alcance",
-          rejection_reason: (body.reason ?? "").trim() || "Alcance incompatible con 72h",
+          comprobante_status: "rechazado",
+          status: "esperando_pago",
+          comprobante_observaciones: observaciones,
         })
         .eq("id", id)
         .select("*")
         .single();
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      await logEvent(supabase, "comprobante_rejected", id, { actor, observaciones });
+      return NextResponse.json({ lead: data });
+    }
+    if (body.action === "reject_scope") {
+      const reason = (body.reason ?? "").trim() || "Alcance incompatible con 72h";
+      const { data, error } = await supabase
+        .from("leads")
+        .update({ status: "rechazado_alcance", rejection_reason: reason })
+        .eq("id", id)
+        .select("*")
+        .single();
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      await logEvent(supabase, "scope_rejected", id, { actor, reason });
       return NextResponse.json({ lead: data });
     }
     return NextResponse.json({ error: "Acción inválida." }, { status: 400 });
   }
 
-  // --- Cambio de estado manual ---
   if (!body.status || !STATES.includes(body.status)) {
     return NextResponse.json({ error: "Estado inválido." }, { status: 400 });
   }
 
-  // Pasar a producción dispara la activación (estado + email)
   if (body.status === "en_produccion") {
     await activateProduction(supabase, id);
     const { data } = await supabase.from("leads").select("*").eq("id", id).single();
@@ -88,6 +121,7 @@ export async function PATCH(
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  await logEvent(supabase, "status_changed", id, { actor, status: body.status });
   return NextResponse.json({ lead: data });
 }
 
