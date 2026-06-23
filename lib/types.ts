@@ -95,6 +95,16 @@ export type Lead = {
   estimated_delivery_at: string | null;
 };
 
+export type PreviewMockup = { title: string; description: string; html: string };
+
+export type ProjectPreview = {
+  interpretation: string;
+  detectedFunctionalities: string[];
+  includedDeliverables: string[];
+  mockups: PreviewMockup[];
+  generatedAt?: string;
+};
+
 export type Faq = {
   id: string;
   question: string;

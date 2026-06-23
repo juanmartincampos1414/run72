@@ -65,6 +65,10 @@ export async function sendProjectStartedEmail(
     <p style="font-size:18px;font-weight:600;background:linear-gradient(110deg,#38bdf8,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">
       Las 72 horas de ejecución han comenzado.
     </p>
+    <a href="${(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.run72.app").replace(/\/$/, "")}/proyecto/${lead.id}"
+       style="display:inline-block;margin-top:8px;background:#fff;color:#050505;text-decoration:none;font-weight:600;font-size:14px;padding:12px 20px;border-radius:999px">
+      Ver la vista previa de tu proyecto →
+    </a>
     <p style="color:#6b7180;font-size:12px;margin-top:24px">RUN72 · run72.app</p>
   </div>`;
 

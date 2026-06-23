@@ -39,7 +39,7 @@ export async function createPreference(opts: {
       ...(opts.payerEmail ? { payer: { email: opts.payerEmail } } : {}),
       notification_url: `${opts.baseUrl}/api/payments/webhook`,
       back_urls: {
-        success: `${opts.baseUrl}/pago?status=success&lead=${opts.externalReference}`,
+        success: `${opts.baseUrl}/proyecto/${opts.externalReference}`,
         pending: `${opts.baseUrl}/pago?status=pending&lead=${opts.externalReference}`,
         failure: `${opts.baseUrl}/pago?status=failure&lead=${opts.externalReference}`,
       },

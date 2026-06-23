@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Logo } from "../Logo";
@@ -13,8 +13,6 @@ import { computeTotals, formatARS } from "@/lib/pricing";
 import { track, getSessionId } from "@/lib/track";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT } from "@/lib/quote-options";
 import type { LeadFile, LineItem, Microservice, QuoteResult, Service } from "@/lib/types";
-import type { Preview } from "@/app/api/preview/route";
-import { cn } from "@/lib/cn";
 
 const STORAGE_KEY = "run72_quote_v2";
 const STEP_LABELS = [
@@ -24,11 +22,10 @@ const STEP_LABELS = [
   "Objetivo",
   "Contexto",
   "Datos",
-  "Preview",
 ];
 const ease = [0.16, 1, 0.3, 1] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LAST_STEP = 6;
+const LAST_STEP = 5;
 
 type Contact = { name: string; company: string; email: string; whatsapp: string };
 
@@ -42,8 +39,6 @@ type State = {
   urgencyNote: string;
   files: LeadFile[];
   contact: Contact;
-  previewRating: number | null;
-  previewComments: string;
 };
 
 const INITIAL: State = {
@@ -56,8 +51,6 @@ const INITIAL: State = {
   urgencyNote: "",
   files: [],
   contact: { name: "", company: "", email: "", whatsapp: "" },
-  previewRating: null,
-  previewComments: "",
 };
 
 export function QuoteConfigurator() {
@@ -72,11 +65,6 @@ export function QuoteConfigurator() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<QuoteResult | null>(null);
   const [hydrated, setHydrated] = useState(false);
-
-  // Preview IA
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const previewFetched = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -192,44 +180,10 @@ export function QuoteConfigurator() {
           EMAIL_RE.test(state.contact.email.trim()) &&
           state.contact.whatsapp.trim().length >= 6
         );
-      case 6:
-        return state.previewRating !== null;
       default:
         return false;
     }
   }, [step, state]);
-
-  // Generar el preview al entrar al paso 7
-  useEffect(() => {
-    if (step !== LAST_STEP || previewFetched.current || !services) return;
-    previewFetched.current = true;
-    track("preview_viewed");
-    setPreviewLoading(true);
-    const projectNames = state.projectTypes.map(
-      (slug) =>
-        slug === "unsure"
-          ? UNSURE_PROJECT.label
-          : projects.find((p) => p.slug === slug)?.name ?? slug,
-    );
-    const addonNames = state.addons.map(
-      (slug) => addonList.find((a) => a.slug === slug)?.name ?? slug,
-    );
-    fetch("/api/preview", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        projects: projectNames,
-        addons: addonNames,
-        brandStatus: state.brandStatus,
-        objective: state.objective,
-        urgencyNote: state.urgencyNote,
-      }),
-    })
-      .then((r) => r.json())
-      .then((d) => setPreview(d.preview as Preview))
-      .catch(() => setPreview(null))
-      .finally(() => setPreviewLoading(false));
-  }, [step, services, projects, addonList, state]);
 
   function go(delta: number) {
     if (delta > 0) track("step_completed", { step, label: STEP_LABELS[step] });
@@ -282,9 +236,6 @@ export function QuoteConfigurator() {
           timing: "asap",
           urgencyNote: state.urgencyNote,
           files: state.files,
-          previewRating: state.previewRating,
-          previewComments: state.previewComments,
-          previewText: preview ? JSON.stringify(preview) : null,
           contact: state.contact,
           sessionId: getSessionId(),
           funnelStepReached: LAST_STEP + 1,
@@ -306,9 +257,7 @@ export function QuoteConfigurator() {
     setState(INITIAL);
     setStep(0);
     setResult(null);
-    setPreview(null);
     setDrawerSlug(null);
-    previewFetched.current = false;
     setDir(-1);
   }
 
@@ -501,22 +450,6 @@ export function QuoteConfigurator() {
                   <ContactForm
                     contact={state.contact}
                     onChange={(contact) => setState((s) => ({ ...s, contact }))}
-                  />
-                </Step>
-              )}
-
-              {step === 6 && (
-                <Step title="Así imaginamos tu proyecto" subtitle="Una primera visión generada a partir de lo que nos contaste.">
-                  <PreviewView
-                    preview={preview}
-                    loading={previewLoading}
-                    rating={state.previewRating}
-                    comments={state.previewComments}
-                    onRating={(r) => {
-                      track("preview_scored", { rating: r });
-                      setState((s) => ({ ...s, previewRating: r }));
-                    }}
-                    onComments={(c) => setState((s) => ({ ...s, previewComments: c }))}
                   />
                 </Step>
               )}
@@ -813,111 +746,5 @@ function Field({
       {children}
       {hint && <span className="text-xs text-faint">{hint}</span>}
     </label>
-  );
-}
-
-function PreviewView({
-  preview,
-  loading,
-  rating,
-  comments,
-  onRating,
-  onComments,
-}: {
-  preview: Preview | null;
-  loading: boolean;
-  rating: number | null;
-  comments: string;
-  onRating: (r: number) => void;
-  onComments: (c: string) => void;
-}) {
-  return (
-    <div>
-      {loading || !preview ? (
-        <div className="glass rounded-3xl p-8 text-center">
-          <div className="mx-auto mb-4 h-1 w-40 overflow-hidden rounded-full bg-white/[0.06]">
-            <motion.div
-              className="h-full w-1/3 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet"
-              animate={{ x: ["-100%", "300%"] }}
-              transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-          <p className="text-sm text-muted">Imaginando tu proyecto…</p>
-        </div>
-      ) : (
-        <div className="glass rounded-3xl p-6 sm:p-7">
-          <p className="text-pretty text-base leading-relaxed">{preview.interpretation}</p>
-
-          {/* Layout conceptual */}
-          <div className="mt-6">
-            <p className="mb-3 text-xs font-medium uppercase tracking-[0.16em] text-faint">
-              Estructura sugerida
-            </p>
-            <div className="flex flex-col gap-2">
-              {preview.structure.map((section, i) => (
-                <div
-                  key={`${section}-${i}`}
-                  className="flex items-center gap-3 rounded-xl border border-line bg-ink/40 px-4 py-3"
-                  style={{ opacity: 1 - i * 0.04 }}
-                >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-brand-cyan/30 to-brand-violet/30 text-xs font-medium text-gradient">
-                    {i + 1}
-                  </span>
-                  <span className="text-sm">{section}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-line bg-surface/40 p-4">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Enfoque visual</p>
-            <p className="mt-2 text-sm leading-relaxed text-muted">{preview.visualApproach}</p>
-          </div>
-
-          <p className="mt-5 text-pretty font-display text-lg font-medium leading-snug text-gradient">
-            “{preview.summary}”
-          </p>
-        </div>
-      )}
-
-      {/* Rating + comentarios */}
-      <div className="mt-6 rounded-3xl border border-line bg-surface/30 p-6">
-        <p className="text-sm font-medium">
-          ¿Qué tan cerca está de lo que imaginabas?
-          <span className="text-brand-cyan"> *</span>
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {Array.from({ length: 10 }).map((_, i) => {
-            const n = i + 1;
-            return (
-              <button
-                key={n}
-                type="button"
-                onClick={() => onRating(n)}
-                className={cn(
-                  "h-10 w-10 rounded-xl border text-sm font-medium tabular-nums transition-all",
-                  rating === n
-                    ? "border-transparent bg-gradient-to-br from-brand-cyan to-brand-violet text-ink"
-                    : "border-line bg-ink/40 text-muted hover:border-line-strong hover:text-fg",
-                )}
-              >
-                {n}
-              </button>
-            );
-          })}
-        </div>
-
-        <label className="mt-5 flex flex-col gap-1.5">
-          <span className="text-sm text-muted">Comentarios o ajustes (opcional)</span>
-          <textarea
-            value={comments}
-            onChange={(e) => onComments(e.target.value)}
-            rows={3}
-            placeholder="¿Qué cambiarías o sumarías a esta visión?"
-            className="rounded-xl border border-line bg-surface/60 px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
-          />
-        </label>
-      </div>
-    </div>
   );
 }

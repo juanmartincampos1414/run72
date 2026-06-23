@@ -377,7 +377,10 @@ function ComprobanteUploader({ leadId, enabled }: { leadId: string; enabled: boo
         <div>
           <p className="text-sm font-medium text-emerald-300">Comprobante recibido</p>
           <p className="text-xs text-muted">
-            Lo validamos y, al aprobarlo, tu proyecto entra a producción.
+            Lo validamos y, al aprobarlo, tu proyecto entra a producción.{" "}
+            <a href={`/proyecto/${leadId}`} className="text-brand-cyan hover:underline">
+              Ver la vista previa de tu proyecto →
+            </a>
           </p>
         </div>
       </div>
