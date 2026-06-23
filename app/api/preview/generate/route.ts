@@ -13,11 +13,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Supabase no configurado." }, { status: 503 });
   }
 
+  // 60/h: la página post-pago hace polling cada 8s esperando la acreditación.
+  // El costo real (generación con Claude) está acotado aparte por el check de
+  // pago + el cache (se genera una sola vez por lead), así que el límite acá
+  // es anti-abuso, no anti-costo.
   const limited = await enforceRateLimit({
     req,
     supabase: getSupabaseAdmin(),
     endpoint: "/api/preview/generate",
-    limit: 5,
+    limit: 60,
   });
   if (limited) return limited;
 
