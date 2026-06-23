@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
 import type { QuoteResult } from "@/lib/types";
@@ -7,6 +8,13 @@ import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
 
 const ease = [0.16, 1, 0.3, 1] as const;
+
+type PublicConfig = {
+  bank_cbu: string | null;
+  bank_alias: string | null;
+  bank_holder: string | null;
+  mp_enabled: boolean;
+};
 
 export function Confirmation({
   result,
@@ -17,6 +25,43 @@ export function Confirmation({
   name: string;
   onRestart: () => void;
 }) {
+  const [config, setConfig] = useState<PublicConfig | null>(null);
+  const [payMethod, setPayMethod] = useState<"mp" | "transfer">("mp");
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/config/public")
+      .then((r) => r.json())
+      .then((c) => setConfig(c))
+      .catch(() => setConfig(null));
+  }, []);
+
+  useEffect(() => {
+    if (config && !config.mp_enabled) setPayMethod("transfer");
+  }, [config]);
+
+  async function payWithMP() {
+    setPaying(true);
+    setPayError(null);
+    try {
+      const res = await fetch("/api/payments/preference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leadId: result.leadId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.init_point)
+        throw new Error(data.error ?? "No se pudo iniciar el pago.");
+      window.location.href = data.init_point;
+    } catch (e) {
+      setPayError(e instanceof Error ? e.message : "Error inesperado.");
+      setPaying(false);
+    }
+  }
+
+  const hasAmount = result.deposit > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,8 +83,8 @@ export function Confirmation({
           <span className="text-gradient">RUN72.</span>
         </h1>
         <p className="mt-3 max-w-md text-pretty text-muted">
-          {name ? `${name.split(" ")[0]}, ` : ""}configuramos tu proyecto y guardamos
-          tu presupuesto. Este es el resumen.
+          {name ? `${name.split(" ")[0]}, ` : ""}este es tu proyecto. Aboná el
+          adelanto del {result.depositPercent}% y entramos a producción.
         </p>
       </div>
 
@@ -97,27 +142,165 @@ export function Confirmation({
         </div>
       </div>
 
-      {/* Próximo paso: pago (Fase 2) */}
-      <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6 text-center">
-        <p className="text-sm text-muted">
-          El próximo paso es abonar el adelanto de{" "}
-          <span className="font-medium text-fg">{formatARS(result.deposit)}</span>{" "}
-          para entrar a producción. Vamos a habilitar el pago con MercadoPago y
-          transferencia en este mismo flujo.
-        </p>
-        <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button href="/" variant="secondary" size="md">
-            Volver al inicio
-          </Button>
-          <button
-            type="button"
-            onClick={onRestart}
-            className="text-sm text-faint transition-colors hover:text-fg"
-          >
-            Configurar otro proyecto
-          </button>
+      {/* Pago */}
+      {hasAmount ? (
+        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Iniciá tu proyecto
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            Aboná el adelanto de{" "}
+            <span className="font-medium text-fg">{formatARS(result.deposit)}</span>{" "}
+            para entrar a producción.
+          </p>
+
+          {/* Selector de método */}
+          <div className="mt-5 flex gap-2 rounded-full border border-line bg-ink/40 p-1">
+            {config?.mp_enabled !== false && (
+              <MethodTab
+                active={payMethod === "mp"}
+                onClick={() => setPayMethod("mp")}
+                label="MercadoPago"
+              />
+            )}
+            <MethodTab
+              active={payMethod === "transfer"}
+              onClick={() => setPayMethod("transfer")}
+              label="Transferencia"
+            />
+          </div>
+
+          <div className="mt-5">
+            {payMethod === "mp" ? (
+              <div>
+                <button
+                  type="button"
+                  onClick={payWithMP}
+                  disabled={paying}
+                  className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3.5 text-[15px] font-semibold text-ink transition-all duration-300 hover:scale-[1.01] disabled:pointer-events-none disabled:opacity-60"
+                >
+                  {paying
+                    ? "Redirigiendo a MercadoPago…"
+                    : `Pagar ${formatARS(result.deposit)} con MercadoPago`}
+                </button>
+                {payError && (
+                  <p className="mt-3 text-sm text-red-300">{payError}</p>
+                )}
+                <p className="mt-3 text-center text-xs text-faint">
+                  Pago seguro · Tarjeta, débito o dinero en cuenta
+                </p>
+              </div>
+            ) : (
+              <TransferDetails config={config} amount={result.deposit} />
+            )}
+          </div>
         </div>
+      ) : (
+        <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6 text-center text-sm text-muted">
+          Como elegiste “No estoy seguro”, vamos a definir el alcance y te pasamos
+          el presupuesto final para iniciar.
+        </div>
+      )}
+
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <Button href="/" variant="secondary" size="md">
+          Volver al inicio
+        </Button>
+        <button
+          type="button"
+          onClick={onRestart}
+          className="text-sm text-faint transition-colors hover:text-fg"
+        >
+          Configurar otro proyecto
+        </button>
       </div>
     </motion.div>
+  );
+}
+
+function MethodTab({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+        active ? "bg-white text-ink" : "text-muted hover:text-fg"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function TransferDetails({
+  config,
+  amount,
+}: {
+  config: PublicConfig | null;
+  amount: number;
+}) {
+  const rows = [
+    { label: "CBU / CVU", value: config?.bank_cbu },
+    { label: "Alias", value: config?.bank_alias },
+    { label: "Titular", value: config?.bank_holder },
+    { label: "Monto a transferir", value: formatARS(amount), plain: true },
+  ];
+
+  return (
+    <div className="space-y-2.5">
+      {rows.map((r) => (
+        <CopyRow key={r.label} label={r.label} value={r.value} plain={r.plain} />
+      ))}
+      <p className="pt-2 text-xs leading-relaxed text-faint">
+        Transferí el adelanto y escribinos para confirmar el inicio. Apenas
+        recibimos el pago, tu proyecto entra a producción.
+      </p>
+    </div>
+  );
+}
+
+function CopyRow({
+  label,
+  value,
+  plain,
+}: {
+  label: string;
+  value: string | null | undefined;
+  plain?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  if (!value) return null;
+
+  function copy() {
+    navigator.clipboard?.writeText(value!).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-ink/40 px-4 py-3">
+      <div className="min-w-0">
+        <p className="text-[11px] text-faint">{label}</p>
+        <p className="truncate text-sm font-medium tabular-nums">{value}</p>
+      </div>
+      {!plain && (
+        <button
+          type="button"
+          onClick={copy}
+          className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs text-muted transition-colors hover:text-fg"
+        >
+          {copied ? "Copiado" : "Copiar"}
+        </button>
+      )}
+    </div>
   );
 }
