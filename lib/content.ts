@@ -216,6 +216,26 @@ export const PROJECTS: Project[] = [
   },
 ];
 
+/** Lo que el cliente recibe al finalizar (checkout + landing). */
+export const DELIVERABLES = [
+  "Proyecto terminado y funcional",
+  "Código fuente completo",
+  "Accesos y credenciales organizadas",
+  "Configuraciones documentadas",
+  "Instrucciones para administrar el proyecto",
+  "Entrega estructurada para que cualquier proveedor pueda continuar el trabajo en el futuro",
+  "Documento maestro con toda la información del proyecto",
+  "Soporte y acompañamiento durante 30 días corridos posteriores a la entrega",
+] as const;
+
+export const OWNERSHIP_TITLE = "Tu proyecto es 100% tuyo";
+
+export const OWNERSHIP_TEXT =
+  "Al finalizar el desarrollo recibís un documento completo con todas las configuraciones, accesos y credenciales necesarias para administrar tu proyecto de forma totalmente independiente. No generamos dependencia: vas a tener acceso y control sobre cada herramienta utilizada durante el proyecto.";
+
+export const TRUST_MESSAGE =
+  "No creemos en generar dependencia tecnológica. Nuestro objetivo es que tengas control total sobre tu negocio desde el primer día. Por eso documentamos todo lo realizado y te entregamos cada acceso, configuración y credencial necesaria para que puedas administrar tu proyecto con total independencia.";
+
 export const TRADITIONAL_FLOW = [
   "Idea",
   "Branding",

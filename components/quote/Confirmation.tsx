@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
 import { track } from "@/lib/track";
 import { FaqAccordion } from "./FaqAccordion";
+import { DELIVERABLES, TRUST_MESSAGE } from "@/lib/content";
 import type { QuoteResult } from "@/lib/types";
 import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
@@ -152,6 +153,24 @@ export function Confirmation({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Qué recibirás al finalizar */}
+      <div className="mt-5 rounded-3xl border border-line bg-surface/30 p-6">
+        <h2 className="font-display text-lg font-semibold tracking-tight">
+          Qué recibirás al finalizar
+        </h2>
+        <ul className="mt-4 grid gap-2.5 sm:grid-cols-2">
+          {DELIVERABLES.map((d) => (
+            <li key={d} className="flex items-start gap-2.5 text-sm text-muted">
+              <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-cyan" strokeWidth={2.5} />
+              {d}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-5 rounded-2xl border border-brand-cyan/20 bg-brand-cyan/[0.05] px-4 py-3 text-xs leading-relaxed text-muted">
+          {TRUST_MESSAGE}
+        </p>
       </div>
 
       {/* Validación de alcance */}
