@@ -10,6 +10,8 @@ values
   ('sitio',       'Sitio Web',            'Desarrollo', 'Sitio institucional multipágina, rápido y optimizado.',              600000,  'project', 2),
   ('ecommerce',   'Ecommerce',            'Desarrollo', 'Tienda online con catálogo, carrito y medios de pago.',              1200000, 'project', 3),
   ('plataforma',  'Plataforma Web',       'Desarrollo', 'Aplicación web a medida con lógica de negocio y usuarios.',          2500000, 'project', 4),
+  ('branding',    'Branding',             'Branding',   'Identidad visual completa: logo, sistema y manual de marca.',        350000,  'project', 5),
+  ('estrategia-comercial','Estrategia Comercial','Estrategia','Propuesta de valor, posicionamiento y plan comercial.',         250000,  'project', 6),
 
   -- Paso 3: servicios adicionales
   ('logo',        'Logo',                 'Branding',   'Diseño de logotipo e isologo profesional.',                          150000,  'addon', 10),

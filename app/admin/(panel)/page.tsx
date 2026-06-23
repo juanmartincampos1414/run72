@@ -123,7 +123,9 @@ export default function LeadsPage() {
                   <div className="font-medium text-fg">{l.name}</div>
                   {l.company && <div className="text-xs text-faint">{l.company}</div>}
                   <div className="text-xs text-muted">{l.email}</div>
-                  {l.phone && <div className="text-xs text-faint">{l.phone}</div>}
+                  {l.whatsapp && (
+                    <div className="text-xs text-faint">WhatsApp: {l.whatsapp}</div>
+                  )}
                 </Td>
                 <Td>
                   <div className="text-fg">{l.project_label ?? "—"}</div>
@@ -135,6 +137,35 @@ export default function LeadsPage() {
                   {(l.objective || l.timing) && (
                     <div className="mt-0.5 text-xs text-faint">
                       {[l.objective, l.timing].filter(Boolean).join(" · ")}
+                    </div>
+                  )}
+                  {l.urgency_note && (
+                    <div className="mt-1 max-w-xs truncate text-xs text-faint" title={l.urgency_note}>
+                      “{l.urgency_note}”
+                    </div>
+                  )}
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                    {typeof l.preview_rating === "number" && (
+                      <span className="rounded bg-white/[0.05] px-1.5 py-0.5 text-muted">
+                        Preview {l.preview_rating}/10
+                      </span>
+                    )}
+                    {l.files?.length > 0 &&
+                      l.files.map((f) => (
+                        <a
+                          key={f.url}
+                          href={f.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded bg-white/[0.05] px-1.5 py-0.5 text-brand-cyan hover:underline"
+                        >
+                          📎 {f.name.length > 16 ? f.name.slice(0, 14) + "…" : f.name}
+                        </a>
+                      ))}
+                  </div>
+                  {l.preview_comments && (
+                    <div className="mt-1 max-w-xs truncate text-xs text-faint" title={l.preview_comments}>
+                      💬 {l.preview_comments}
                     </div>
                   )}
                 </Td>

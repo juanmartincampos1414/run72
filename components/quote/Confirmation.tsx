@@ -114,7 +114,15 @@ export function Confirmation({
         </ul>
 
         <div className="space-y-3 pt-5">
-          <div className="flex items-baseline justify-between gap-3">
+          <div className="flex items-baseline justify-between gap-3 text-sm">
+            <span className="text-muted">Subtotal</span>
+            <span className="tabular-nums text-fg">{formatARS(result.subtotal)}</span>
+          </div>
+          <div className="flex items-baseline justify-between gap-3 text-sm">
+            <span className="text-muted">IVA (21%)</span>
+            <span className="tabular-nums text-fg">{formatARS(result.iva)}</span>
+          </div>
+          <div className="flex items-baseline justify-between gap-3 border-t border-line pt-3">
             <span className="text-sm font-medium">Total del proyecto</span>
             <span className="font-display text-xl font-semibold tabular-nums">
               {formatARS(result.total)}
@@ -259,9 +267,9 @@ function TransferDetails({
       {rows.map((r) => (
         <CopyRow key={r.label} label={r.label} value={r.value} plain={r.plain} />
       ))}
-      <p className="pt-2 text-xs leading-relaxed text-faint">
-        Transferí el adelanto y escribinos para confirmar el inicio. Apenas
-        recibimos el pago, tu proyecto entra a producción.
+      <p className="mt-1 rounded-xl border border-brand-cyan/25 bg-brand-cyan/[0.06] px-4 py-3 text-xs leading-relaxed text-fg">
+        Una vez realizada la transferencia, debés enviar el comprobante a{" "}
+        <span className="font-medium">hola@run72.app</span> para iniciar el proyecto.
       </p>
     </div>
   );

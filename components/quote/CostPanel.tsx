@@ -12,7 +12,10 @@ type Props = {
 };
 
 export function CostPanel({ lineItems, depositPercent = 30, pending }: Props) {
-  const { total, deposit, balance } = computeTotals(lineItems, depositPercent);
+  const { subtotal, iva, total, deposit, balance } = computeTotals(
+    lineItems,
+    depositPercent,
+  );
   const hasItems = lineItems.length > 0;
 
   return (
@@ -52,7 +55,10 @@ export function CostPanel({ lineItems, depositPercent = 30, pending }: Props) {
         </ul>
       )}
 
-      <div className="mt-5 space-y-3 border-t border-line pt-4">
+      <div className="mt-5 space-y-2.5 border-t border-line pt-4">
+        <Row label="Subtotal" value={formatARS(subtotal)} />
+        <Row label="IVA (21%)" value={formatARS(iva)} />
+        <div className="my-1 border-t border-line" />
         <Row label="Total" value={formatARS(total)} strong />
         <Row
           label={`Adelanto (${depositPercent}%)`}

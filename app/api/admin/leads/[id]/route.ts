@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { activateProduction } from "@/lib/activation";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,14 @@ export async function PATCH(
   }
 
   const supabase = getSupabaseAdmin();
+
+  // Transferencia validada por el admin → activar producción (estado + email)
+  if (body.status === "en_produccion") {
+    await activateProduction(supabase, id);
+    const { data } = await supabase.from("leads").select("*").eq("id", id).single();
+    return NextResponse.json({ lead: data });
+  }
+
   const { data, error } = await supabase
     .from("leads")
     .update({ status: body.status })

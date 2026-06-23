@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
-import {
-  buildLineItems,
-  computeScore,
-  computeTotals,
-} from "@/lib/pricing";
-import { BRAND_STATUS, OBJECTIVES, TIMINGS, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
-import type { QuoteSubmission, Service } from "@/lib/types";
+import { buildLineItems, computeScore, computeTotals } from "@/lib/pricing";
+import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
+import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -28,13 +24,16 @@ export async function POST(req: Request) {
   const contact = body.contact ?? ({} as QuoteSubmission["contact"]);
   const name = (contact.name ?? "").trim();
   const email = (contact.email ?? "").trim().toLowerCase();
+  const whatsapp = (contact.whatsapp ?? "").trim();
   if (!name) return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });
   if (!EMAIL_RE.test(email))
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
+  if (whatsapp.length < 6)
+    return NextResponse.json({ error: "El WhatsApp es obligatorio." }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
 
-  // --- Cargar % de adelanto desde config ---
+  // --- % de adelanto desde config ---
   const { data: config } = await supabase
     .from("config")
     .select("deposit_percent")
@@ -42,11 +41,12 @@ export async function POST(req: Request) {
     .maybeSingle();
   const depositPercent = config?.deposit_percent ?? 30;
 
-  // --- Resolver precios SIEMPRE desde la DB (nunca confiar en el cliente) ---
-  const wantedSlugs = [
-    ...(body.projectType && body.projectType !== "unsure" ? [body.projectType] : []),
-    ...(Array.isArray(body.addons) ? body.addons : []),
-  ];
+  // --- Resolver precios SIEMPRE desde la DB ---
+  const projectSlugs = (Array.isArray(body.projectTypes) ? body.projectTypes : []).filter(
+    (s) => s && s !== "unsure",
+  );
+  const addonSlugs = Array.isArray(body.addons) ? body.addons : [];
+  const wantedSlugs = [...projectSlugs, ...addonSlugs];
 
   let services: Service[] = [];
   if (wantedSlugs.length > 0) {
@@ -59,30 +59,31 @@ export async function POST(req: Request) {
     services = (data ?? []) as Service[];
   }
 
-  const project =
-    body.projectType && body.projectType !== "unsure"
-      ? services.find((s) => s.slug === body.projectType && s.type === "project") ?? null
-      : null;
-
-  const addonServices = (Array.isArray(body.addons) ? body.addons : [])
+  const projectServices = projectSlugs
+    .map((slug) => services.find((s) => s.slug === slug && s.type === "project"))
+    .filter((s): s is Service => Boolean(s));
+  const addonServices = addonSlugs
     .map((slug) => services.find((s) => s.slug === slug && s.type === "addon"))
     .filter((s): s is Service => Boolean(s));
 
-  const lineItems = buildLineItems(project, addonServices);
-  const { total, deposit, balance } = computeTotals(lineItems, depositPercent);
+  const lineItems = buildLineItems(projectServices, addonServices);
+  const { subtotal, iva, total, deposit, balance } = computeTotals(lineItems, depositPercent);
   const { score, hot } = computeScore({
-    projectType: body.projectType,
+    projectTypes: (Array.isArray(body.projectTypes) ? body.projectTypes : []).filter(Boolean),
     addons: addonServices.map((a) => a.slug),
     timing: body.timing,
     objective: body.objective,
     total,
   });
 
-  const projectLabel = project
-    ? project.name
-    : body.projectType === "unsure"
-      ? UNSURE_PROJECT.label
-      : null;
+  const unsure = (Array.isArray(body.projectTypes) ? body.projectTypes : []).includes("unsure");
+  const labels = [
+    ...projectServices.map((p) => p.name),
+    ...(unsure ? [UNSURE_PROJECT.label] : []),
+  ];
+  const projectLabel = labels.length > 0 ? labels.join(" + ") : null;
+
+  const files: LeadFile[] = Array.isArray(body.files) ? body.files.slice(0, 20) : [];
 
   // --- Insertar lead ---
   const { data: lead, error: insertError } = await supabase
@@ -91,14 +92,20 @@ export async function POST(req: Request) {
       name,
       company: (contact.company ?? "").trim() || null,
       email,
-      phone: (contact.phone ?? "").trim() || null,
-      project_type: body.projectType ?? null,
+      whatsapp,
+      phone: whatsapp, // compatibilidad con columna previa
+      project_type:
+        [...projectSlugs, ...(unsure ? ["unsure"] : [])].join(",") || null,
       project_label: projectLabel,
       brand_status: labelFor(BRAND_STATUS, body.brandStatus),
       objective: labelFor(OBJECTIVES, body.objective),
-      timing: labelFor(TIMINGS, body.timing),
+      timing: "Lo antes posible",
+      urgency_note: (body.urgencyNote ?? "").trim() || null,
+      files,
       addons: addonServices.map((a) => ({ slug: a.slug, name: a.name, price_ars: a.price_ars })),
       line_items: lineItems,
+      subtotal_ars: subtotal,
+      iva_ars: iva,
       total_ars: total,
       deposit_ars: deposit,
       balance_ars: balance,
@@ -106,6 +113,10 @@ export async function POST(req: Request) {
       score,
       hot,
       status: "nuevo",
+      preview_text: body.previewText ?? null,
+      preview_rating:
+        typeof body.previewRating === "number" ? body.previewRating : null,
+      preview_comments: (body.previewComments ?? "").trim() || null,
     })
     .select("id")
     .single();
@@ -121,6 +132,8 @@ export async function POST(req: Request) {
     leadId: lead.id,
     projectLabel,
     lineItems,
+    subtotal,
+    iva,
     total,
     deposit,
     balance,

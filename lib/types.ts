@@ -37,6 +37,11 @@ export type Lead = {
   timing: string | null;
   addons: Array<{ slug: string; name: string; price_ars: number }>;
   line_items: LineItem[];
+  whatsapp: string | null;
+  urgency_note: string | null;
+  files: Array<{ name: string; url: string; type: string }>;
+  subtotal_ars: number;
+  iva_ars: number;
   total_ars: number;
   deposit_ars: number;
   balance_ars: number;
@@ -44,23 +49,34 @@ export type Lead = {
   score: number;
   hot: boolean;
   status: LeadStatus;
+  preview_text: string | null;
+  preview_rating: number | null;
+  preview_comments: string | null;
   preference_id: string | null;
   payment_id: string | null;
   payment_status: string | null;
+  production_started_at: string | null;
 };
+
+export type LeadFile = { name: string; url: string; type: string };
 
 /** Payload que envía el configurador al crear un lead. */
 export type QuoteSubmission = {
-  projectType: string | null; // slug del servicio 'project' o 'unsure'
+  projectTypes: string[]; // slugs de servicios 'project' (multi-select)
   brandStatus: string | null;
   addons: string[]; // slugs de servicios 'addon'
   objective: string | null;
   timing: string | null;
+  urgencyNote: string;
+  files: LeadFile[];
+  previewRating: number | null;
+  previewComments: string;
+  previewText: string | null;
   contact: {
     name: string;
     company: string;
     email: string;
-    phone: string;
+    whatsapp: string;
   };
 };
 
@@ -69,6 +85,8 @@ export type QuoteResult = {
   leadId: string;
   projectLabel: string | null;
   lineItems: LineItem[];
+  subtotal: number;
+  iva: number;
   total: number;
   deposit: number;
   balance: number;

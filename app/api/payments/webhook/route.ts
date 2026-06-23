@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
 import { getPayment } from "@/lib/mercadopago";
+import { activateProduction } from "@/lib/activation";
 
 export const dynamic = "force-dynamic";
 
@@ -41,16 +42,15 @@ export async function POST(req: Request) {
     if (!leadId) return NextResponse.json({ ok: true });
 
     const supabase = getSupabaseAdmin();
-    const update: Record<string, unknown> = {
-      payment_id: `${payment.id}`,
-      payment_status: payment.status,
-    };
-    // Solo avanzamos el pipeline si el pago fue aprobado
-    if (payment.status === "approved") {
-      update.status = "adelanto_pagado";
-    }
+    await supabase
+      .from("leads")
+      .update({ payment_id: `${payment.id}`, payment_status: payment.status })
+      .eq("id", leadId);
 
-    await supabase.from("leads").update(update).eq("id", leadId);
+    // Pago aprobado → activar producción (estado + email automático)
+    if (payment.status === "approved") {
+      await activateProduction(supabase, leadId);
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

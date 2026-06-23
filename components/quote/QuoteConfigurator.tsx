@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Logo } from "../Logo";
@@ -9,38 +9,51 @@ import { CostPanel } from "./CostPanel";
 import { Confirmation } from "./Confirmation";
 import { ArrowRight } from "../icons";
 import { computeTotals, formatARS } from "@/lib/pricing";
-import {
-  BRAND_STATUS,
-  OBJECTIVES,
-  TIMINGS,
-  UNSURE_PROJECT,
-} from "@/lib/quote-options";
-import type { LineItem, QuoteResult, Service } from "@/lib/types";
+import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT } from "@/lib/quote-options";
+import type { LeadFile, LineItem, QuoteResult, Service } from "@/lib/types";
+import type { Preview } from "@/app/api/preview/route";
 import { cn } from "@/lib/cn";
 
-const STORAGE_KEY = "run72_quote_v1";
-const STEP_LABELS = ["Proyecto", "Marca", "Servicios", "Objetivo", "Timing", "Datos"];
+const STORAGE_KEY = "run72_quote_v2";
+const STEP_LABELS = [
+  "Proyecto",
+  "Marca",
+  "Servicios",
+  "Objetivo",
+  "Contexto",
+  "Datos",
+  "Preview",
+];
 const ease = [0.16, 1, 0.3, 1] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LAST_STEP = 6;
 
-type Contact = { name: string; company: string; email: string; phone: string };
+type Contact = { name: string; company: string; email: string; whatsapp: string };
 
 type State = {
-  projectType: string | null;
+  projectTypes: string[];
   brandStatus: string | null;
   addons: string[];
   objective: string | null;
-  timing: string | null;
+  timingSelected: boolean;
+  urgencyNote: string;
+  files: LeadFile[];
   contact: Contact;
+  previewRating: number | null;
+  previewComments: string;
 };
 
 const INITIAL: State = {
-  projectType: null,
+  projectTypes: [],
   brandStatus: null,
   addons: [],
   objective: null,
-  timing: null,
-  contact: { name: "", company: "", email: "", phone: "" },
+  timingSelected: false,
+  urgencyNote: "",
+  files: [],
+  contact: { name: "", company: "", email: "", whatsapp: "" },
+  previewRating: null,
+  previewComments: "",
 };
 
 export function QuoteConfigurator() {
@@ -54,7 +67,11 @@ export function QuoteConfigurator() {
   const [result, setResult] = useState<QuoteResult | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  // --- Cargar servicios (precios desde la DB) ---
+  // Preview IA
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const previewFetched = useRef(false);
+
   useEffect(() => {
     let alive = true;
     fetch("/api/services")
@@ -69,14 +86,13 @@ export function QuoteConfigurator() {
     };
   }, []);
 
-  // --- Restaurar desde localStorage ---
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw) as { state?: State; step?: number };
         if (saved.state) setState({ ...INITIAL, ...saved.state });
-        if (typeof saved.step === "number") setStep(Math.min(saved.step, 5));
+        if (typeof saved.step === "number") setStep(Math.min(saved.step, LAST_STEP));
       }
     } catch {
       /* noop */
@@ -84,7 +100,6 @@ export function QuoteConfigurator() {
     setHydrated(true);
   }, []);
 
-  // --- Persistir ---
   useEffect(() => {
     if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, step }));
@@ -99,13 +114,14 @@ export function QuoteConfigurator() {
     [services],
   );
 
-  // --- Line items en vivo para el panel de costos ---
   const lineItems = useMemo<LineItem[]>(() => {
     const items: LineItem[] = [];
-    if (state.projectType === "unsure") {
-      items.push({ name: UNSURE_PROJECT.label, price_ars: 0 });
-    } else if (state.projectType) {
-      const p = projects.find((s) => s.slug === state.projectType);
+    for (const slug of state.projectTypes) {
+      if (slug === "unsure") {
+        items.push({ name: UNSURE_PROJECT.label, price_ars: 0 });
+        continue;
+      }
+      const p = projects.find((s) => s.slug === slug);
       if (p) items.push({ name: p.name, price_ars: p.price_ars });
     }
     for (const slug of state.addons) {
@@ -113,43 +129,90 @@ export function QuoteConfigurator() {
       if (a) items.push({ name: a.name, price_ars: a.price_ars });
     }
     return items;
-  }, [state.projectType, state.addons, projects, addonList]);
+  }, [state.projectTypes, state.addons, projects, addonList]);
 
-  // --- Validación por paso ---
   const stepValid = useMemo(() => {
     switch (step) {
       case 0:
-        return state.projectType !== null;
+        return state.projectTypes.length > 0;
       case 1:
         return state.brandStatus !== null;
       case 2:
-        return true; // addons opcionales
+        return true;
       case 3:
         return state.objective !== null;
       case 4:
-        return state.timing !== null;
+        return state.timingSelected && state.urgencyNote.trim().length > 0;
       case 5:
         return (
           state.contact.name.trim().length > 1 &&
-          EMAIL_RE.test(state.contact.email.trim())
+          EMAIL_RE.test(state.contact.email.trim()) &&
+          state.contact.whatsapp.trim().length >= 6
         );
+      case 6:
+        return state.previewRating !== null;
       default:
         return false;
     }
   }, [step, state]);
 
+  // Generar el preview al entrar al paso 7
+  useEffect(() => {
+    if (step !== LAST_STEP || previewFetched.current || !services) return;
+    previewFetched.current = true;
+    setPreviewLoading(true);
+    const projectNames = state.projectTypes.map(
+      (slug) =>
+        slug === "unsure"
+          ? UNSURE_PROJECT.label
+          : projects.find((p) => p.slug === slug)?.name ?? slug,
+    );
+    const addonNames = state.addons.map(
+      (slug) => addonList.find((a) => a.slug === slug)?.name ?? slug,
+    );
+    fetch("/api/preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projects: projectNames,
+        addons: addonNames,
+        brandStatus: state.brandStatus,
+        objective: state.objective,
+        urgencyNote: state.urgencyNote,
+      }),
+    })
+      .then((r) => r.json())
+      .then((d) => setPreview(d.preview as Preview))
+      .catch(() => setPreview(null))
+      .finally(() => setPreviewLoading(false));
+  }, [step, services, projects, addonList, state]);
+
   function go(delta: number) {
     setDir(delta);
-    setStep((s) => Math.max(0, Math.min(5, s + delta)));
+    setStep((s) => Math.max(0, Math.min(LAST_STEP, s + delta)));
   }
 
-  function toggleAddon(slug: string) {
+  function toggle(list: "projectTypes" | "addons", slug: string) {
     setState((s) => ({
       ...s,
-      addons: s.addons.includes(slug)
-        ? s.addons.filter((a) => a !== slug)
-        : [...s.addons, slug],
+      [list]: s[list].includes(slug)
+        ? s[list].filter((x) => x !== slug)
+        : [...s[list], slug],
     }));
+  }
+
+  async function uploadFiles(fileList: FileList) {
+    const form = new FormData();
+    Array.from(fileList).forEach((f) => form.append("files", f));
+    try {
+      const res = await fetch("/api/leads/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (Array.isArray(data.files)) {
+        setState((s) => ({ ...s, files: [...s.files, ...(data.files as LeadFile[])] }));
+      }
+    } catch {
+      /* noop */
+    }
   }
 
   async function submit() {
@@ -160,11 +223,16 @@ export function QuoteConfigurator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          projectType: state.projectType,
+          projectTypes: state.projectTypes,
           brandStatus: state.brandStatus,
           addons: state.addons,
           objective: state.objective,
-          timing: state.timing,
+          timing: "asap",
+          urgencyNote: state.urgencyNote,
+          files: state.files,
+          previewRating: state.previewRating,
+          previewComments: state.previewComments,
+          previewText: preview ? JSON.stringify(preview) : null,
           contact: state.contact,
         }),
       });
@@ -183,29 +251,25 @@ export function QuoteConfigurator() {
     setState(INITIAL);
     setStep(0);
     setResult(null);
+    setPreview(null);
+    previewFetched.current = false;
     setDir(-1);
   }
 
-  // --- Estados de carga / error de servicios ---
   if (loadError) {
     const comingSoon = /no configurado/i.test(loadError);
     return (
       <Shell>
         <div className="mx-auto max-w-md rounded-3xl border border-line bg-surface/40 p-8 text-center">
           <p className="font-medium">
-            {comingSoon
-              ? "Estamos activando el cotizador."
-              : "No pudimos cargar el configurador."}
+            {comingSoon ? "Estamos activando el cotizador." : "No pudimos cargar el configurador."}
           </p>
           <p className="mt-2 text-sm text-muted">
             {comingSoon
               ? "En unos minutos vas a poder armar tu proyecto y obtener tu presupuesto al instante."
               : loadError}
           </p>
-          <Link
-            href="/"
-            className="mt-5 inline-block text-sm text-brand-cyan hover:underline"
-          >
+          <Link href="/" className="mt-5 inline-block text-sm text-brand-cyan hover:underline">
             Volver al inicio
           </Link>
         </div>
@@ -224,140 +288,164 @@ export function QuoteConfigurator() {
   return (
     <Shell>
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        {/* Columna principal */}
         <div>
           <ProgressBar step={step} />
 
           <div className="relative mt-8 min-h-[340px]">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, x: dir * 28 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, ease }}
-              >
-                {step === 0 && (
-                  <Step
-                    title="¿Qué querés construir?"
-                    subtitle="Elegí el tipo de proyecto. Si no estás seguro, lo definimos juntos."
-                  >
-                    <div className="grid gap-3">
-                      {!services && <SkeletonCards n={4} />}
-                      {projects.map((p) => (
-                        <OptionCard
-                          key={p.slug}
-                          title={p.name}
-                          description={p.description}
-                          price={formatARS(p.price_ars)}
-                          selected={state.projectType === p.slug}
-                          onSelect={() => setState((s) => ({ ...s, projectType: p.slug }))}
-                        />
-                      ))}
-                      {services && (
-                        <OptionCard
-                          title={UNSURE_PROJECT.label}
-                          description={UNSURE_PROJECT.hint}
-                          price="a definir"
-                          selected={state.projectType === "unsure"}
-                          onSelect={() =>
-                            setState((s) => ({ ...s, projectType: "unsure" }))
-                          }
-                        />
-                      )}
-                    </div>
-                  </Step>
-                )}
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: dir * 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, ease }}
+            >
+              {step === 0 && (
+                <Step
+                  title="¿Qué querés construir?"
+                  subtitle="Elegí uno o varios. Podés combinar desarrollo, branding y estrategia."
+                >
+                  <div className="grid gap-3">
+                    {!services && <SkeletonCards n={4} />}
+                    {projects.map((p) => (
+                      <OptionCard
+                        key={p.slug}
+                        title={p.name}
+                        description={p.description}
+                        price={formatARS(p.price_ars)}
+                        multi
+                        selected={state.projectTypes.includes(p.slug)}
+                        onSelect={() => toggle("projectTypes", p.slug)}
+                      />
+                    ))}
+                    {services && (
+                      <OptionCard
+                        title={UNSURE_PROJECT.label}
+                        description={UNSURE_PROJECT.hint}
+                        price="a definir"
+                        multi
+                        selected={state.projectTypes.includes("unsure")}
+                        onSelect={() => toggle("projectTypes", "unsure")}
+                      />
+                    )}
+                  </div>
+                </Step>
+              )}
 
-                {step === 1 && (
-                  <Step
-                    title="¿Ya tenés marca?"
-                    subtitle="Así sabemos desde dónde partimos con el diseño."
-                  >
-                    <div className="grid gap-3">
-                      {BRAND_STATUS.map((o) => (
-                        <OptionCard
-                          key={o.value}
-                          title={o.label}
-                          selected={state.brandStatus === o.value}
-                          onSelect={() =>
-                            setState((s) => ({ ...s, brandStatus: o.value }))
-                          }
-                        />
-                      ))}
-                    </div>
-                  </Step>
-                )}
+              {step === 1 && (
+                <Step title="¿Ya tenés marca?" subtitle="Así sabemos desde dónde partimos con el diseño.">
+                  <div className="grid gap-3">
+                    {BRAND_STATUS.map((o) => (
+                      <OptionCard
+                        key={o.value}
+                        title={o.label}
+                        selected={state.brandStatus === o.value}
+                        onSelect={() => setState((s) => ({ ...s, brandStatus: o.value }))}
+                      />
+                    ))}
+                  </div>
+                </Step>
+              )}
 
-                {step === 2 && (
-                  <Step
-                    title="¿Qué necesitás además?"
-                    subtitle="Sumá servicios para potenciar tu lanzamiento. Podés elegir varios."
-                  >
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      {!services && <SkeletonCards n={6} />}
-                      {addonList.map((a) => (
-                        <OptionCard
-                          key={a.slug}
-                          title={a.name}
-                          description={a.description}
-                          price={formatARS(a.price_ars)}
-                          multi
-                          selected={state.addons.includes(a.slug)}
-                          onSelect={() => toggleAddon(a.slug)}
-                        />
-                      ))}
-                    </div>
-                  </Step>
-                )}
+              {step === 2 && (
+                <Step
+                  title="¿Qué necesitás además?"
+                  subtitle="Sumá servicios para potenciar tu lanzamiento. Podés elegir varios."
+                >
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {!services && <SkeletonCards n={6} />}
+                    {addonList.map((a) => (
+                      <OptionCard
+                        key={a.slug}
+                        title={a.name}
+                        description={a.description}
+                        price={formatARS(a.price_ars)}
+                        multi
+                        selected={state.addons.includes(a.slug)}
+                        onSelect={() => toggle("addons", a.slug)}
+                      />
+                    ))}
+                  </div>
+                </Step>
+              )}
 
-                {step === 3 && (
-                  <Step
-                    title="¿Cuál es el objetivo del proyecto?"
-                    subtitle="Enfocamos la estrategia según lo que querés lograr."
-                  >
-                    <div className="grid gap-3">
-                      {OBJECTIVES.map((o) => (
-                        <OptionCard
-                          key={o.value}
-                          title={o.label}
-                          selected={state.objective === o.value}
-                          onSelect={() => setState((s) => ({ ...s, objective: o.value }))}
-                        />
-                      ))}
-                    </div>
-                  </Step>
-                )}
+              {step === 3 && (
+                <Step title="¿Cuál es el objetivo del proyecto?" subtitle="Enfocamos la estrategia según lo que querés lograr.">
+                  <div className="grid gap-3">
+                    {OBJECTIVES.map((o) => (
+                      <OptionCard
+                        key={o.value}
+                        title={o.label}
+                        selected={state.objective === o.value}
+                        onSelect={() => setState((s) => ({ ...s, objective: o.value }))}
+                      />
+                    ))}
+                  </div>
+                </Step>
+              )}
 
-                {step === 4 && (
-                  <Step
-                    title="¿Cuándo querés lanzar?"
-                    subtitle="Tu urgencia define cómo organizamos la ejecución."
-                  >
-                    <div className="grid gap-3">
-                      {TIMINGS.map((o) => (
-                        <OptionCard
-                          key={o.value}
-                          title={o.label}
-                          description={o.hint}
-                          selected={state.timing === o.value}
-                          onSelect={() => setState((s) => ({ ...s, timing: o.value }))}
-                        />
-                      ))}
-                    </div>
-                  </Step>
-                )}
-
-                {step === 5 && (
-                  <Step
-                    title="¿A dónde te enviamos la propuesta?"
-                    subtitle="Con estos datos generamos tu presupuesto y abrimos tu proyecto."
-                  >
-                    <ContactForm
-                      contact={state.contact}
-                      onChange={(contact) => setState((s) => ({ ...s, contact }))}
+              {step === 4 && (
+                <Step title="¿Cuándo querés lanzar?" subtitle="Contanos el contexto y sumá referencias si tenés.">
+                  <div className="grid gap-4">
+                    <OptionCard
+                      title="Lo antes posible (por algo estoy acá)"
+                      selected={state.timingSelected}
+                      onSelect={() => setState((s) => ({ ...s, timingSelected: true }))}
                     />
-                  </Step>
-                )}
-              </motion.div>
+
+                    {state.timingSelected && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, ease }}
+                        className="grid gap-4"
+                      >
+                        <label className="flex flex-col gap-1.5">
+                          <span className="text-sm text-muted">
+                            Contanos más sobre urgencia o contexto del proyecto
+                            <span className="text-brand-cyan"> *</span>
+                          </span>
+                          <textarea
+                            value={state.urgencyNote}
+                            onChange={(e) => setState((s) => ({ ...s, urgencyNote: e.target.value }))}
+                            rows={4}
+                            placeholder="Ej: necesito lanzar antes de fin de mes, ya tengo el dominio y referencias de diseño…"
+                            className="rounded-xl border border-line bg-surface/60 px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
+                          />
+                        </label>
+
+                        <FileUpload files={state.files} onUpload={uploadFiles} onRemove={(url) =>
+                          setState((s) => ({ ...s, files: s.files.filter((f) => f.url !== url) }))
+                        } />
+                      </motion.div>
+                    )}
+                  </div>
+                </Step>
+              )}
+
+              {step === 5 && (
+                <Step
+                  title="¿A dónde te enviamos la propuesta?"
+                  subtitle="Con estos datos generamos tu presupuesto y abrimos tu proyecto."
+                >
+                  <ContactForm
+                    contact={state.contact}
+                    onChange={(contact) => setState((s) => ({ ...s, contact }))}
+                  />
+                </Step>
+              )}
+
+              {step === 6 && (
+                <Step title="Así imaginamos tu proyecto" subtitle="Una primera visión generada a partir de lo que nos contaste.">
+                  <PreviewView
+                    preview={preview}
+                    loading={previewLoading}
+                    rating={state.previewRating}
+                    comments={state.previewComments}
+                    onRating={(r) => setState((s) => ({ ...s, previewRating: r }))}
+                    onComments={(c) => setState((s) => ({ ...s, previewComments: c }))}
+                  />
+                </Step>
+              )}
+            </motion.div>
           </div>
 
           {submitError && (
@@ -366,7 +454,6 @@ export function QuoteConfigurator() {
             </p>
           )}
 
-          {/* Navegación */}
           <div className="mt-8 flex items-center justify-between gap-3">
             <button
               type="button"
@@ -377,14 +464,12 @@ export function QuoteConfigurator() {
               Atrás
             </button>
 
-            {step < 5 ? (
+            {step < LAST_STEP ? (
               <button
                 type="button"
                 onClick={() => go(1)}
                 disabled={!stepValid}
-                className={cn(
-                  "group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-all duration-300 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-40",
-                )}
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-all duration-300 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-40"
               >
                 Continuar
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -403,37 +488,13 @@ export function QuoteConfigurator() {
           </div>
         </div>
 
-        {/* Panel de costos (sticky en desktop, detalle abajo en mobile) */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <CostPanel lineItems={lineItems} pending={submitting} />
         </aside>
       </div>
 
-      {/* Barra inferior fija (mobile) — resumen persistente */}
       {lineItems.length > 0 && <MobileTotalBar lineItems={lineItems} />}
     </Shell>
-  );
-}
-
-function MobileTotalBar({ lineItems }: { lineItems: LineItem[] }) {
-  const { total, deposit } = computeTotals(lineItems, 30);
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/90 backdrop-blur lg:hidden">
-      <div className="container-x flex items-center justify-between py-3">
-        <div>
-          <p className="text-[11px] text-faint">Total</p>
-          <p className="font-display text-base font-semibold tabular-nums">
-            {formatARS(total)}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-[11px] text-faint">Adelanto 30%</p>
-          <p className="font-display text-base font-semibold tabular-nums text-gradient">
-            {formatARS(deposit)}
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -447,15 +508,32 @@ function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" aria-label="RUN72 — inicio">
             <Logo />
           </Link>
-          <Link
-            href="/"
-            className="text-sm text-muted transition-colors hover:text-fg"
-          >
+          <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
             Volver al sitio
           </Link>
         </div>
       </header>
       <main className="container-x py-10 pb-28 md:py-14 lg:pb-14">{children}</main>
+    </div>
+  );
+}
+
+function MobileTotalBar({ lineItems }: { lineItems: LineItem[] }) {
+  const { total, deposit } = computeTotals(lineItems, 30);
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/90 backdrop-blur lg:hidden">
+      <div className="container-x flex items-center justify-between py-3">
+        <div>
+          <p className="text-[11px] text-faint">Total (IVA incl.)</p>
+          <p className="font-display text-base font-semibold tabular-nums">{formatARS(total)}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[11px] text-faint">Adelanto 30%</p>
+          <p className="font-display text-base font-semibold tabular-nums text-gradient">
+            {formatARS(deposit)}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -505,12 +583,56 @@ function SkeletonCards({ n }: { n: number }) {
   return (
     <>
       {Array.from({ length: n }).map((_, i) => (
-        <div
-          key={i}
-          className="h-[76px] animate-pulse rounded-2xl border border-line bg-surface/40"
-        />
+        <div key={i} className="h-[76px] animate-pulse rounded-2xl border border-line bg-surface/40" />
       ))}
     </>
+  );
+}
+
+function FileUpload({
+  files,
+  onUpload,
+  onRemove,
+}: {
+  files: LeadFile[];
+  onUpload: (f: FileList) => void;
+  onRemove: (url: string) => void;
+}) {
+  return (
+    <div>
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-line-strong bg-surface/40 px-4 py-6 text-center transition-colors hover:bg-surface-2/60">
+        <span className="text-sm font-medium">Adjuntar archivos</span>
+        <span className="text-xs text-faint">PDFs, imágenes, documentos o referencias (opcional)</span>
+        <input
+          type="file"
+          multiple
+          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,.gif,.txt,.fig,.ppt,.pptx,.xls,.xlsx"
+          className="hidden"
+          onChange={(e) => e.target.files && onUpload(e.target.files)}
+        />
+      </label>
+      {files.length > 0 && (
+        <ul className="mt-3 flex flex-col gap-2">
+          {files.map((f) => (
+            <li
+              key={f.url}
+              className="flex items-center justify-between gap-3 rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm"
+            >
+              <a href={f.url} target="_blank" rel="noopener noreferrer" className="truncate text-muted hover:text-fg">
+                {f.name}
+              </a>
+              <button
+                type="button"
+                onClick={() => onRemove(f.url)}
+                className="shrink-0 text-xs text-faint hover:text-red-300"
+              >
+                Quitar
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -521,39 +643,183 @@ function ContactForm({
   contact: Contact;
   onChange: (c: Contact) => void;
 }) {
-  const fields: Array<{
-    key: keyof Contact;
-    label: string;
-    type: string;
-    required?: boolean;
-    placeholder: string;
-    autoComplete: string;
-  }> = [
-    { key: "name", label: "Nombre", type: "text", required: true, placeholder: "Tu nombre", autoComplete: "name" },
-    { key: "company", label: "Empresa", type: "text", placeholder: "Opcional", autoComplete: "organization" },
-    { key: "email", label: "Email", type: "email", required: true, placeholder: "tu@email.com", autoComplete: "email" },
-    { key: "phone", label: "Teléfono", type: "tel", placeholder: "Opcional", autoComplete: "tel" },
-  ];
-
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {fields.map((f) => (
-        <label key={f.key} className="flex flex-col gap-1.5">
-          <span className="text-sm text-muted">
-            {f.label}
-            {f.required && <span className="text-brand-cyan"> *</span>}
-          </span>
-          <input
-            type={f.type}
-            value={contact[f.key]}
-            required={f.required}
-            placeholder={f.placeholder}
-            autoComplete={f.autoComplete}
-            onChange={(e) => onChange({ ...contact, [f.key]: e.target.value })}
-            className="h-12 rounded-xl border border-line bg-surface/60 px-4 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
+      <Field label="Nombre" required>
+        <input
+          type="text"
+          value={contact.name}
+          required
+          autoComplete="name"
+          placeholder="Tu nombre"
+          onChange={(e) => onChange({ ...contact, name: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Empresa">
+        <input
+          type="text"
+          value={contact.company}
+          autoComplete="organization"
+          placeholder="Opcional"
+          onChange={(e) => onChange({ ...contact, company: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Email" required hint="A este email te enviaremos la factura y documentación del proyecto.">
+        <input
+          type="email"
+          value={contact.email}
+          required
+          autoComplete="email"
+          placeholder="tu@email.com"
+          onChange={(e) => onChange({ ...contact, email: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="WhatsApp" required>
+        <input
+          type="tel"
+          value={contact.whatsapp}
+          required
+          autoComplete="tel"
+          placeholder="Ej: +54 9 11 1234 5678"
+          onChange={(e) => onChange({ ...contact, whatsapp: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
+    </div>
+  );
+}
+
+const inputCls =
+  "h-12 rounded-xl border border-line bg-surface/60 px-4 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2";
+
+function Field({
+  label,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-sm text-muted">
+        {label}
+        {required && <span className="text-brand-cyan"> *</span>}
+      </span>
+      {children}
+      {hint && <span className="text-xs text-faint">{hint}</span>}
+    </label>
+  );
+}
+
+function PreviewView({
+  preview,
+  loading,
+  rating,
+  comments,
+  onRating,
+  onComments,
+}: {
+  preview: Preview | null;
+  loading: boolean;
+  rating: number | null;
+  comments: string;
+  onRating: (r: number) => void;
+  onComments: (c: string) => void;
+}) {
+  return (
+    <div>
+      {loading || !preview ? (
+        <div className="glass rounded-3xl p-8 text-center">
+          <div className="mx-auto mb-4 h-1 w-40 overflow-hidden rounded-full bg-white/[0.06]">
+            <motion.div
+              className="h-full w-1/3 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet"
+              animate={{ x: ["-100%", "300%"] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+          <p className="text-sm text-muted">Imaginando tu proyecto…</p>
+        </div>
+      ) : (
+        <div className="glass rounded-3xl p-6 sm:p-7">
+          <p className="text-pretty text-base leading-relaxed">{preview.interpretation}</p>
+
+          {/* Layout conceptual */}
+          <div className="mt-6">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.16em] text-faint">
+              Estructura sugerida
+            </p>
+            <div className="flex flex-col gap-2">
+              {preview.structure.map((section, i) => (
+                <div
+                  key={`${section}-${i}`}
+                  className="flex items-center gap-3 rounded-xl border border-line bg-ink/40 px-4 py-3"
+                  style={{ opacity: 1 - i * 0.04 }}
+                >
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-brand-cyan/30 to-brand-violet/30 text-xs font-medium text-gradient">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm">{section}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-line bg-surface/40 p-4">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Enfoque visual</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{preview.visualApproach}</p>
+          </div>
+
+          <p className="mt-5 text-pretty font-display text-lg font-medium leading-snug text-gradient">
+            “{preview.summary}”
+          </p>
+        </div>
+      )}
+
+      {/* Rating + comentarios */}
+      <div className="mt-6 rounded-3xl border border-line bg-surface/30 p-6">
+        <p className="text-sm font-medium">
+          ¿Qué tan cerca está de lo que imaginabas?
+          <span className="text-brand-cyan"> *</span>
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Array.from({ length: 10 }).map((_, i) => {
+            const n = i + 1;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => onRating(n)}
+                className={cn(
+                  "h-10 w-10 rounded-xl border text-sm font-medium tabular-nums transition-all",
+                  rating === n
+                    ? "border-transparent bg-gradient-to-br from-brand-cyan to-brand-violet text-ink"
+                    : "border-line bg-ink/40 text-muted hover:border-line-strong hover:text-fg",
+                )}
+              >
+                {n}
+              </button>
+            );
+          })}
+        </div>
+
+        <label className="mt-5 flex flex-col gap-1.5">
+          <span className="text-sm text-muted">Comentarios o ajustes (opcional)</span>
+          <textarea
+            value={comments}
+            onChange={(e) => onComments(e.target.value)}
+            rows={3}
+            placeholder="¿Qué cambiarías o sumarías a esta visión?"
+            className="rounded-xl border border-line bg-surface/60 px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
           />
         </label>
-      ))}
+      </div>
     </div>
   );
 }
