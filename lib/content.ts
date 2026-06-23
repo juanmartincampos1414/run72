@@ -224,7 +224,7 @@ export const PROJECTS: Project[] = [
     accent: ["#a855f7", "#6366f1"],
   },
   {
-    name: "Tips.li",
+    name: "Tips",
     category: "Plataforma Digital",
     description: "Plataforma y presencia digital lista para operar.",
     url: "https://tips.li",
