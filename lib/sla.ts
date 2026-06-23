@@ -66,14 +66,6 @@ export const SLA_COLOR: Record<SlaBucket, { bar: string; text: string; label: st
   expired: { bar: "from-red-600 to-red-700", text: "text-red-500", label: "Fuera de SLA" },
 };
 
-/** ¿El lead está en ventana de producción (SLA corriendo)? */
-export function isActiveProject(lead: {
-  status: string;
-  production_started_at: string | null;
-}): boolean {
-  return Boolean(lead.production_started_at) && lead.status === "en_produccion";
-}
-
 /* ---------------- Estados de pago (badges) ---------------- */
 
 export type AnticipoState =

@@ -7,6 +7,20 @@ export const dynamic = "force-dynamic";
 const BUCKET = "lead-files";
 const MAX = 20 * 1024 * 1024; // 20 MB
 
+/** Extensiones permitidas (en paridad con el `accept` del cotizador). Validamos por
+ *  extensión —no por MIME— porque archivos como .fig llegan con type "" / octet-stream.
+ *  Nunca permitimos HTML/SVG/JS/ejecutables: el bucket es público y un archivo servido
+ *  desde ahí con ese content-type podría ejecutar scripts (XSS / phishing). */
+const ALLOWED_EXT = new Set([
+  "pdf", "doc", "docx", "png", "jpg", "jpeg", "webp", "gif",
+  "txt", "fig", "ppt", "pptx", "xls", "xlsx",
+]);
+
+function extOf(name: string): string {
+  const i = name.lastIndexOf(".");
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : "";
+}
+
 /** Sube archivos adjuntos del cotizador al bucket y devuelve sus URLs públicas. */
 export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
@@ -24,6 +38,7 @@ export async function POST(req: Request) {
 
   for (const file of files.slice(0, 10)) {
     if (file.size > MAX) continue;
+    if (!ALLOWED_EXT.has(extOf(file.name))) continue; // descartamos extensiones no permitidas
     const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80);
     const path = `${crypto.randomUUID()}-${safe}`;
     const { error } = await supabase.storage

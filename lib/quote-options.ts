@@ -25,12 +25,6 @@ export const OBJECTIVES: Option[] = [
   { value: "otro", label: "Otro" },
 ];
 
-export const TIMINGS: Option[] = [
-  { value: "asap", label: "Lo antes posible", hint: "Ejecución exprés en 72 horas" },
-  { value: "30d", label: "Dentro de 30 días" },
-  { value: "90d", label: "Dentro de 90 días" },
-];
-
 export function labelFor(options: Option[], value: string | null): string | null {
   if (!value) return null;
   return options.find((o) => o.value === value)?.label ?? value;
