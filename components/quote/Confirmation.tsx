@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
 import { track } from "@/lib/track";
+import { FaqAccordion } from "./FaqAccordion";
 import type { QuoteResult } from "@/lib/types";
 import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
@@ -259,6 +260,9 @@ export function Confirmation({
           el presupuesto final para iniciar.
         </div>
       )}
+
+      {/* FAQ pre-pago (administrable desde /admin/faqs) */}
+      <FaqAccordion />
 
       <div className="mt-6 flex items-center justify-center gap-4">
         <Button href="/" variant="secondary" size="md">

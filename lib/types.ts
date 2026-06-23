@@ -95,6 +95,14 @@ export type Lead = {
   estimated_delivery_at: string | null;
 };
 
+export type Faq = {
+  id: string;
+  question: string;
+  answer: string;
+  sort_order: number;
+  active: boolean;
+};
+
 export type LeadFile = { name: string; url: string; type: string };
 
 /** Payload que envía el configurador al crear un lead. */
