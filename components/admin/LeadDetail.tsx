@@ -9,6 +9,7 @@ import {
   saldoState,
 } from "@/lib/sla";
 import { SlaBar } from "./SlaBar";
+import { DELIVERY_FIELDS, resolveDeliveryDoc, type DeliveryDoc } from "@/lib/delivery";
 import type { Lead, ProjectPreview } from "@/lib/types";
 
 type Version = {
@@ -251,6 +252,11 @@ export function LeadDetail({ leadId }: { leadId: string }) {
         </Section>
       )}
 
+      {/* Documento Final de Entrega */}
+      <Section title="Documento Final de Entrega">
+        <DeliveryDocEditor lead={lead} leadId={leadId} />
+      </Section>
+
       {/* Auditoría */}
       <Section title="Auditoría">
         {events.length === 0 ? (
@@ -280,6 +286,57 @@ function fmt(iso: string) {
   return new Date(iso).toLocaleString("es-AR", {
     day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit",
   });
+}
+
+function DeliveryDocEditor({ lead, leadId }: { lead: Lead; leadId: string }) {
+  const [doc, setDoc] = useState<DeliveryDoc>(() => resolveDeliveryDoc(lead));
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    setSaved(false);
+    await fetch(`/api/admin/leads/${leadId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ delivery_doc: doc }),
+    });
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  return (
+    <div>
+      <p className="mb-4 text-xs text-faint">
+        Pre-llenado con la info del lead. Completá credenciales, configuraciones y recomendaciones al entregar.
+        Es el documento maestro que recibe el cliente.
+      </p>
+      <div className="grid gap-3">
+        {DELIVERY_FIELDS.map((f) => (
+          <label key={f.key} className="flex flex-col gap-1.5">
+            <span className="text-xs text-muted">{f.label}</span>
+            <textarea
+              value={doc[f.key]}
+              onChange={(e) => setDoc({ ...doc, [f.key]: e.target.value })}
+              rows={f.key === "resumen" || f.key === "recomendaciones" || f.key === "configuraciones" ? 3 : 2}
+              className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-brand-blue/60"
+            />
+          </label>
+        ))}
+      </div>
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded-full bg-white px-5 py-2 text-sm font-medium text-ink disabled:opacity-60"
+        >
+          {saving ? "Guardando…" : "Guardar documento"}
+        </button>
+        {saved && <span className="text-sm text-emerald-400">Guardado ✓</span>}
+      </div>
+    </div>
+  );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

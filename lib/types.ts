@@ -96,6 +96,7 @@ export type Lead = {
   estimated_delivery_at: string | null;
   intake: Record<string, unknown> | null;
   preparation_level: string | null;
+  delivery_doc: Record<string, unknown> | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };

@@ -62,6 +62,19 @@ export async function PATCH(
   const supabase = getSupabaseAdmin();
   const observaciones = (body.observaciones ?? "").trim() || null;
 
+  // Guardar Documento Final de Entrega
+  if (body.delivery_doc) {
+    const { data, error } = await supabase
+      .from("leads")
+      .update({ delivery_doc: body.delivery_doc })
+      .eq("id", id)
+      .select("*")
+      .single();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await logEvent(supabase, "delivery_doc_updated", id, { actor });
+    return NextResponse.json({ lead: data });
+  }
+
   if (body.action) {
     if (body.action === "approve_payment") {
       await supabase
