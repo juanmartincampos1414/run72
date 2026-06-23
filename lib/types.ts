@@ -111,6 +111,8 @@ export type QuoteSubmission = {
   previewRating: number | null;
   previewComments: string;
   previewText: string | null;
+  sessionId?: string;
+  funnelStepReached?: number;
   contact: {
     name: string;
     company: string;

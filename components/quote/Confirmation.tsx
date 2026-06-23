@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { formatARS } from "@/lib/pricing";
+import { track } from "@/lib/track";
 import type { QuoteResult } from "@/lib/types";
 import { CheckIcon, BoltIcon } from "../icons";
 import { Button } from "../ui/Button";
@@ -45,6 +46,7 @@ export function Confirmation({
   async function payWithMP() {
     setPaying(true);
     setPayError(null);
+    track("payment_initiated", { leadId: result.leadId, method: "mercadopago" });
     try {
       const res = await fetch("/api/payments/preference", {
         method: "POST",
@@ -348,6 +350,7 @@ function ComprobanteUploader({ leadId, enabled }: { leadId: string; enabled: boo
     if (!file) return;
     setSending(true);
     setError(null);
+    track("payment_initiated", { leadId, method: "transferencia" });
     try {
       const form = new FormData();
       form.append("leadId", leadId);

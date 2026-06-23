@@ -144,6 +144,9 @@ export async function POST(req: Request) {
   if (selectedMicros.length > 0) extraRow.microservices_selected = selectedMicros;
   extraRow.complexity_score = complexityScore;
   extraRow.requires_manual_review = requiresReview;
+  if (body.sessionId) extraRow.session_id = body.sessionId;
+  if (typeof body.funnelStepReached === "number")
+    extraRow.funnel_step_reached = body.funnelStepReached;
 
   // Insert resiliente: si una columna nueva no existe todavía, reintenta sin extras.
   let lead: { id: string } | null = null;

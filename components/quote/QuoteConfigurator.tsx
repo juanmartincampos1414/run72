@@ -10,6 +10,7 @@ import { Confirmation } from "./Confirmation";
 import { MicroserviceDrawer } from "./MicroserviceDrawer";
 import { ArrowRight } from "../icons";
 import { computeTotals, formatARS } from "@/lib/pricing";
+import { track, getSessionId } from "@/lib/track";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT } from "@/lib/quote-options";
 import type { LeadFile, LineItem, Microservice, QuoteResult, Service } from "@/lib/types";
 import type { Preview } from "@/app/api/preview/route";
@@ -114,6 +115,11 @@ export function QuoteConfigurator() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ state, step }));
   }, [state, step, hydrated]);
 
+  // Tracking: inicio del cotizador (una vez por sesión de carga)
+  useEffect(() => {
+    track("cotizador_started");
+  }, []);
+
   const projects = useMemo(
     () => (services ?? []).filter((s) => s.type === "project"),
     [services],
@@ -156,12 +162,16 @@ export function QuoteConfigurator() {
     return state.microservices.filter((k) => k.startsWith(`${serviceSlug}:`)).length;
   }
   function toggleMicro(key: string) {
-    setState((s) => ({
-      ...s,
-      microservices: s.microservices.includes(key)
-        ? s.microservices.filter((k) => k !== key)
-        : [...s.microservices, key],
-    }));
+    setState((s) => {
+      const on = !s.microservices.includes(key);
+      track("microservice_toggled", { key, on });
+      return {
+        ...s,
+        microservices: on
+          ? [...s.microservices, key]
+          : s.microservices.filter((k) => k !== key),
+      };
+    });
   }
 
   const stepValid = useMemo(() => {
@@ -193,6 +203,7 @@ export function QuoteConfigurator() {
   useEffect(() => {
     if (step !== LAST_STEP || previewFetched.current || !services) return;
     previewFetched.current = true;
+    track("preview_viewed");
     setPreviewLoading(true);
     const projectNames = state.projectTypes.map(
       (slug) =>
@@ -221,6 +232,7 @@ export function QuoteConfigurator() {
   }, [step, services, projects, addonList, state]);
 
   function go(delta: number) {
+    if (delta > 0) track("step_completed", { step, label: STEP_LABELS[step] });
     setDir(delta);
     setStep((s) => Math.max(0, Math.min(LAST_STEP, s + delta)));
   }
@@ -228,6 +240,7 @@ export function QuoteConfigurator() {
   function toggle(list: "projectTypes" | "addons", slug: string) {
     setState((s) => {
       const isOn = s[list].includes(slug);
+      if (!isOn) track("service_selected", { service: slug, list });
       return {
         ...s,
         [list]: isOn ? s[list].filter((x) => x !== slug) : [...s[list], slug],
@@ -273,11 +286,14 @@ export function QuoteConfigurator() {
           previewComments: state.previewComments,
           previewText: preview ? JSON.stringify(preview) : null,
           contact: state.contact,
+          sessionId: getSessionId(),
+          funnelStepReached: LAST_STEP + 1,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "No se pudo generar el presupuesto.");
       setResult(data as QuoteResult);
+      track("checkout_started", { leadId: (data as QuoteResult).leadId, total: (data as QuoteResult).total });
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Error inesperado.");
@@ -496,7 +512,10 @@ export function QuoteConfigurator() {
                     loading={previewLoading}
                     rating={state.previewRating}
                     comments={state.previewComments}
-                    onRating={(r) => setState((s) => ({ ...s, previewRating: r }))}
+                    onRating={(r) => {
+                      track("preview_scored", { rating: r });
+                      setState((s) => ({ ...s, previewRating: r }));
+                    }}
                     onComments={(c) => setState((s) => ({ ...s, previewComments: c }))}
                   />
                 </Step>
