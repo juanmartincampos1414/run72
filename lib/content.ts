@@ -19,14 +19,10 @@ export const SITE = {
  * Mientras tanto, el CTA abre un email pre-armado como fallback funcional.
  */
 export const QUOTE = {
-  /** Cambiar a "/cotizar" cuando el cotizador multi-paso esté publicado. */
-  href: `mailto:${SITE.email}?subject=${encodeURIComponent(
-    "Quiero cotizar mi proyecto",
-  )}&body=${encodeURIComponent(
-    "Hola RUN72, quiero lanzar mi proyecto en 72 horas.\n\nQué quiero construir:\n\nObjetivo / industria:\n\nFecha ideal de lanzamiento:\n",
-  )}`,
-  /** true = fallback email actual · false = ruta interna del cotizador. */
-  isFallbackEmail: true,
+  /** Cotizador web multi-paso. */
+  href: "/cotizar",
+  /** true = fallback email · false = ruta interna del cotizador. */
+  isFallbackEmail: false,
   label: "Cotizar mi proyecto",
   labelShort: "Cotizar",
 } as const;
