@@ -37,6 +37,8 @@ const EVENT_LABEL: Record<string, string> = {
   preview_regenerated: "Preview regenerado",
   production_started: "Proyecto iniciado",
   status_changed: "Cambio de estado",
+  proposal_generated: "Propuesta generada (chat)",
+  lead_created_from_chat: "Lead creado desde chat",
 };
 
 export function LeadDetail({ leadId }: { leadId: string }) {
@@ -103,6 +105,15 @@ export function LeadDetail({ leadId }: { leadId: string }) {
             {lead.company ? ` · ${lead.company}` : ""}
           </p>
           <p className="mt-1 text-sm text-fg">{lead.project_label ?? "—"}</p>
+          <span
+            className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+              lead.source_type === "chat"
+                ? "bg-brand-violet/15 text-brand-violet"
+                : "bg-white/[0.06] text-muted"
+            }`}
+          >
+            {lead.source_type === "chat" ? "💬 Chat" : "⚡ Formulario"}
+          </span>
         </div>
         <div className="text-right">
           <p className="font-display text-xl font-semibold tabular-nums">{formatARS(lead.total_ars)}</p>
@@ -116,6 +127,13 @@ export function LeadDetail({ leadId }: { leadId: string }) {
           <p className="mb-2 text-xs text-faint">SLA 72 horas</p>
           <SlaBar startedAt={lead.production_started_at} deadlineAt={lead.estimated_delivery_at} />
         </div>
+      )}
+
+      {/* Resumen conversacional (leads de chat) */}
+      {lead.conversation_summary && (
+        <Section title="Resumen de la conversación">
+          <p className="text-sm leading-relaxed text-muted">{lead.conversation_summary}</p>
+        </Section>
       )}
 
       {/* Pago + comprobante */}

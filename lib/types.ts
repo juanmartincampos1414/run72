@@ -97,6 +97,8 @@ export type Lead = {
   intake: Record<string, unknown> | null;
   preparation_level: string | null;
   delivery_doc: Record<string, unknown> | null;
+  source_type: string; // "form" | "chat"
+  conversation_summary: string | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };
@@ -144,6 +146,8 @@ export type QuoteSubmission = {
   preparationLevel?: string;
   sessionId?: string;
   funnelStepReached?: number;
+  sourceType?: string; // "form" | "chat"
+  conversationSummary?: string;
   contact: {
     name: string;
     company: string;

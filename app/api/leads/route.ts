@@ -166,6 +166,9 @@ export async function POST(req: Request) {
     extraRow.funnel_step_reached = body.funnelStepReached;
   if (body.intake) extraRow.intake = body.intake;
   if (body.preparationLevel) extraRow.preparation_level = body.preparationLevel;
+  const sourceType = body.sourceType === "chat" ? "chat" : "form";
+  extraRow.source_type = sourceType;
+  if (body.conversationSummary) extraRow.conversation_summary = body.conversationSummary;
 
   // Insert resiliente: si una columna nueva no existe todavía, reintenta sin extras.
   let lead: { id: string } | null = null;
@@ -193,7 +196,10 @@ export async function POST(req: Request) {
     );
   }
 
-  await logEvent(supabase, "lead_created", lead.id, { total, projectLabel });
+  await logEvent(supabase, "lead_created", lead.id, { total, projectLabel, source: sourceType });
+  if (sourceType === "chat") {
+    await logEvent(supabase, "lead_created_from_chat", lead.id, { total });
+  }
 
   return NextResponse.json({
     leadId: lead.id,

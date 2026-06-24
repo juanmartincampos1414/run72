@@ -25,7 +25,11 @@ export type EventType =
   | "preview_scored"
   | "checkout_started"
   | "payment_initiated"
-  | "payment_completed";
+  | "payment_completed"
+  | "chat_started"
+  | "proposal_generated"
+  | "proposal_accepted"
+  | "lead_created_from_chat";
 
 export function track(eventType: EventType, metadata: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
