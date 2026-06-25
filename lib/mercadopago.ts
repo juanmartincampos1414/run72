@@ -122,6 +122,69 @@ export async function getPayment(
   return (await res.json()) as MPPayment;
 }
 
+/* ---------------- Suscripciones (preapproval) ---------------- */
+
+export type MPPreapproval = {
+  id: string;
+  init_point: string;
+  status: string; // pending | authorized | paused | cancelled
+  external_reference: string | null;
+};
+
+/** Crea una suscripción mensual (preapproval) y devuelve el init_point para autorizar. */
+export async function createPreapproval(opts: {
+  accessToken: string;
+  reason: string;
+  amount: number;
+  externalReference: string; // userId del Hub
+  payerEmail: string;
+  baseUrl: string;
+}): Promise<MPPreapproval> {
+  const res = await fetch(`${MP_API}/preapproval`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${opts.accessToken}`,
+    },
+    body: JSON.stringify({
+      reason: opts.reason,
+      external_reference: opts.externalReference,
+      payer_email: opts.payerEmail,
+      auto_recurring: {
+        frequency: 1,
+        frequency_type: "months",
+        transaction_amount: opts.amount,
+        currency_id: "ARS",
+      },
+      back_url: `${opts.baseUrl}/hub`,
+      status: "pending",
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text();
+    throw new Error(`MercadoPago preapproval: ${res.status} ${detail}`);
+  }
+  return (await res.json()) as MPPreapproval;
+}
+
+export async function getPreapproval(
+  accessToken: string,
+  preapprovalId: string,
+): Promise<MPPreapproval> {
+  const res = await fetch(`${MP_API}/preapproval/${preapprovalId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok) throw new Error(`MercadoPago preapproval ${preapprovalId}: ${res.status}`);
+  return (await res.json()) as MPPreapproval;
+}
+
+/** Mapea el estado de MP a nuestro subscription_status. */
+export function mapPreapprovalStatus(mpStatus: string): "active" | "suspended" | "cancelled" {
+  if (mpStatus === "authorized") return "active";
+  if (mpStatus === "cancelled") return "cancelled";
+  return "suspended"; // pending | paused | otros
+}
+
 /** Deriva la URL base pública desde el request (fallback a run72.app). */
 export function baseUrlFrom(req: Request): string {
   const env = process.env.NEXT_PUBLIC_SITE_URL;

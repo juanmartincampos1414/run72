@@ -4,6 +4,15 @@
  * (tabla hub_checklist). El score se computa server/client desde esos estados.
  */
 
+/** Precio de la suscripción mensual al Business Hub (ARS). */
+export const HUB_PRICE_ARS = 25000;
+
+/** Carpetas del Centro de Documentos. */
+export const HUB_FOLDERS = ["Contratos", "Facturas", "Marca", "Legal", "Impuestos", "General"] as const;
+
+/** Extensiones permitidas para documentos del Hub. */
+export const HUB_DOC_EXT = ["pdf", "doc", "docx", "xls", "xlsx", "png", "jpg", "jpeg"] as const;
+
 export type HubStatus = "pendiente" | "en_proceso" | "completado" | "no_aplica";
 
 export const STATUS_LABEL: Record<HubStatus, string> = {
