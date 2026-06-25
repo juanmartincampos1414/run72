@@ -156,67 +156,83 @@ export function ChatConcierge({ onBack }: { onBack: () => void }) {
 
   return (
     <Shell onBack={onBack}>
-      <div className="mx-auto flex h-[calc(100vh-220px)] min-h-[460px] max-w-2xl flex-col">
-        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pb-4">
-          {messages.map((m, i) => (
-            <Bubble key={i} role={m.role} content={m.content} />
-          ))}
+      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1fr_360px]">
+        {/* Columna del chat */}
+        <div className="flex h-[60vh] flex-col lg:h-[calc(100vh-200px)]">
+          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pb-4">
+            {messages.map((m, i) => (
+              <Bubble key={i} role={m.role} content={m.content} />
+            ))}
 
-          {loading && <Typing />}
+            {loading && <Typing />}
 
-          {pricing && proposal && !creating && (
+            {creating && (
+              <div className="rounded-2xl border border-line bg-surface/40 p-4 text-sm text-muted">
+                Generando tu presupuesto…
+              </div>
+            )}
+
+            {error && (
+              <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </p>
+            )}
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              send(input);
+            }}
+            className="mt-2 flex items-end gap-2 border-t border-line pt-4"
+          >
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send(input);
+                }
+              }}
+              rows={1}
+              placeholder="Escribí tu mensaje…"
+              disabled={creating}
+              className="max-h-32 flex-1 resize-none rounded-2xl border border-line bg-surface/60 px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
+            />
+            <button
+              type="submit"
+              disabled={!input.trim() || loading || creating}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet text-ink transition-transform hover:scale-105 disabled:pointer-events-none disabled:opacity-40"
+              aria-label="Enviar"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+
+        {/* Panel de propuesta (fuera del chat) */}
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          {pricing && proposal && !creating ? (
             <ProposalCard
               proposal={proposal}
               pricing={pricing}
               onAccept={acceptProposal}
               onAdjust={adjustProposal}
             />
-          )}
-
-          {creating && (
-            <div className="rounded-2xl border border-line bg-surface/40 p-4 text-sm text-muted">
-              Generando tu presupuesto…
+          ) : (
+            <div className="hidden rounded-3xl border border-dashed border-line bg-surface/20 p-6 text-center lg:block">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] text-brand-cyan">
+                <BoltIcon className="h-5 w-5" />
+              </div>
+              <p className="mt-3 text-sm font-medium tracking-tight">Tu propuesta RUN72</p>
+              <p className="mt-1 text-xs leading-relaxed text-faint">
+                Acá vas a ver el detalle y el precio en cuanto definamos tu proyecto.
+              </p>
             </div>
           )}
-
-          {error && (
-            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-              {error}
-            </p>
-          )}
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(input);
-          }}
-          className="mt-2 flex items-end gap-2 border-t border-line pt-4"
-        >
-          <textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send(input);
-              }
-            }}
-            rows={1}
-            placeholder="Escribí tu mensaje…"
-            disabled={creating}
-            className="max-h-32 flex-1 resize-none rounded-2xl border border-line bg-surface/60 px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-faint focus:border-brand-blue/60 focus:bg-surface-2"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim() || loading || creating}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet text-ink transition-transform hover:scale-105 disabled:pointer-events-none disabled:opacity-40"
-            aria-label="Enviar"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </form>
+        </aside>
       </div>
     </Shell>
   );
