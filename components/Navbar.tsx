@@ -51,7 +51,13 @@ export function Navbar() {
             ))}
           </ul>
 
-          <div className="hidden md:block">
+          <div className="hidden items-center gap-2 md:flex">
+            <a
+              href="/hub"
+              className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:text-fg"
+            >
+              Business Hub
+            </a>
             <QuoteButton label={QUOTE.labelShort} withArrow={false} size="md" />
           </div>
 
@@ -103,6 +109,13 @@ export function Navbar() {
                 {link.label}
               </a>
             ))}
+            <a
+              href="/hub"
+              onClick={() => setOpen(false)}
+              className="rounded-2xl px-4 py-3 text-sm text-muted transition-colors hover:bg-white/[0.04] hover:text-fg"
+            >
+              Business Hub
+            </a>
             <QuoteButton label={QUOTE.labelShort} className="mt-1 w-full" />
           </div>
         </motion.div>
