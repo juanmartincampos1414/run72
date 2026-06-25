@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { PriceInput } from "@/components/admin/PriceInput";
 import type { Microservice } from "@/lib/types";
 
 type Draft = {
@@ -109,7 +110,7 @@ export default function MicroserviciosPage() {
             <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} className={inp} />
           </Field>
           <Field label="Precio ARS">
-            <input type="number" value={draft.price_ars} onChange={(e) => setDraft({ ...draft, price_ars: Number(e.target.value) })} className={inp} />
+            <PriceInput value={draft.price_ars} onChange={(n) => setDraft({ ...draft, price_ars: n })} className={inp} />
           </Field>
           <Field label="Orden">
             <input type="number" value={draft.sort_order} onChange={(e) => setDraft({ ...draft, sort_order: Number(e.target.value) })} className={inp} />
@@ -157,10 +158,9 @@ export default function MicroserviciosPage() {
                   />
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-faint">$</span>
-                    <input
-                      type="number"
+                    <PriceInput
                       value={m.price_ars}
-                      onChange={(e) => patch(m.id, { price_ars: Number(e.target.value) })}
+                      onChange={(n) => patch(m.id, { price_ars: n })}
                       className="w-24 rounded-lg border border-line bg-surface px-2 py-1.5 text-right text-xs tabular-nums outline-none"
                     />
                   </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatARS } from "@/lib/pricing";
+import { PriceInput } from "@/components/admin/PriceInput";
 import type { Service } from "@/lib/types";
 
 type Draft = {
@@ -116,10 +117,9 @@ export default function ServiciosPage() {
             />
           </Field>
           <Field label="Precio ARS">
-            <input
-              type="number"
+            <PriceInput
               value={draft.price_ars}
-              onChange={(e) => setDraft({ ...draft, price_ars: Number(e.target.value) })}
+              onChange={(n) => setDraft({ ...draft, price_ars: n })}
               className={inputCls}
             />
           </Field>
@@ -188,10 +188,9 @@ export default function ServiciosPage() {
 
             <div className="flex items-center gap-1">
               <span className="text-xs text-faint">$</span>
-              <input
-                type="number"
+              <PriceInput
                 value={s.price_ars}
-                onChange={(e) => patch(s.id, { price_ars: Number(e.target.value) })}
+                onChange={(n) => patch(s.id, { price_ars: n })}
                 className="w-28 rounded-lg border border-line bg-surface px-3 py-1.5 text-right text-xs tabular-nums outline-none"
               />
             </div>
