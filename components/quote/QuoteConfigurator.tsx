@@ -588,7 +588,7 @@ export function QuoteConfigurator() {
                 disabled={!stepValid || submitting}
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-40"
               >
-                {submitting ? "Generando…" : "Quiero mi proyecto en 72 horas"}
+                {submitting ? "Generando…" : "Run72"}
                 {!submitting && <ArrowRight className="h-4 w-4" />}
               </button>
             )}
