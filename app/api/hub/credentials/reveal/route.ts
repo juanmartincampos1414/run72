@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { requireActiveHub } from "@/lib/hub-guard";
 import { decrypt, vaultReady } from "@/lib/crypto";
 import { logEvent } from "@/lib/audit";
 
@@ -15,11 +15,10 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
   if (!vaultReady()) return NextResponse.json({ error: "Bóveda no configurada." }, { status: 503 });
 
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !user.email) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
+  if (!user.email) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
 
   const b = await req.json().catch(() => ({}));
   const id = String(b.id ?? "");

@@ -16,37 +16,15 @@ import {
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-type Profile = { company_name: string | null; subscription_status: string } | null;
-
 export function HubDashboard() {
   const [statuses, setStatuses] = useState<Record<string, HubStatus>>({});
-  const [profile, setProfile] = useState<Profile>(null);
-  const [loading, setLoading] = useState(true);
   const [openArea, setOpenArea] = useState<string | null>(null);
 
   useEffect(() => {
-    async function init() {
-      // Al volver de MercadoPago, confirmamos el estado de la suscripción.
-      const preapprovalId = new URLSearchParams(window.location.search).get("preapproval_id");
-      if (preapprovalId) {
-        await fetch("/api/hub/subscribe", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preapprovalId }),
-        }).catch(() => {});
-        window.history.replaceState({}, "", "/hub");
-      }
-      try {
-        const d = await (await fetch("/api/hub/checklist")).json();
-        setStatuses(d.statuses ?? {});
-        setProfile(d.profile ?? null);
-      } catch {
-        /* noop */
-      } finally {
-        setLoading(false);
-      }
-    }
-    init();
+    fetch("/api/hub/checklist")
+      .then((r) => (r.ok ? r.json() : { statuses: {} }))
+      .then((d) => setStatuses(d.statuses ?? {}))
+      .catch(() => {});
   }, []);
 
   const score = useMemo(() => overallScore(statuses), [statuses]);
@@ -61,24 +39,8 @@ export function HubDashboard() {
     }).catch(() => {});
   }
 
-  if (loading) {
-    return (
-      <HubShell>
-        <div className="py-20 text-center text-sm text-faint">Cargando tu panel…</div>
-      </HubShell>
-    );
-  }
-
-  if (profile && profile.subscription_status !== "active") {
-    return (
-      <HubShell company={profile.company_name}>
-        <Suspended status={profile.subscription_status} />
-      </HubShell>
-    );
-  }
-
   return (
-    <HubShell company={profile?.company_name ?? null}>
+    <HubShell>
       {/* Hero: score general */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -204,48 +166,4 @@ function stColor(st: HubStatus): string {
   if (st === "en_proceso") return "text-amber-300";
   if (st === "no_aplica") return "text-faint";
   return "text-muted";
-}
-
-function Suspended({ status }: { status: string }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function subscribe() {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/hub/subscribe", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok || !data.init_point) throw new Error(data.error ?? "No se pudo iniciar la suscripción.");
-      window.location.href = data.init_point;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error inesperado.");
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="mx-auto max-w-md rounded-3xl border border-amber-500/30 bg-amber-500/[0.06] p-8 text-center">
-      <p className="text-3xl">🔒</p>
-      <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight">
-        Tu acceso está {status === "cancelled" ? "cancelado" : "suspendido"}
-      </h1>
-      <p className="mt-3 text-sm leading-relaxed text-muted">
-        Tus datos están guardados y a salvo. Para volver a entrar, activá tu suscripción mensual.
-      </p>
-      <button
-        type="button"
-        onClick={subscribe}
-        disabled={busy}
-        className="mt-5 w-full rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet py-3 text-sm font-semibold text-ink transition-transform hover:scale-[1.01] disabled:opacity-50"
-      >
-        {busy ? "Redirigiendo a MercadoPago…" : "Activar suscripción"}
-      </button>
-      {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-      <p className="mt-4 text-xs text-faint">
-        ¿Dudas? Escribinos a{" "}
-        <a href="mailto:hola@run72.app" className="text-brand-cyan hover:underline">hola@run72.app</a>.
-      </p>
-    </div>
-  );
 }

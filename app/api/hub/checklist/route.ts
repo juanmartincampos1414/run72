@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { requireActiveHub } from "@/lib/hub-guard";
 import { HUB_AREAS, STATUS_ORDER, type HubStatus } from "@/lib/hub";
 
 export const dynamic = "force-dynamic";
@@ -55,8 +56,9 @@ export async function GET() {
 /** Actualiza el estado de un ítem del checklist del usuario. */
 export async function POST(req: Request) {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
-  const user = await currentUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
 
   const body = await req.json().catch(() => ({}));
   const itemKey = String(body.itemKey ?? "");

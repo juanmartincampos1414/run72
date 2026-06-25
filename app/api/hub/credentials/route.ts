@@ -1,24 +1,17 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { requireActiveHub } from "@/lib/hub-guard";
 import { encrypt, vaultReady } from "@/lib/crypto";
 import { logEvent } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
-async function currentUser() {
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
-}
-
 /** Lista las credenciales del usuario SIN datos sensibles descifrados. */
 export async function GET() {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
-  const user = await currentUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
 
   const { data } = await getSupabaseAdmin()
     .from("hub_credentials")
@@ -43,8 +36,9 @@ export async function GET() {
 export async function POST(req: Request) {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
   if (!vaultReady()) return NextResponse.json({ error: "La bóveda no está configurada (falta HUB_VAULT_KEY)." }, { status: 503 });
-  const user = await currentUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
 
   const b = await req.json().catch(() => ({}));
   if (!b.service_name?.trim()) return NextResponse.json({ error: "El nombre del servicio es obligatorio." }, { status: 400 });
@@ -67,8 +61,9 @@ export async function POST(req: Request) {
 /** Elimina una credencial del usuario. */
 export async function DELETE(req: Request) {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
-  const user = await currentUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Falta id." }, { status: 400 });
 

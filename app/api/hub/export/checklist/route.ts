@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { requireActiveHub } from "@/lib/hub-guard";
 import { HUB_AREAS, STATUS_LABEL, overallScore, type HubStatus } from "@/lib/hub";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +12,9 @@ function csvCell(s: string): string {
 /** Exporta el checklist + estado del negocio en CSV (abre en Excel). */
 export async function GET() {
   if (!isSupabaseConfigured()) return NextResponse.json({ error: "No configurado." }, { status: 503 });
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
+  const user = auth.user;
 
   const { data } = await getSupabaseAdmin()
     .from("hub_checklist")

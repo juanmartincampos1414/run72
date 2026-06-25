@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServer } from "@/lib/supabase/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { requireActiveHub } from "@/lib/hub-guard";
 
 export const dynamic = "force-dynamic";
 
 /** Partners recomendados visibles para el cliente (solo activos). */
 export async function GET() {
   if (!isSupabaseConfigured()) return NextResponse.json({ partners: [] });
-  const supabase = await createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  const auth = await requireActiveHub();
+  if ("response" in auth) return auth.response;
 
   const { data } = await getSupabaseAdmin()
     .from("hub_partners")
