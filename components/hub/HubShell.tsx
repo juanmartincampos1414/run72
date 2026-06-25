@@ -8,6 +8,8 @@ import { createSupabaseBrowser } from "@/lib/supabase/client";
 const NAV = [
   { href: "/hub", label: "Resumen" },
   { href: "/hub/documentos", label: "Documentos" },
+  { href: "/hub/partners", label: "Partners" },
+  { href: "/hub/credenciales", label: "Credenciales" },
 ];
 
 export function HubShell({

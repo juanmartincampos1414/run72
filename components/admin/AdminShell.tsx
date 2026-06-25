@@ -13,6 +13,8 @@ const LINKS = [
   { href: "/admin/servicios", label: "Servicios" },
   { href: "/admin/microservicios", label: "Microservicios" },
   { href: "/admin/faqs", label: "FAQs" },
+  { href: "/admin/hub", label: "Business Hub" },
+  { href: "/admin/hub/partners", label: "Hub · Partners" },
   { href: "/admin/configuracion", label: "Configuración" },
 ];
 

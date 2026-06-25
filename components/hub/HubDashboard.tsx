@@ -111,6 +111,12 @@ export function HubDashboard() {
               Entrá una vez por semana y resolvé lo que esté en rojo o amarillo. Todo lo
               importante de tu negocio, en un solo lugar.
             </p>
+            <a
+              href="/api/hub/export/checklist"
+              className="mt-3 inline-block text-xs font-medium text-brand-cyan hover:underline"
+            >
+              ↓ Exportar checklist (CSV)
+            </a>
           </div>
         </div>
       </motion.div>
