@@ -31,7 +31,10 @@ export function HubLogin() {
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { data: { company_name: company.trim() } },
+          options: {
+            data: { company_name: company.trim() },
+            emailRedirectTo: `${window.location.origin}/hub`,
+          },
         });
         if (error) throw error;
         if (data.session) {
