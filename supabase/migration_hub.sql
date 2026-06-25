@@ -14,8 +14,9 @@ create table if not exists public.hub_profiles (
   user_id             uuid primary key,
   company_name        text,
   email               text,
-  -- 'active' | 'suspended' | 'cancelled' (lo maneja la suscripción de MP en Fase 2)
-  subscription_status text not null default 'active',
+  -- 'active' | 'suspended' | 'cancelled'. Default 'suspended' = suscripción
+  -- obligatoria: el cliente nuevo debe activar la suscripción de MP para entrar.
+  subscription_status text not null default 'suspended',
   created_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
 );
