@@ -40,9 +40,27 @@ export async function middleware(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const isAdmin = Boolean(user) && isAdminEmail(user?.email);
 
   const path = req.nextUrl.pathname;
+
+  // --- Business Hub (clientes): cualquier usuario autenticado ---
+  if (path === "/hub" || path.startsWith("/hub/")) {
+    const isHubLogin = path.startsWith("/hub/login");
+    if (!user && !isHubLogin) {
+      const redirect = req.nextUrl.clone();
+      redirect.pathname = "/hub/login";
+      return NextResponse.redirect(redirect);
+    }
+    if (user && isHubLogin) {
+      const redirect = req.nextUrl.clone();
+      redirect.pathname = "/hub";
+      return NextResponse.redirect(redirect);
+    }
+    return res;
+  }
+
+  // --- Admin RUN72: solo allowlist ---
+  const isAdmin = Boolean(user) && isAdminEmail(user?.email);
   const isLogin = path.startsWith("/admin/login");
 
   if (!isAdmin && !isLogin) {
@@ -60,5 +78,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/hub", "/hub/:path*"],
 };
