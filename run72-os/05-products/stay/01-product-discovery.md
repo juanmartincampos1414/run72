@@ -4,93 +4,90 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 01 Product Discovery |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v0.2 |
+| **Estado** | Draft (listo para Review) |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
 
-> **Cómo leer este documento.** Lo que aparece como **🔹 Hipótesis** son supuestos
-> derivados de la tesis de RUN72 sobre Stay (no son evidencia todavía: hay que
-> confirmarlos o corregirlos). Lo que aparece como **❓ Abierto** necesita tu input
-> como Founder y/o investigación de campo. Guía: el *Product Discovery Playbook*.
-
----
-
-## 0. Para arrancar necesito de vos (Founder)
-
-Según el Playbook, Discovery empieza por el Founder. Para reemplazar hipótesis por
-realidad, lo primero:
-
-1. **El problema de Stay en UNA frase** (qué dolor, de quién). Sin solución.
-2. **¿Por qué te importa / por qué ahora?**
-3. **¿Quién es exactamente el cliente?** (¿hoteles boutique? ¿alquileres temporarios?
-   ¿hostels? ¿cadenas chicas?) — tu intuición inicial.
-
-Con eso empezamos a llenar las secciones de abajo.
+> Fuente: `00 Founder Brief`. ✅ = respondido por el Founder · 🧪 = supuesto a validar
+> en el piloto (Palacio Paz). Guía: *Product Discovery Playbook*.
 
 ---
 
 ## 1. Problema
 
-- **Frase del problema:** ❓ Abierto (input del Founder).
-- 🔹 **Hipótesis:** los alojamientos dependen de OTAs (Booking, Airbnb, Expedia) para
-  conseguir huéspedes; pagan comisiones altas y **no son dueños de la relación con el
-  huésped** (datos, contacto, recompra). Cada estadía termina y la relación se pierde.
-- **Alternativa actual:** ❓ ¿Cómo intentan hoy fidelizar / captar directo? (mail manual,
-  WhatsApp, nada, un PMS, planillas).
-- **Costo del problema:** ❓ ¿Cuánto pierden en comisiones / recompra no capturada?
+✅ **Frase:** los hoteles pagan comisiones altas a las OTAs para conseguir huéspedes y,
+una vez que el huésped llega, **no logran convertir esa estadía en una relación directa**;
+cada nueva reserva vuelve a pagar comisión.
+
+- **Alternativa actual:** 🧪 cómo intentan hoy fidelizar/captar directo (mail, WhatsApp,
+  programas propios, nada) — a relevar en el piloto.
+- **Costo del problema:** 🧪 cuánto representan las comisiones OTA y la recompra no
+  capturada para un hotel boutique — a cuantificar en el piloto.
 
 ## 2. ICP y usuarios
 
-- **¿Quién paga (ICP)?** ❓ Abierto. 🔹 Hipótesis: dueño/operador de alojamiento chico-mediano.
-- **¿Quién usa?** ❓ ¿el mismo dueño? ¿recepción? ¿el huésped también?
-- **¿Quién decide / quién bloquea la compra?** ❓ Abierto.
+- ✅ **Quién paga (ICP):** hoteles, foco inicial **boutique** (piloto: Palacio Paz Hotel
+  Boutique, con restaurante Trufa).
+- 🧪 **Quién usa:** hotel (recepción/management) + el **huésped** durante la estadía
+  (puntos de captura). A precisar roles en el piloto.
+- 🧪 **Quién decide/bloquea la compra:** dueño/dirección del hotel — confirmar.
 
 ## 3. Por qué existe + Categoría
 
-- **Por qué existe:** 🔹 para que cada alojamiento **sea dueño de su relación directa
-  con el huésped** en vez de alquilarla a las OTAs.
-- **Categoría:** 🔹 **Direct Guest Platform (DGP)** — categoría propia, no "otro PMS"
-  ni "otro channel manager". (Confirmar/afinar.)
+- ✅ **Por qué existe:** romper la dependencia de las OTAs convirtiendo cada estadía en
+  una relación directa hotel–huésped.
+- ✅ **Categoría:** **Direct Guest Platform (DGP)** — categoría nueva. No es PMS, ni CRM,
+  ni Booking Engine. **Vive por encima del stack del hotel y lo conecta.**
 
 ## 4. North Star
 
-- 🔹 **Candidata:** *relaciones directas con huéspedes activadas* (o % de estadías
-  convertidas en relación directa / recompra directa). ❓ A definir con el Founder.
+✅ **Turn Every Stay Into a Direct Relationship.**
+🧪 Métrica operativa a definir (p. ej. % de estadías convertidas en relación directa /
+reservas directas atribuibles a Stay).
 
 ## 5. Momento mágico
 
-- ❓ Abierto. 🔹 Hipótesis: el instante en que el alojamiento ve **su primer huésped que
-  vuelve (o reserva directo) sin pagar comisión**.
+🧪 Hipótesis: el hotel ve su **primera reserva directa de un huésped que llegó por OTA**
+(comisión evitada). A confirmar/observar en el piloto.
 
 ## 6. Qué NO hace (límites)
 
-- 🔹 Hipótesis a confirmar: **no** reemplaza al PMS, **no** es un channel manager,
-  **no** compite con las OTAs en captación inicial. (Ver AD futura tipo "¿Por qué Stay
-  no reemplaza un PMS?" mencionada en el POS.)
-- ❓ ¿Qué más queda explícitamente afuera del MVP?
+✅ No es PMS, Channel Manager, Booking Engine ni CRM tradicional. No administra reservas
+ni reemplaza software existente. **Conecta, no reemplaza.**
+- Registrar como AD: *"¿Por qué Stay no reemplaza un PMS?"* (mencionada en el POS).
 
-## 7. Supuestos críticos (a validar)
+## 7. Supuestos críticos (a validar en el piloto)
 
-- ❓ Que los alojamientos **quieren** y **pueden** captar directo (no dependen 100% de OTA por necesidad).
-- ❓ Que hay disposición a pagar por una herramienta dedicada a la relación directa.
-- ❓ Que el huésped acepta una relación directa con el alojamiento.
+- 🧪 Los hoteles **quieren y pueden** captar directo (no dependen 100% de OTA por necesidad).
+- 🧪 Hay **disposición a pagar** por una capa dedicada a la relación directa.
+- 🧪 El **huésped acepta** una relación directa con el hotel (identificación + post-checkout).
+- 🧪 Se puede **identificar** al huésped OTA durante la estadía (punto de captura efectivo).
 
 ## 8. Por qué RUN72 puede ganar
 
-- 🔹 Ventaja: enfoque AI-Native + velocidad (POS) + **componentes reutilizables** ya
-  existentes en el ecosistema candidatos a Stay: **Auth, Notification Engine,
-  Campaign Engine, Review Engine, Wallet, NFC, Analytics** (ver `04 Shared Components`).
-- ❓ ¿Tenés acceso/relación con alojamientos para validar e iterar rápido?
+- ✅ **Reutilización masiva** del ecosistema (Tips+/Margin) → velocidad: Guest Profiles,
+  NFC, QR, Wallet, Campaign/Notification/Review Engine, Dashboard, Auth, Roles, Orgs,
+  Analytics, Event Tracking (ver `04 Shared Components`). Metodología de Margin (POS).
+- ✅ **AI-Native** + el piloto real (Palacio Paz) para iterar aprendiendo, no vendiendo.
 
 ## 9. Evidencia
 
-- ❓ Pendiente: 5–8 conversaciones con dueños/operadores + revisión de cómo resuelven
-  hoy + competidores. (Resumir acá los hallazgos a medida que aparezcan.)
+🧪 **Pendiente (piloto Palacio Paz):** observar el Guest Journey real, cuantificar comisiones
+y recompra, y validar los 4 supuestos críticos. El objetivo del piloto es **aprender**.
 
 ---
 
-### Estado de cierre
-Para pasar a **Frozen** (y habilitar `02 Brand System`) faltan: la frase del problema,
-ICP confirmado, North Star definido, "qué NO hace" cerrado y los supuestos con plan de
-validación. Hoy: **Draft**.
+## Alcance del MVP (referencia — se profundiza en `10 MVP Scope`)
+
+Hipótesis a validar: **¿Podemos convertir huéspedes OTA en huéspedes directos?**
+Construir solo: Guest Capture · Guest Club · Direct Booking Incentive · CRM básico ·
+Campaigns · Review Flow · Dashboard · Integraciones esenciales. Reutilizar de Tips+/Margin.
+
+## Para pasar a Frozen (faltante)
+
+- [ ] Definir la **métrica operativa** del North Star.
+- [ ] Cerrar **momento mágico** y roles de usuario.
+- [ ] Plan concreto de **validación** de los 4 supuestos en el piloto.
+- [ ] (Idealmente) primeras observaciones de campo de Palacio Paz.
+- [ ] Aprobación del Founder + Freeze Checklist del Playbook.
