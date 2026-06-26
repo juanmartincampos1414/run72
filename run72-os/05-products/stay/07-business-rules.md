@@ -4,10 +4,20 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 07 Business Rules |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna. Parámetros comerciales = defaults a calibrar en el piloto (no reabren la etapa). |
+
+## Principio de decisión (AD-004)
+
+Por defecto, las Business Rules **proponen**, no imponen:
+- Las **Rules** determinan **qué debería ocurrir**.
+- Los **Engines** lo ejecutan.
+- **Stay propone** la acción cuando corresponde.
+- El **hotel conserva el control operativo**, salvo **automatizaciones que configure
+  explícitamente** (opt-in). Habilita automatización progresiva a futuro.
 
 > Toda la **lógica de decisión** (AD-003). Los Engines la ejecutan. Reglas **declarativas** y
 > **configurables por propiedad**. `⚙️` = parámetro configurable · `🧪` = umbral a validar en el
@@ -81,7 +91,9 @@
 
 > Los umbrales `🧪` se calibran con datos reales del piloto; arrancamos con los defaults.
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder a las reglas (transiciones + atribución + guardrails).
-- [ ] Resolver (o marcar como "a calibrar en piloto") las 3 decisiones de negocio.
-- [ ] Aprobación → **Frozen v1.0** → habilita `08 API & Ecosystem Strategy`.
+## Freeze Checklist
+- [x] Reglas de transición del Lifecycle (R-L1…L7), no lineales.
+- [x] Identidad/consentimiento, atribución, incentivos, beneficios, guardrails.
+- [x] Principio AD-004 (Stay propone, el hotel decide).
+- [x] Parámetros comerciales con defaults, marcados **a calibrar en el piloto** (opción B).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `08 API & Ecosystem Strategy`.

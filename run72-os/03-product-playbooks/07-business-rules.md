@@ -13,6 +13,12 @@
 > reglas la **deciden**. Las reglas se expresan de forma **declarativa** (condición → resultado)
 > y **configurable por cliente** (cada propiedad puede ajustar umbrales).
 
+## Principio (AD-004): proponer por defecto
+
+Las Business Rules **proponen** decisiones/recomendaciones; **no sustituyen** la decisión
+operativa del cliente. La ejecución automática es **opt-in**. Esto reduce riesgo y habilita
+**automatización progresiva** (sugerir → asistir → automatizar).
+
 ## 1. Objetivo
 Definir, antes de desarrollar, todas las reglas: transiciones de estado, qué puede hacer cada
 actor, restricciones, automatizaciones y qué eventos disparan qué.
