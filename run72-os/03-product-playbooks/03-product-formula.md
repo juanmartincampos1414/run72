@@ -11,6 +11,13 @@
 
 > Etapa 03 del Stage Gate. Sintetiza el producto en **una sola página** (y una sola frase).
 
+## Regla metodológica (RUN72)
+
+**El Product Formula es siempre la definición de UNA página del producto.** Si cualquier
+persona de RUN72 necesita entender qué es un producto en **menos de dos minutos**, este
+documento debe ser suficiente. Si no alcanza con una página, el producto todavía no está
+suficientemente claro.
+
 ## 1. Objetivo
 
 Destilar todo lo definido (Discovery + Brand) en una **fórmula clara, corta y memorable**:

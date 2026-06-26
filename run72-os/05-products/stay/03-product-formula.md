@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 03 Product Formula |
-| **Versión** | v0.1 |
-| **Estado** | Draft (propuesta lista para Frozen) |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna (solo cambia si cambian Discovery o Brand System en nueva versión) |
 
 > Síntesis de `01 Discovery` (FROZEN) + `02 Brand System` (FROZEN). Esta etapa **no descubre
 > nada nuevo**: consolida en una página.
@@ -40,7 +41,9 @@
 
 ---
 
-## Para pasar a Frozen (faltante)
-- [ ] Aprobación del Founder → **Frozen v1.0** → habilita `04 Journey Map`.
+## Freeze Checklist
+- [x] Frase única + one-pager completo.
+- [x] Sintetiza Discovery + Brand (no descubre nada nuevo).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `04 Journey Map`.
 
 > Nota: Buyer/Usuario son la definición de trabajo; se precisan en `04 Journey Map`.
