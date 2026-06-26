@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 04 Journey Map |
-| **Versión** | v0.2 |
-| **Estado** | Draft (listo para Frozen) |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna (mejoras futuras → nueva versión, sin reabrir la etapa) |
 
 > Dos niveles (ver **AD-002**): un **Relationship Lifecycle universal** (modelo del producto)
 > y un **Hotel Journey** (implementación de cada propiedad). De los estados del Lifecycle nacen
@@ -32,9 +33,12 @@ transición emite un **evento** que alimenta el ecosistema. Aplica a **cualquier
 | **Returning** | Reserva **directa** (recompra sin OTA) | Convertir la relación en ingreso directo | `stay.directbooking.confirmed` |
 | **Advocate** | Recomienda: reseña / refiere | Convertir la satisfacción en crecimiento | `stay.guest.advocated` |
 
-> Nota: el Lifecycle mide **profundidad de relación**, no el tiempo de una estadía. Una sola
-> estadía puede avanzar varios estados; Loyal/Returning/Advocate se consolidan en el post-stay
-> y a través de futuras estadías. Advocate puede ocurrir antes que Returning.
+> **Aclaración conceptual (importante).** El Relationship Lifecycle **no es una secuencia
+> temporal rígida**: es un **modelo de estados que representa el nivel/profundidad de la
+> relación** hotel–huésped. En la práctica, un huésped puede convertirse en **Advocate antes
+> que Returning**, o permanecer **mucho tiempo en Loyal sin volver todavía**. Lo que importa no
+> es el orden cronológico, sino la **profundidad de la relación**. (Diseñar Engines/KPIs sobre
+> esta base, no sobre un flujo lineal.)
 
 ---
 
@@ -80,7 +84,10 @@ Property (hotel/org) · Reward · Booking (directa) · Event.
 
 ---
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder al Lifecycle universal (estados + orden) y al mapeo de Palacio Paz.
-- [ ] Entry Points quedan como candidatos a validar en el piloto (no se fijan).
-- [ ] Aprobación → **Frozen v1.0** → habilita `05 Product Engines`.
+## Freeze Checklist
+- [x] Relationship Lifecycle universal (8 estados) + aclaración de profundidad ≠ tiempo.
+- [x] Hotel Journey (Palacio Paz) mapeado a los estados.
+- [x] Entry Points = mecanismos a validar en el piloto (no fijados).
+- [x] Eventos definidos como transiciones de estado.
+- [x] KPIs / Engines / Entities derivados del Lifecycle (puntero a 05/06).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `05 Product Engines`.
