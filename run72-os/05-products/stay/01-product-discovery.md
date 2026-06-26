@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 01 Product Discovery |
-| **Versión** | v0.3 |
-| **Estado** | Draft (propuesta lista para Frozen) |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna (las mejoras futuras van en una nueva versión, no reabren la etapa) |
 
 > Fuente: `00 Founder Brief` + refinamiento del Founder (Guest Journey + North Star
 > económica). ✅ = definido · 🧪 = supuesto a validar en el piloto (Palacio Paz).
@@ -50,18 +51,18 @@ de captura y prepara los **Product Engines** (etapa 05).
 
 ## 5. North Star
 
-✅ **Visión:** *Turn Every Stay Into a Direct Relationship.*
+Separamos lo que el **producto controla** del **impacto económico** para el hotel:
 
-✅ **North Star (económica, valor para el hotel):** **OTA Revenue Recaptured** — los ingresos
-que el hotel deja de pagar a las OTAs y captura directo gracias a Stay (reservas directas
-atribuibles + comisiones evitadas). Mide el impacto económico real, no el uso.
+- ✅ **Visión:** *Turn Every Stay Into a Direct Relationship.*
+- ✅ **North Star (Producto):** **Direct Guest Relationship Rate** — % de huéspedes que pasan
+  a formar parte de una relación directa con el hotel gracias a Stay. Es la métrica que el
+  producto controla y debe maximizar.
+- ✅ **Business Outcome (ROI del hotel):** **OTA Revenue Recaptured** — ingresos recuperados +
+  comisiones evitadas gracias a Stay. Es el principal indicador de valor económico.
 
-**Métricas operativas (drivers, no North Star):**
-- **Guest Capture Rate** — % de huéspedes identificados durante la estadía.
-- **Direct Booking Conversion** — % de huéspedes que reservan directo después.
-- **CRM Growth** — crecimiento de la base de huéspedes directos del hotel.
+**Métricas operativas (drivers):** Guest Capture Rate · Direct Booking Conversion · CRM Growth.
 
-🧪 Fórmula exacta de atribución (qué reserva cuenta como "recapturada") a cerrar con el piloto.
+🧪 Fórmulas/umbrales exactos de cada métrica a cerrar con el piloto.
 
 ## 6. Momento mágico
 
@@ -109,5 +110,6 @@ Reutilizar de Tips+/Margin.
 - [x] North Star económica + métricas operativas.
 - [x] Momento mágico.
 - [x] Qué NO hace.
+- [x] North Star de Producto + Business Outcome separados.
 - [x] Supuestos críticos con **plan de validación** documentado.
-- [ ] Aprobación del Founder → pasar a **Frozen v1.0** y habilitar `02 Brand System`.
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `02 Brand System`.
