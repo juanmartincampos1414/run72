@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 10 Build Specs |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna. El stack/infra se define en `12 Arquitectura`, no acá. |
 
 > Solo implementación, solo el **MVP Scope (09 FROZEN)**. ♻️ = reutiliza Tips+/Shared · 🆕 = nuevo.
 > Doble pregunta (LL-002): lo 🆕 se diseña para que sea reutilizable por el ecosistema.
@@ -79,7 +80,9 @@ Recaptured** (de `commission_saved`). Distribución de huéspedes por estado.
 Integraciones PMS/CRS/POS/Payments/Wallet-NFC-WiFi · automatizaciones operativas · multi-propiedad ·
 plataforma de beneficios · motor de reglas externo · IA avanzada. (Ver 09.)
 
-## Para pasar a Frozen (faltante)
-- [ ] Revisión Founder + Engineering del set de módulos y modelo de datos.
-- [ ] Confirmar stack/Arquitectura concreta → se define en `12 Arquitectura` (no acá).
-- [ ] Aprobación → **Frozen v1.0** → habilita `11 Sprint Planning`.
+## Freeze Checklist
+- [x] Modelo de datos del MVP definido.
+- [x] Módulos/engines con responsabilidad, API, eventos y reutilización marcada.
+- [x] Connectors del MVP con contratos mínimos (Draft, se certifican con providers reales).
+- [x] Solo implementación; sin estrategia nueva; stack se decide en `12 Arquitectura`.
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `11 Sprint Planning`.
