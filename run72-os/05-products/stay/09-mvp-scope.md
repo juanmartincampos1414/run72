@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 09 MVP Scope |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna. Parámetros (incl. tipo de incentivo) = configurables, se calibran en el piloto. |
 
 > El MVP valida **una sola hipótesis**. Lo más importante de este doc es el **NO-alcance**.
 > Piloto: Palacio Paz (+ Trufa). Guía: *MVP Scope Playbook*.
@@ -36,6 +37,12 @@ Direct Relationship · Relationship Intelligence (básico) · Loyalty/Club (mín
 Reviews (**Google**) · AI Intelligence (insights básicos) · Analytics (interno).
 **Flows del Brief:** Guest Capture · Guest Club (mínimo) · Direct Booking Incentive · CRM básico ·
 Campaigns · Review Flow · Dashboard.
+
+> **Direct Booking Incentive = concepto + regla configurable (no una plataforma de beneficios).**
+> El MVP valida que **un incentivo personalizado convierte una relación OTA en directa** — no qué
+> incentivo gana. El **tipo de beneficio es un parámetro configurable por propiedad** (R-IN2 de `07`).
+> En Palacio Paz arranca **manual**: late checkout, welcome drink, beneficio en Trufa, upgrade
+> sujeto a disponibilidad, código de descuento, etc. Construimos el **mecanismo**, no el catálogo.
 **Atribución:** **manual/CSV** (no integración PMS).
 **Reglas:** las de `07` con defaults; ejecución **propuesta** (AD-004), no automática.
 
@@ -57,7 +64,9 @@ Campaigns · Review Flow · Dashboard.
 - Atribución manual/CSV de la primera reserva directa.
 - Objetivo: **aprender** y calibrar umbrales — no vender software.
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder a la hipótesis, in-scope y **NO-alcance**.
-- [ ] Confirmar criterio de éxito (aunque los umbrales se calibren en piloto).
-- [ ] Aprobación → **Frozen v1.0** → habilita `10 Build Specs`.
+## Freeze Checklist
+- [x] Hipótesis única (OTA → directo, medible).
+- [x] In-scope mínimo + **NO-alcance explícito**.
+- [x] Criterio de éxito (umbrales a calibrar en piloto).
+- [x] Direct Booking Incentive = concepto + regla configurable (mecanismo, no catálogo).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `10 Build Specs`.
