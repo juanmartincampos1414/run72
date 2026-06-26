@@ -4,10 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 05 Product Engines |
-| **Versión** | v0.2 |
-| **Estado** | Draft (listo para Frozen) |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna (mejoras futuras → nueva versión, sin reabrir la etapa) |
 
 > Capacidades permanentes derivadas del **Relationship Lifecycle** (`04`, FROZEN), conectadas
 > por **eventos**. Arquitectura en capas (**AD-003**): **Engines ejecutan · Business Rules
@@ -120,7 +121,9 @@ CRM/Guest Profile · Analytics/Event Tracking · Auth/Roles/Organizations.
    estadía (ventaja compuesta, AI-Native).
 4. **Connectors / Plugin System** — Stay corre en cualquier hotel sin atarse a una tecnología.
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder al set final (Connectors + 6 Engines) y al mapa de capas/eventos.
-- [ ] Confirmar que la lógica de decisión queda reservada para `07 Business Rules`.
-- [ ] Aprobación → **Frozen v1.0** → habilita `06 Core Entities`.
+## Freeze Checklist
+- [x] Set final: Connectors (Plugins) + 6 Engines + reutilizados de Tips+.
+- [x] Engines ejecutan / Business Rules deciden (AD-003).
+- [x] Mapa de capas y eventos consistente con el Lifecycle.
+- [x] Reutilización de Tips+ marcada.
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `06 Core Entities`.
