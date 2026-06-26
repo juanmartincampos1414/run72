@@ -30,7 +30,15 @@ Secuenciar el build del MVP en incrementos pequeños, cada uno demostrable y cer
 - `10 Build Specs` **FROZEN** (+ 05–09).
 
 ## 4. Plantilla por sprint
-**Objetivo · Alcance (módulos/connectors) · Reutiliza · Definition of Done · Valor demostrable · Fuera.**
+Cada sprint **documenta explícitamente cuatro cosas** (regla RUN72) — así no entrega solo
+software, también **conocimiento reutilizable** (ventaja compuesta):
+
+1. **Hipótesis** que intenta validar.
+2. **Capacidad funcional** que entrega.
+3. **Definition of Done** (binario).
+4. **Aprendizaje esperado** al finalizar.
+
+(+ Alcance/módulos · Reutiliza · Fuera.)
 
 ## 5. Entregables
 `11 Sprint Planning`: la secuencia de sprints con su plantilla.
