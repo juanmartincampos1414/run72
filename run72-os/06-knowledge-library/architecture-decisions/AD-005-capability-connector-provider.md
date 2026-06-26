@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | Aceptada · **candidata a principio del POS** |
+| **Estado** | **Principio del Framework (PROMOVIDO)** · pendiente incorporar al POS en su próxima versión |
 | **Fecha** | Junio 2026 |
 | **Autor** | Founder |
 | **Ámbito** | **Todo RUN72** (Margin, Tips+, Stay y futuros) |

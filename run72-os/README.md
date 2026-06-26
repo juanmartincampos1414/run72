@@ -31,6 +31,14 @@ los entregables, los chequeos de Freeze). Empezamos por el primero:
 
 - [`03-product-playbooks/01-product-discovery.md`](03-product-playbooks/01-product-discovery.md) — **el que usamos para arrancar Stay.**
 
+## Principios del Framework (ADs promovidas)
+
+- **Capability → Connector → Provider (AD-005).** Los productos dependen de **capacidades del
+  negocio**, nunca de proveedores. → [Capability Catalog](04-shared-components/capability-catalog.md)
+  (fuente de verdad) · capa operativa: [Integration Runtime (AD-006)](06-knowledge-library/architecture-decisions/AD-006-integration-runtime.md).
+- Otras decisiones vivas: AD-002 (Relationship Lifecycle), AD-003 (Engines/Rules/Connectors/Shared),
+  AD-004 (proponer, no imponer). Ver `06-knowledge-library/architecture-decisions/`.
+
 ## Reglas de oro
 
 - **Markdown es la fuente de verdad.** PDFs/presentaciones son versiones congeladas para comunicar, no para trabajar.
