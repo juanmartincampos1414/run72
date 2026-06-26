@@ -14,6 +14,17 @@
 > Engines, el CRM y el conocimiento. Si el Journey Map está bien hecho, los Product Engines
 > (etapa 05) **emergen solos**.
 
+## Principio: dos niveles (ver AD-002)
+
+Separar siempre:
+1. **Relationship Lifecycle** — el **modelo universal** del producto (estados de la relación).
+   De los estados nacen Engines, Core Entities, KPIs y CRM.
+2. **[Cliente] Journey** — la **implementación específica** (cómo cada cliente activa esos
+   estados con sus momentos operativos).
+
+Los **Entry Points** son mecanismos de implementación: se validan, no se fijan en el modelo.
+Esto hace que el producto no dependa del flujo de un cliente puntual y tenga un modelo propio.
+
 ## 1. Objetivo
 
 Mapear todos los momentos de la relación y, en cada uno, detectar la oportunidad del producto
