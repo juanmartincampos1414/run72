@@ -4,10 +4,16 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 06 Core Entities |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna (mejoras futuras → nueva versión, sin reabrir la etapa) |
+
+> **Decisión registrada:** `RelationshipState` (profundidad de relación · capa conceptual del
+> Lifecycle) y `Membership/Reward` (beneficios/club · capa comercial) se mantienen **separadas**
+> a propósito — son conceptos distintos; fusionarlas mezclaría el modelo del Lifecycle con la
+> capa de beneficios.
 
 > El modelo de datos del dominio. **Sin lógica** (la lógica vive en `07 Business Rules`).
 > 🌐 = compartida (reutilizable en el ecosistema RUN72) · 🏠 = propia de Stay (algunas son
@@ -99,7 +105,9 @@ Property 1───* Stay *───1 Guest
 - **Candidatas a compartidas (Regla del Tres):** RelationshipState y Moment — si otro producto
   necesita modelar relación/interacciones, se promueven a `04 Shared Components`.
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder al modelo de entidades y relaciones.
-- [ ] Confirmar compartidas vs propias.
-- [ ] Aprobación → **Frozen v1.0** → habilita `07 Business Rules`.
+## Freeze Checklist
+- [x] Entidades + relaciones definidas, sin lógica.
+- [x] Compartidas vs propias marcadas; reutilización de Tips+ explícita.
+- [x] RelationshipState y Membership/Reward separadas (decisión registrada).
+- [x] RelationshipState y Moment marcadas candidatas a compartidas (Regla del Tres).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `07 Business Rules`.
