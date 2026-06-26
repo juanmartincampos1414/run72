@@ -4,122 +4,123 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 05 Product Engines |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v0.2 |
+| **Estado** | Draft (listo para Frozen) |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
 
-> Capacidades permanentes derivadas del **Relationship Lifecycle** (`04`, FROZEN). Conectadas
-> por **eventos**, no por llamadas directas. 🆕 = nuevo · ♻️ = reutilizado de Tips+.
-> Guía: *Product Engines Playbook*.
+> Capacidades permanentes derivadas del **Relationship Lifecycle** (`04`, FROZEN), conectadas
+> por **eventos**. Arquitectura en capas (**AD-003**): **Engines ejecutan · Business Rules
+> deciden · Connectors conectan · Shared Components se reutilizan.** 🆕 nuevo · ♻️ reutilizado de Tips+.
 
 ---
 
-## Mapa de eventos (cómo se conectan)
+## Principio rector
+**Los Engines no deciden, ejecutan.** Toda lógica de decisión (cuándo avanza un estado, qué
+incentivo aplica, qué beneficio corresponde) vive en `07 Business Rules`. Los Engines son
+deterministas, simples y reutilizables.
+
+## Mapa de capas y eventos
 
 ```
-Entry Point Engine ──stay.interaction.captured──▶ Experience/Moment + Guest Identity
-        Guest Identity ──identified / known──▶ Relationship Lifecycle Engine (CORE)
-        Experience/Moment ──engaged / recognized──▶ Relationship Lifecycle Engine
-Relationship Lifecycle ──transiciones (loyal, returning, advocated…)──▶
-        ▶ Loyalty/Club · Campaign · Notification · Review · Direct Booking/Recapture
-Todos los eventos ──▶ Analytics / Event Tracking (KPIs, North Star, Business Outcome)
+CONNECTORS (Plugins)  QR · NFC · WiFi · WhatsApp · Wallet · PMS · POS · Booking
+        │  traducen el mundo externo → stay.interaction.captured
+        ▼
+Guest Identity Engine ──identified/known──▶ Relationship Lifecycle Engine (CORE)
+Experience/Moment Engine ──engaged/recognized──▶ (ejecuta transiciones según Business Rules 07)
+                                          │ emite transiciones de estado
+        ┌─────────────────────────────────┼───────────────────────────────┐
+        ▼                                  ▼                               ▼
+ Direct Relationship Engine        Loyalty/Club Engine          Campaign · Notification · Review
+        │                                                                   │
+        └────────────▶ Relationship Intelligence Engine ◀──────────────────┘
+                 (aprende de TODO; produce conocimiento/insights)
+Todos los eventos ──▶ Analytics / Event Tracking (KPIs · North Star · Business Outcome)
 ```
+
+---
+
+## Connectors / Plugins *(no son Engines — AD-003)*
+QR · NFC · WiFi · WhatsApp · Wallet · PMS · POS · Booking Engine. Mecanismos de entrada/salida
+que **traducen el mundo externo a eventos normalizados** (`stay.interaction.captured`) y
+alimentan al Guest Identity Engine. Intercambiables; se validan en el piloto. Alineado con el
+**Plugin System** de RUN72.
 
 ---
 
 ## 🆕 1. Relationship Lifecycle Engine — **CORE**
-
-- **Objetivo:** ser el cerebro del modelo: mantener el **RelationshipState** de cada huésped y
-  avanzar la **profundidad** de la relación a partir de eventos (no lineal).
-- **Inputs:** eventos de interacción (Experience/Moment, Entry Point), identidad (Guest Identity), reservas (Direct Booking).
-- **Outputs:** estado actual + historial por Guest; **eventos de transición**.
-- **KPIs:** distribución de huéspedes por estado · tasas de transición · **Direct Guest Relationship Rate**.
-- **Dependencias:** Guest Identity, Event Tracking.
-- **APIs:** `getRelationshipState(guest)` · `advanceState(event)` · config de reglas de transición **por hotel**.
-- **Eventos:** consume interacción/identidad/reserva → emite `stay.guest.{identified,engaged,known,recognized,loyal,advocated}`, `stay.directbooking.confirmed`.
+- **Objetivo:** mantener el `RelationshipState` de cada huésped y **ejecutar** las transiciones
+  de profundidad de relación. **No decide** las transiciones: las dicta `07 Business Rules`.
+- **Inputs:** eventos de identidad / momento / reserva + **reglas de transición (07)**.
+- **Outputs:** estado actual + historial; **eventos de transición**.
+- **KPIs:** distribución por estado · tasas de transición · **Direct Guest Relationship Rate**.
+- **Dependencias:** Guest Identity, Business Rules (07), Event Tracking.
+- **APIs:** `getRelationshipState(guest)` · `applyTransition(guest, event)` *(según regla)*.
+- **Eventos:** emite `stay.guest.{identified,engaged,known,recognized,loyal,advocated}`.
 
 ## 🆕 2. Guest Identity Engine *(sobre Guest Profiles de Tips+)*
-
-- **Objetivo:** resolver y unificar la identidad del huésped (Anonymous→Identified→Known) a
-  través de canales, momentos y estadías. Un solo Guest, muchos touchpoints.
-- **Inputs:** señales de captura (Entry Point), datos pre-stay (OTA), opt-in.
+- **Objetivo:** resolver y unificar la identidad del huésped a través de connectors, momentos y estadías.
+- **Inputs:** `stay.interaction.captured` (de Connectors), datos pre-stay, opt-in.
 - **Outputs:** Guest unificado, match/merge, nivel de conocimiento.
-- **KPIs:** **Guest Capture Rate** · % perfiles unificados · completitud de datos.
+- **KPIs:** **Guest Capture Rate** · % perfiles unificados.
 - **Dependencias:** ♻️ Tips+ Guest Profiles, CRM.
-- **APIs:** `identify(signal)` · `resolve(guest)` · `enrich(prefs)`.
 - **Eventos:** emite `stay.guest.identified`, `stay.guest.known`.
 
-## 🆕 3. Entry Point Engine
-
-- **Objetivo:** abstraer los mecanismos de captura (QR/NFC/WiFi/WhatsApp/Wallet) en **una
-  interfaz única** → eventos de interacción normalizados, independientes del canal.
-- **Inputs:** tap NFC, scan QR, login WiFi, msg WhatsApp, acción Wallet.
-- **Outputs:** interaction event normalizado (quién · dónde · qué momento · qué canal).
-- **KPIs:** interacciones por Entry Point · **tasa de activación por canal** (clave para el piloto).
-- **Dependencias:** — (capa de entrada).
-- **APIs:** `registerEntryPoint(...)` · `handleInteraction(channel, payload)`.
-- **Eventos:** emite `stay.interaction.captured`.
-- *Nota:* desacopla el modelo de los canales (AD-002). Los canales se validan en el piloto.
-
-## 🆕 4. Experience / Moment Engine
-
-- **Objetivo:** registrar cada interacción como un **Moment** estructurado y derivar señales de
-  relación (Engaged/Recognized) y preferencias (Known) para el Lifecycle.
-- **Inputs:** `stay.interaction.captured`, contexto del momento (Hotel Journey).
-- **Outputs:** entidad **Moment/Interaction**, señales para el Lifecycle, datos de preferencia.
+## 🆕 3. Experience / Moment Engine
+- **Objetivo:** registrar cada interacción como un **Moment** estructurado y derivar señales
+  (Engaged/Recognized) y preferencias para el Lifecycle.
+- **Inputs:** `stay.interaction.captured`, contexto del momento.
+- **Outputs:** entidad **Moment/Interaction**, señales, preferencias.
 - **KPIs:** moments por estadía · engagement depth.
-- **Dependencias:** Entry Point, Lifecycle, CRM.
-- **APIs:** `logMoment(...)` · `getGuestMoments(guest)`.
+- **Dependencias:** Connectors, Lifecycle, CRM.
 - **Eventos:** emite `stay.guest.engaged`, `stay.experience.logged`, `stay.guest.recognized`.
 
-## 🆕 5. Direct Booking / Recapture Engine — **corazón del negocio**
+## 🆕 4. Direct Relationship Engine *(antes "Recapture" — responsabilidad ampliada)*
+- **Objetivo:** construir, sostener y **recuperar** la relación directa hotel–huésped a lo largo
+  del tiempo — incluida la reserva directa y su **atribución** (Returning), pero no limitada a ella.
+- **Inputs:** RelationshipState, incentivos/beneficios (según reglas 07), eventos post-stay,
+  datos de reserva (origen OTA vs directo, vía Connectors).
+- **Outputs:** acciones de relación directa, **atribución** de reserva, comisión evitada / revenue recapturado.
+- **KPIs:** **Direct Booking Conversion** · **OTA Revenue Recaptured** (Business Outcome) · recompra.
+- **Dependencias:** ♻️ Campaign, CRM, Lifecycle, Business Rules (07), Connectors (PMS/Booking).
+- **Eventos:** emite `stay.directrelationship.action`, `stay.directbooking.confirmed`.
 
-- **Objetivo:** impulsar y **atribuir** la reserva directa (Returning) y medir el **OTA Revenue
-  Recaptured**. Convierte la relación en ingreso directo. (El moat: la atribución.)
-- **Inputs:** RelationshipState (Loyal/Recognized), incentivos, eventos post-stay, datos de
-  reserva (origen OTA vs directo, vía integraciones).
-- **Outputs:** incentivo de reserva directa, **atribución** de la reserva, comisión evitada /
-  revenue recapturado.
-- **KPIs:** **Direct Booking Conversion** · **OTA Revenue Recaptured** (Business Outcome) · tiempo a recompra.
-- **Dependencias:** ♻️ Campaign (envío de incentivos), CRM, Lifecycle, Analytics, integraciones PMS/Booking (etapa 08).
-- **APIs:** `sendIncentive(guest)` · `attributeBooking(booking)` · `recapturedRevenue(property)`.
-- **Eventos:** emite `stay.directbooking.incentive_sent`, `stay.directbooking.confirmed`.
+## 🆕 5. Relationship Intelligence Engine
+- **Objetivo:** **aprender** sobre la relación huésped–hotel. No solo registra eventos: construye
+  **conocimiento** (perfiles enriquecidos, patrones, propensiones) que alimenta campañas,
+  recomendaciones, IA, personalización y decisiones futuras. (Capa AI-Native del producto.)
+- **Inputs:** todos los eventos del ecosistema (interacción, momentos, transiciones, reservas).
+- **Outputs:** insights, segmentos, recomendaciones, scores de propensión (p. ej. propensión a recompra directa).
+- **KPIs:** calidad/uso de insights · lift de campañas/recomendaciones impulsadas por el engine.
+- **Dependencias:** Analytics/Event Tracking, CRM, AI Gateway (Shared), Lifecycle.
+- **Eventos:** consume todo; emite `stay.insight.generated`, recomendaciones para Campaign/Direct Relationship.
 
 ## 🆕/♻️ 6. Loyalty / Club Engine *(reutiliza Wallet/Rewards de Tips+)*
-
-- **Objetivo:** gestionar el Guest Club, beneficios y rewards que sostienen la relación (Recognized→Loyal).
-- **Inputs:** RelationshipState, consumo (Trufa, spa), reglas de beneficios del hotel.
-- **Outputs:** membresía de club, rewards, beneficios aplicados.
-- **KPIs:** % miembros activos · reward redemption · retención (Loyal).
-- **Dependencias:** ♻️ Tips+ Wallet/Rewards, Lifecycle, CRM.
-- **APIs:** (de Wallet) `issueReward` · `redeem` · gestión de membresía.
+- **Objetivo:** ejecutar el Guest Club y los beneficios/rewards (Recognized→Loyal). **Qué beneficio
+  corresponde** lo deciden las Business Rules (07); el engine lo ejecuta.
+- **Inputs:** RelationshipState, consumo, reglas de beneficios (07).
+- **Outputs:** membresía, rewards, beneficios aplicados.
+- **KPIs:** % miembros activos · redemption · retención (Loyal).
+- **Dependencias:** ♻️ Tips+ Wallet/Rewards, Lifecycle, Business Rules (07), CRM.
 - **Eventos:** emite `stay.reward.redeemed`, `stay.guest.loyal`.
 
 ---
 
-## ♻️ Reutilizados directos de Tips+ (referencia — no se rediseñan)
-
-| Engine | Rol en Stay | Evento |
-|---|---|---|
-| **Campaign Engine** | Comms pre/post-stay + incentivos de reserva directa | consume transiciones |
-| **Notification Engine** | Avisos a staff/huésped (room service, etc.) | consume `stay.service.requested` |
-| **Review Engine** | Reseñas (→ Advocate) | emite `stay.guest.advocated` |
-| **CRM / Guest Profile** | Base de huéspedes directa del hotel | consume todo |
-| **Analytics / Event Tracking** | KPIs, North Star, Business Outcome | consume todo |
-| **Auth / Roles / Organizations** | Multi-propiedad, accesos | base |
+## ♻️ Reutilizados directos de Tips+ (referencia)
+Campaign Engine · Notification Engine · Review Engine (→ `stay.guest.advocated`) ·
+CRM/Guest Profile · Analytics/Event Tracking · Auth/Roles/Organizations.
 
 ---
 
 ## Las innovaciones más fuertes (para defender)
-1. **Relationship Lifecycle Engine** — el modelo conceptual hecho motor: nadie compite con una
-   feature, compiten con un modelo. Difícil de copiar.
-2. **Direct Booking / Recapture Engine** — la **atribución** del ingreso recuperado de las OTAs
-   es lo que vuelve el valor de Stay medible y vendible (ROI demostrable).
-3. **Entry Point Engine** — desacopla el modelo de los canales: Stay funciona en cualquier hotel
-   sin atarse a una tecnología.
+1. **Relationship Lifecycle Engine + Business Rules** — el modelo conceptual hecho motor, con la
+   lógica de decisión separada y versionable. Difícil de copiar.
+2. **Direct Relationship Engine** — la **atribución** del ingreso recuperado vuelve el ROI medible.
+3. **Relationship Intelligence Engine** — el producto **aprende** y se vuelve más valioso con cada
+   estadía (ventaja compuesta, AI-Native).
+4. **Connectors / Plugin System** — Stay corre en cualquier hotel sin atarse a una tecnología.
 
 ## Para pasar a Frozen (faltante)
-- [ ] OK del Founder al set de Engines (nuevos + reutilizados) y al mapa de eventos.
-- [ ] Confirmar que todo lo reutilizable de Tips+ está marcado como reutilizado.
+- [ ] OK del Founder al set final (Connectors + 6 Engines) y al mapa de capas/eventos.
+- [ ] Confirmar que la lógica de decisión queda reservada para `07 Business Rules`.
 - [ ] Aprobación → **Frozen v1.0** → habilita `06 Core Entities`.

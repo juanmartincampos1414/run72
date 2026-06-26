@@ -12,6 +12,15 @@
 > Etapa 05. Diseñamos **capacidades permanentes** (Engines), no funcionalidades. Las pantallas
 > cambian; los Engines permanecen. **Los Engines nacen del Relationship Lifecycle** (AD-002).
 
+## Principios de arquitectura (AD-003)
+
+- **Engines ejecutan, Business Rules deciden.** Los Engines son deterministas y no contienen
+  lógica de decisión; las decisiones viven en `07 Business Rules`.
+- **Connectors / Plugins conectan.** QR/NFC/WiFi/WhatsApp/Wallet/PMS/POS… **no son Engines**:
+  son mecanismos de entrada que traducen el mundo externo a eventos normalizados.
+- **Shared Components se reutilizan** antes de construir.
+- Los Engines se comunican por **eventos**, no por llamadas directas.
+
 ## 1. Objetivo
 
 Definir las capacidades internas del producto: qué hace cada Engine, qué consume y produce,
