@@ -9,22 +9,26 @@
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
 
-> Etapa 12. Recién acá decidimos **stack e infraestructura**. Conectamos el modelo conceptual
-> (engines/entities/rules/connectors) con tecnología concreta. **Reutilizar el stack del ecosistema**
-> antes de introducir tecnología nueva.
+> Etapa 12. **No se diseña un stack nuevo: se hereda el del ecosistema (AD-007).** Esta etapa
+> documenta **cómo el producto se alinea y reutiliza** la arquitectura existente de RUN72.
+> "**Heredar antes de decidir.**" Baseline: `04-shared-components/ecosystem-architecture.md`.
 
 ## 1. Objetivo
-Definir sobre qué se construye: lenguaje, framework, DB, hosting, event bus, cómo se materializan
-Connectors e Integration Runtime, multi-tenancy, seguridad, observabilidad y deploy.
+Documentar la alineación del producto con la arquitectura heredada. **No** re-elegir tecnología.
 
-> Pregunta única: **"¿Sobre qué tecnología corre el modelo, reutilizando el ecosistema?"**
+> Pregunta única: **"¿Cómo se apoya este producto en la arquitectura existente de RUN72?"**
 
 ## 2. Entradas
-- `05`–`11` **FROZEN**.
+- `05`–`11` **FROZEN** + `ecosystem-architecture` (baseline heredado).
 
-## 3. Qué definir
-- Stack (lenguaje/framework) · DB · Auth/multi-tenant · **Event bus** · Connectors/Runtime (AD-006) ·
-  AI Gateway · Hosting/Deploy · Seguridad · Observabilidad · **Reutilización** (qué se comparte con el ecosistema y cómo).
+## 3. Las 5 preguntas
+1. ¿Qué reutiliza **sin modificaciones**?
+2. ¿Qué reutiliza **con extensiones**?
+3. ¿Qué **componentes nuevos** incorpora al ecosistema?
+4. ¿Qué tiene **potencial de Shared Component** (Regla del Tres)?
+5. ¿Qué **decisiones quedan abiertas** para el build (se registran como ADs propias del build)?
+
+> Cualquier **desvío** del stack heredado requiere una **AD** que lo justifique.
 
 ## 4. Cómo ejecutar
 1. Partir del stack del ecosistema (no inventar) y justificar cualquier desvío con una AD.

@@ -36,8 +36,10 @@ los entregables, los chequeos de Freeze). Empezamos por el primero:
 - **Capability → Connector → Provider (AD-005).** Los productos dependen de **capacidades del
   negocio**, nunca de proveedores. → [Capability Catalog](04-shared-components/capability-catalog.md)
   (fuente de verdad) · capa operativa: [Integration Runtime (AD-006)](06-knowledge-library/architecture-decisions/AD-006-integration-runtime.md).
+- **Heredar antes de decidir (AD-007).** La arquitectura vive en RUN72; los productos la heredan
+  (no re-deciden el stack). Baseline: [ecosystem-architecture](04-shared-components/ecosystem-architecture.md).
 - Otras decisiones vivas: AD-002 (Relationship Lifecycle), AD-003 (Engines/Rules/Connectors/Shared),
-  AD-004 (proponer, no imponer). Ver `06-knowledge-library/architecture-decisions/`.
+  AD-004 (proponer, no imponer), AD-006 (Integration Runtime). Ver `06-knowledge-library/architecture-decisions/`.
 
 ## Reglas de oro
 

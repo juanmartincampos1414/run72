@@ -1,62 +1,66 @@
-# Stay — 12 Arquitectura (MVP)
+# Stay — 12 Arquitectura (alineación con el ecosistema)
 
 | | |
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 12 Arquitectura |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna. Las 3 decisiones de build se resuelven como ADs específicas del build. |
 
-> Sobre qué corre el modelo. **Propuesta alineada al stack del ecosistema RUN72** (reutilizar
-> antes de inventar). ✅ = decisión propuesta · ❓ = a confirmar con Engineering.
+> Stay **no diseña una arquitectura nueva**: **hereda** la del ecosistema (AD-007) y documenta su
+> **alineación**. Stack heredado (TS · Next.js · Supabase · Vercel · Anthropic/AI Gateway · GitHub):
+> ver [`ecosystem-architecture`](../../04-shared-components/ecosystem-architecture.md). Esta etapa
+> responde 5 preguntas.
 
 ---
 
-## Stack propuesto (reutiliza el ecosistema)
+## 1. ¿Qué reutiliza **sin modificaciones**?
+Stack heredado completo (TS/Next.js/Supabase/Vercel/AI Gateway/GitHub) · **Auth · Roles ·
+Organizations** · **Event Tracking/Analytics** · **Design System** · patrón de acceso por API.
 
-| Capa | Decisión propuesta | Reutiliza |
-|---|---|---|
-| Lenguaje | **TypeScript** | ecosistema RUN72 |
-| Framework / API | **Next.js (App Router)** + API routes/serverless | RUN72 |
-| DB | **Supabase Postgres**, multi-tenant por `property_id` (acceso vía API service-role) | RUN72/Tips+ |
-| Auth & multi-tenant | **Supabase Auth** + Roles + Organizations | ♻️ Tips+ |
-| **Event bus** | MVP: **tabla `events` + workers/processors** con idempotencia; evolucionable a broker | patrón RUN72 |
-| AI Gateway | **Anthropic (claude)** detrás del AI Connector | ♻️ patrón RUN72 |
-| Hosting / Deploy | **Vercel** + Supabase | RUN72 |
-| Design System / Dashboard | tokens + componentes RUN72/Tips+ | ♻️ |
+## 2. ¿Qué reutiliza **con extensiones**?
+- **Guest Profiles** → extendido con preferencias y opt-in de hospitalidad (base del Guest Identity).
+- **Campaign / Notification Engine** → para incentivos y mensajería del Guest Journey.
+- **Review Engine** → flujo de reseñas hotelero (→ Advocate).
+- **Wallet / Rewards** → Guest Club / Membership.
+- **Dashboard framework** → KPIs del Lifecycle.
 
-## Mapeo modelo → tecnología
-- **Engines** = módulos/servicios deterministas (TS) que consumen/emiten eventos del bus.
-- **Business Rules (07)** = config declarativa (tabla/JSON por propiedad), no hardcode.
-- **Connectors (AD-005)** = adapters detrás de un contrato; cada Provider implementa el contrato.
-- **Integration Runtime (AD-006)** = módulo compartido: credenciales por tenant, sync/idempotencia,
-  normalización (provider → Core Entities), capability flags, observabilidad.
-- **Core Entities** = tablas Postgres (Guest, Stay, RelationshipState, Moment, Booking, Reward, Event).
+## 3. ¿Qué **componentes nuevos** incorpora Stay al ecosistema?
+- **Relationship Lifecycle Engine** (CORE) · **RelationshipState** entity.
+- **Experience / Moment Engine** · **Moment** entity.
+- **Direct Relationship Engine** (incentivo + atribución).
+- **Relationship Intelligence Engine** (insights sobre la relación).
+- **Connectors de hospitality** (PMS, Booking/CRS, Capture) sobre el modelo Capability→Connector→Provider.
 
-## Seguridad
-- Aislamiento por tenant (`property_id`); todo acceso por API (RLS bloquea anon, como el resto del ecosistema).
-- **Consentimiento (opt-in) aplicado a nivel datos**; opt-out frena comunicación.
-- Credenciales de Connectors **cifradas** (server-side, fuera de la DB) — mismo criterio que la bóveda del ecosistema.
-- Auditoría vía `events`.
+## 4. ¿Qué tiene **potencial de Shared Component**?
+- **Relationship Lifecycle Engine** y **RelationshipState** (cualquier producto con relación cliente↔negocio).
+- **Experience / Moment Engine** y **Moment** (interacciones event-driven).
+- **Integration Runtime** (AD-006) y los **contratos de Connector** compartidos (Messaging, Reviews,
+  Payments, AI) — ya aparecen en ≥2 productos (ver Capability Catalog).
+- Promoción vía **Regla del Tres**.
 
-## Reutilización física de Shared Components ❓
-Decisión de Engineering (a confirmar en build): **monorepo con paquetes compartidos** vs. servicios
-compartidos. Recomendación: empezar **monorepo + paquetes** (Auth, Event bus, Connectors, Design
-System) para maximizar reutilización con Tips+ sin sobre-ingeniería. Se registra como AD al decidir.
+## 5. ¿Qué **decisiones quedan abiertas** (se resuelven en el build, como ADs específicas)?
+1. **Event Bus del MVP:** tabla `events` + workers vs. cola gestionada.
+2. **Organización de repositorios:** Stay en el repo del ecosistema vs. repo propio.
+3. **Estrategia de paquetes compartidos:** monorepo + paquetes vs. servicios compartidos.
+
+> Estas tres son **decisiones de build**, no prerrequisitos del Stage Gate. Se registran como ADs
+> propias del build cuando se resuelvan.
+
+---
+
+## Seguridad (heredada + aplicada)
+Aislamiento por tenant (`property_id`), acceso por API, **opt-in a nivel datos**, credenciales de
+Connectors cifradas (criterio del ecosistema), auditoría por `events`.
 
 ## Anti sobre-ingeniería (pre-PMF)
-- **Sin** microservicios ni broker complejo en el MVP (tabla de eventos + workers alcanza).
-- **Sin** integraciones PMS/Payments (atribución CSV).
-- Lo mínimo para correr el piloto y calibrar.
+Sin microservicios ni broker complejo; sin PMS/Payments (atribución CSV). Lo mínimo para el piloto.
 
-## Decisiones a confirmar (Engineering)
-1. Event bus del MVP: tabla `events` + workers ✅ vs. cola gestionada ❓.
-2. Reutilización física: monorepo + paquetes (recomendado) ❓.
-3. ¿Stay vive en el repo del ecosistema o repo propio que consume los paquetes compartidos? ❓
-
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder + Engineering al stack y al mapeo.
-- [ ] Resolver (o marcar como AD) las 3 decisiones de Engineering.
-- [ ] Aprobación → **Frozen v1.0** → habilita `13 Roadmap`.
+## Freeze Checklist
+- [x] Stay alineado al stack **heredado** (AD-007); sin re-decidir tecnología.
+- [x] 5 preguntas respondidas (reutiliza sin/with extensiones · nuevos · candidatos a shared · abiertas).
+- [x] Decisiones de build marcadas como ADs específicas (no bloquean el Stage Gate).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `13 Roadmap`.
