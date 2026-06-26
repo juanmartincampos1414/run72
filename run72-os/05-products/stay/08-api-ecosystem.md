@@ -4,40 +4,40 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 08 API & Ecosystem Strategy |
-| **Versión** | v0.1 |
-| **Estado** | Draft |
+| **Versión** | v1.0 |
+| **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
 | **Última actualización** | Junio 2026 |
+| **Modificaciones** | Ninguna. Providers concretos = implementación, se eligen por propiedad/piloto. |
 
-> Las integraciones son **Connectors** (AD-003): traducen el mundo externo a eventos del modelo,
-> y ejecutan acciones salientes. **El proveedor es implementación** (se elige por propiedad/piloto);
-> el modelo no depende de ninguno. Guía: *API & Ecosystem Playbook*.
+> **Modelo de 3 capas (AD-005): Capability → Connector → Provider.** Stay depende de
+> **capacidades del negocio**, no de proveedores. El **Connector** es el contrato; el **Provider**
+> es una implementación intercambiable. *"Los productos de RUN72 nunca dependen de proveedores.
+> Dependen de capacidades del negocio."* Guía: *API & Ecosystem Playbook*.
 
 ---
 
-## Catálogo de Connectors
+## Catálogo de Capabilities → Connectors → Providers
 
-| Sistema | Categoría | Dir | Qué aporta / hace | Alimenta | Evento / Webhook | MVP |
+| Capability | Connector (contrato) | Providers (ejemplos · abiertos) | Dir | Alimenta | Evento | MVP |
 |---|---|---|---|---|---|---|
-| QR | Captura | in | punto de interacción por momento | Guest Identity · Moment | `stay.interaction.captured` | ✅ |
-| WhatsApp (inbound) | Captura/Canal | in | identificación + interacción conversacional | Guest Identity · Moment | `stay.interaction.captured` | ✅ |
-| NFC | Captura | in | interacción en habitación/espacios | Moment | `stay.interaction.captured` | ◻️ post |
-| WiFi (captive) | Captura | in | identificación al conectarse | Guest Identity | `stay.interaction.captured` | ◻️ post |
-| Wallet | Captura/Beneficios | in/out | credencial + rewards | Loyalty/Club | `stay.reward.redeemed` | ◻️ post |
-| **PMS** | Sistema hotel | in/out | datos de reserva/estadía, **atribución** | Stay · Direct Relationship | webhook `booking.created/updated` | ◻️ post¹ |
-| Booking Engine / CRS | Sistema hotel | in | origen de reserva (OTA vs directo) | Booking · atribución | webhook reserva | ◻️ post¹ |
-| POS | Sistema hotel | in | consumo (Trufa, room service) | Moment · Recognized | `stay.experience.logged` | ◻️ post |
-| WhatsApp Business API | Comms (out) | out | mensajes/campañas/incentivos | Campaign · Notification · Direct Relationship | consume transiciones | ✅ |
-| Email Marketing | Comms (out) | out | campañas post-stay | Campaign | consume transiciones | ✅ |
-| Payment Provider (Stripe/MercadoPago) | Pagos | in/out | cobro de reserva directa / incentivos | Direct Relationship | webhook pago | ◻️ post |
-| Google Reviews | Reputación | in/out | solicitar/leer reseñas (→ Advocate) | Review Engine | `stay.guest.advocated` | ✅ |
-| TripAdvisor | Reputación | in/out | reseñas | Review Engine | `stay.guest.advocated` | ◻️ post |
-| Analytics | Medición | out | KPIs externos | Analytics | consume todo | ◻️ post (interno ✅) |
-| **AI Gateway** (Shared) | IA | in/out | insights/recomendaciones | Relationship Intelligence | `stay.insight.generated` | ✅ |
+| **Guest Capture** | Capture (QR/NFC/WiFi) | QR, NFC, WiFi captive | in | Guest Identity · Moment | `stay.interaction.captured` | QR ✅ |
+| **Guest Messaging** | Messaging | WhatsApp Business API (Meta), SMS, Email | in/out | Identity · Campaign · Notification | `stay.interaction.captured` / consume transiciones | WhatsApp+Email ✅ |
+| **Property Management** | PMS | Cloudbeds, Mews, Opera, Oracle Hospitality | in/out | Stay · Direct Relationship | webhook `booking.created/updated` | post¹ |
+| **Reservations** | Booking Engine / CRS | SiteMinder, Mirai, SynXis, Bookassist | in | Booking · atribución | webhook reserva | post¹ |
+| **Point of Sale** | POS | (según hotel) | in | Moment · Recognized | `stay.experience.logged` | post |
+| **Reviews / Reputation** | Reputation | Google Reviews, TripAdvisor, Booking Reviews | in/out | Review Engine | `stay.guest.advocated` | Google ✅ |
+| **Payments** | Payments | Stripe, Mercado Pago, Adyen | in/out | Direct Relationship | webhook pago | post |
+| **Benefits / Wallet** | Wallet | (Wallet de Tips+) | in/out | Loyalty/Club | `stay.reward.redeemed` | post |
+| **AI Intelligence** | AI Gateway (Shared) | (modelos vía AI Gateway) | in/out | Relationship Intelligence | `stay.insight.generated` | ✅ |
+| **Analytics** | Analytics | (interno + externos) | out | Analytics | consume todo | interno ✅ |
 
 ¹ **Atribución en el piloto:** la integración profunda con PMS/Booking es pesada; en Palacio Paz
-la atribución de reserva directa puede arrancar **manual/CSV** y automatizarse después. Lo que
-importa para el MVP es **poder atribuir**, no la integración completa.
+la atribución de reserva directa arranca **manual/CSV** y se automatiza después. Para el MVP
+importa **poder atribuir**, no integrar todo.
+
+> El **catálogo de Capabilities + contratos de Connector** es reutilizable por todo RUN72
+> (`04 Shared Components`). Un Provider nuevo = nueva implementación del contrato; el producto no cambia.
 
 ## Estrategia de eventos
 - **Entrantes:** Connectors → `stay.interaction.captured` / webhooks de reserva-pago → Engines.
@@ -53,7 +53,9 @@ Todo lo demás (PMS/CRS/POS/Payments/Wallet/NFC/TripAdvisor) = **post-MVP**.
 El proveedor concreto de cada categoría se decide por propiedad/piloto. El producto funciona con
 cualquiera que cumpla el contrato del Connector. (No fijar vendors en el modelo.)
 
-## Para pasar a Frozen (faltante)
-- [ ] OK del Founder al catálogo de Connectors y a la selección MVP.
-- [ ] Confirmar que la atribución del MVP arranca manual/CSV en el piloto.
-- [ ] Aprobación → **Frozen v1.0** → habilita `09 MVP Scope`.
+## Freeze Checklist
+- [x] Modelo Capability → Connector → Provider (AD-005).
+- [x] Catálogo de capabilities con Connector, providers de ejemplo (abiertos), dirección, evento, MVP.
+- [x] MVP: QR + WhatsApp + Email + Google Reviews + AI Gateway; atribución manual/CSV en piloto.
+- [x] Providers = implementación (no fijados en el modelo).
+- [x] **Aprobado por el Founder → FROZEN v1.0.** Habilita `09 MVP Scope`.

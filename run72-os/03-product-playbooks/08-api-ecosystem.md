@@ -10,8 +10,17 @@
 | **Última actualización** | Junio 2026 |
 
 > Etapa 08. Recién acá hablamos de integraciones. **El producto ya existe** (etapas 01–07): las
-> APIs/PMS/WhatsApp/Booking/Stripe son **implementaciones** del **Connector/Plugin layer** (AD-003),
-> no el producto. Se eligen por propiedad/piloto.
+> APIs/PMS/WhatsApp/Booking/Stripe son **implementaciones**, no el producto.
+
+## Modelo de 3 capas (AD-005): Capability → Connector → Provider
+
+- **Capability** — capacidad del negocio de la que depende el producto (ej. Property Management, Payments).
+- **Connector** — el contrato/interfaz que implementa la capability (independiente del proveedor).
+- **Provider** — implementación concreta e intercambiable (Cloudbeds, Stripe, WhatsApp…).
+
+**Los productos de RUN72 dependen de capacidades, nunca de proveedores.** Modelar siempre por
+Capability; el Provider se elige por cliente/piloto y se puede cambiar sin tocar el producto.
+El catálogo de Capabilities + contratos vive en `04 Shared Components` (reutilizable por todo RUN72).
 
 ## 1. Objetivo
 Definir todas las integraciones necesarias y cómo se conectan al modelo: qué sistemas, qué datos
