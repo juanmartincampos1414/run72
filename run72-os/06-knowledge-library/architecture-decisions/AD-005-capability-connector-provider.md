@@ -53,3 +53,15 @@ Ejemplos de Providers por Connector (Stay):
 - El **catálogo de Capabilities + contratos de Connector** vive en `04 Shared Components` (reutilizable).
 - **Candidata a principio del POS**: aplica a Margin, Tips+ y Stay (3 productos) — cumple, en
   espíritu, la Regla del Tres; promover al POS cuando se valide con build real.
+
+## Refinamientos del review CTO (ver AD-006)
+
+- **Congelar el PRINCIPIO, no los CONTRATOS.** El principio ("depender de capacidades, no de
+  proveedores") puede ser POS. Los **contratos de Connector concretos** quedan Draft→Certified
+  hasta integrarse con **≥2–3 providers reales** — el contrato correcto emerge del 2º/3º, no del 1º.
+- **Regla de granularidad:** las Capabilities se definen por **resultado de negocio** y se
+  gobiernan en un **catálogo único** a nivel Framework (evita que cada producto las recorte distinto
+  y se pierda la reutilización).
+- **Falta una capa operativa** (auth, sync/idempotencia, normalización/anti-corruption, capability
+  flags, observabilidad) → se formaliza en **AD-006 (Integration Runtime)**.
+- **Build vs buy:** un "Provider" puede ser un **agregador** existente; no reconstruir un iPaaS.

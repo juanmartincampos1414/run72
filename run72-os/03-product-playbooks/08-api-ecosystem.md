@@ -22,6 +22,14 @@
 Capability; el Provider se elige por cliente/piloto y se puede cambiar sin tocar el producto.
 El catálogo de Capabilities + contratos vive en `04 Shared Components` (reutilizable por todo RUN72).
 
+### 7 preguntas antes de toda integración (AD-005/AD-006)
+1. ¿Qué **Capability** del negocio resolvemos? 2. ¿Qué **Connector** la abstrae?
+3. ¿Qué **contrato** cumple? 4. ¿Qué **Providers** lo implementan? 5. ¿Qué **eventos** produce?
+6. ¿Es **read/write/both**? 7. ¿Cuál es el **failure mode** si el provider cae/cambia?
+> Si una integración no responde estas preguntas, todavía está demasiado acoplada a un proveedor.
+> **Congelar el principio, no los contratos** (estos se certifican con ≥2–3 providers reales).
+> La capa operativa (auth, sync, normalización, observabilidad) vive en el **Integration Runtime** (AD-006).
+
 ## 1. Objetivo
 Definir todas las integraciones necesarias y cómo se conectan al modelo: qué sistemas, qué datos
 entran/salen, qué eventos/webhooks, qué infraestructura compartida — y su prioridad (MVP vs post).
