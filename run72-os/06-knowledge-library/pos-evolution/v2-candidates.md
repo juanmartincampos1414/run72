@@ -42,7 +42,7 @@ Leyenda de evidencia: `[1/3]` = validado en 1 de 3 productos requeridos.
 | **Cada Sprint entrega software *y* aprendizaje** | `[1/3]` Stay | Retro #01 |
 | **Cada producto debe fortalecer el ecosistema** (LL-002) | `[1/3]` Stay | Retro #01 |
 | **El producto valida el mercado; la retro valida el sistema que construye productos** | `[1/3]` Stay | Retro #01 |
-| **El POS reduce incertidumbre antes de escribir código** (LL-004) | `[0/3]` — hipótesis, ni siquiera confirmada en Stay aún | Retro #01 |
+| **El POS reduce incertidumbre antes de escribir código** (LL-004) | `[1/3]` — **tesis**; Stay ocupa el slot 1, su confirmación llega en la retro técnica post-Sprint 1 | Retro #01 |
 
 ---
 

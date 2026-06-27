@@ -44,11 +44,16 @@ solo lugar por documento. Nunca duplicar. Nunca sobrescribir la historia (GitHub
 Las decisiones se documentan **cuando aparecen, no después.** El Framework mejora por evidencia, no por
 intuición: **la Regla del Tres** — una mejora entra al sistema solo tras usarse con éxito en 3 productos.
 
-## Artículo 5 — Reducir incertidumbre antes de escribir código
+## Artículo 5 — Construir con disciplina, no con documentación
 
-Construimos con el Stage Gate del POS porque el objetivo no es producir documentación: es **cerrar
-preguntas mientras cerrarlas todavía es barato.** El producto valida el mercado; la retrospectiva valida
-el sistema que construye productos.
+Construimos con el **Stage Gate del POS**. El compromiso constitucional es el **método**: cerrar
+preguntas mientras cerrarlas todavía es barato, no producir documentación por sí misma. El producto
+valida el mercado; la retrospectiva valida el sistema que construye productos.
+
+> **Lo que NO es constitucional (todavía):** la afirmación *"el POS reduce la incertidumbre antes de
+> escribir código"* es una **tesis**, no un principio. Necesita evidencia de 3 productos antes de
+> promoverse (Artículo 4, Regla del Tres). Se rastrea en
+> [LL-004](../06-knowledge-library/lessons-learned/LL-004-pos-reduces-uncertainty.md) · `[1/3]`.
 
 ---
 

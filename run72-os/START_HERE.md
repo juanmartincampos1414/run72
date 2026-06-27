@@ -13,6 +13,41 @@ RUN72 no es un producto: es **el sistema que produce productos AI-Native**. Marg
 productos. El verdadero activo es el **RUN72 Product Operating System (POS)** — y mejora con cada
 producto que construye. Esa ventaja compuesta (un sistema que aprende) es lo difícil de copiar.
 
+## El ciclo de RUN72 (el mapa en 1 minuto)
+
+```
+                        Constitution
+                             │
+                             ▼
+               Product Operating System
+                             │
+      ┌──────────────────────┼──────────────────────┐
+      ▼                      ▼                      ▼
+ Stage Gates            Playbooks         Knowledge Library
+      │                      │                      │
+      └──────────────┬───────┴──────────────┬───────┘
+                     ▼                      ▼
+          Shared Components      Ecosystem Architecture
+                     │
+                     ▼
+            Capability Catalog
+                     │
+                     ▼
+                 Productos
+       Margin · Tips+ · Stay · ...
+                     │
+                     ▼
+            Nuevo conocimiento
+                     │
+                     ▼
+         Evolución del Framework  ──┐
+                     │              │ vuelve a alimentar
+                     └──────────────┘ la Constitución y el POS
+```
+
+El sistema es un **ciclo, no una pila**: cada producto genera conocimiento, el conocimiento evoluciona
+el Framework, y el Framework hace al próximo producto más fuerte. Ahí está la ventaja compuesta.
+
 ## 2. La jerarquía (de lo más estable a lo más cambiante)
 
 ```
