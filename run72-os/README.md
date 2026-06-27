@@ -1,5 +1,8 @@
 # RUN72 — Base de Conocimiento
 
+> 👉 **¿Te incorporás al proyecto (persona o IA)? Empezá por [`START_HERE.md`](START_HERE.md).**
+> Este README es el mapa; `START_HERE` es el onboarding.
+
 > Fuente de verdad en **Markdown** (Cap. 02 del POS). GitHub es la memoria.
 > Un solo lugar por documento. Nunca duplicar. Nunca sobrescribir la historia.
 
