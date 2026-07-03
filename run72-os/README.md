@@ -41,6 +41,11 @@ los entregables, los chequeos de Freeze). Empezamos por el primero:
   (fuente de verdad) · capa operativa: [Integration Runtime (AD-006)](06-knowledge-library/architecture-decisions/AD-006-integration-runtime.md).
 - **Heredar antes de decidir (AD-007).** La arquitectura vive en RUN72; los productos la heredan
   (no re-deciden el stack). Baseline: [ecosystem-architecture](04-shared-components/ecosystem-architecture.md).
+- **Toda capability consume el Twin (AD-008).** En un producto AI-Native el activo central es el
+  Twin (lo que el sistema sabe de la entidad que sirve); toda capability lo consume y lo mejora
+  — "¿qué sabe el sistema de esta entidad antes de hacer esto?". Incluye **Twin Health** como
+  métrica operativa. Origen: JC AI Agency (Brand Twin, Reglas 28–30).
+  → [AD-008](06-knowledge-library/architecture-decisions/AD-008-every-capability-consumes-the-twin.md)
 - Otras decisiones vivas: AD-002 (Relationship Lifecycle), AD-003 (Engines/Rules/Connectors/Shared),
   AD-004 (proponer, no imponer), AD-006 (Integration Runtime). Ver `06-knowledge-library/architecture-decisions/`.
 
