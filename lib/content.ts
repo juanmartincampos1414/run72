@@ -182,7 +182,7 @@ export const PROJECTS: Project[] = [
     category: "Agencia IA",
     description:
       "Marca y presencia digital enfocada en automatización e inteligencia artificial.",
-    url: "https://jcmarketing.digital",
+    url: "https://aigency.jcmarketing.digital/",
     accent: ["#8b5cf6", "#ec4899"],
   },
   {
