@@ -47,3 +47,22 @@ Payments · Reviews · Messaging · Wallet · CRM · Identity · Notifications.
 **Messaging, Reviews/Reputation, Payments, AI Intelligence, Analytics** aparecen en ≥2 productos.
 Son las primeras candidatas a **certificar un contrato de Connector común** (Regla del Tres) y a
 vivir como Shared Component formal. Esa convergencia es la métrica real de la tesis RUN72.
+
+---
+
+## Capabilities — Relationship (formalizadas por Founder Decision, Phase 6 de Stay, 2026-07-03)
+
+Origen: Domain Model v1.0 FROZEN de Stay (`Stai/docs/domain/PHASE_6_DOMAIN_MODEL.md`) + AD-B017/018/022.
+Packages = implementación real en el monorepo `RUN72-monorepo` (evidencia: CI verde, RLS demostrada).
+
+| Capability | Definición (resultado de negocio) | Packages / implementación | Estado |
+|---|---|---|---|
+| **Guest Capture** | Transformar cualquier interacción física o digital en el inicio de una relación persistente entre una organización y una persona. Todos los connectors (NFC, QR, Wallet, Email, SMS, WhatsApp, OTA, PMS, WiFi, API, Deep Link, Kiosco) producen el mismo **Guest Capture Event** — el evento es el contrato, no la tecnología | `@run72/event-kit` + `@run72/guest` + `@run72/identity` + `@run72/consent` (+ Entry Point Engine, dominio Stay) | **Formalizada** (Pilot: QR) |
+| **Entry Point** | Configurar y operar oportunidades de iniciar una relación (primer contacto persona↔organización), con contexto físico, campaña y atribución de captura | Dominio Stay (aggregate `EntryPoint`; candidato a package vía Regla del Tres) | Draft |
+| **Relationship Management** | Mantener el activo relacional (Guest × Organization): profundidad (8 estados), condición operativa (Active/Dormant/Closed) e historia append-only | Dominio Stay (aggregate `Relationship`) sobre `@run72/event-kit` + `@run72/timeline` | Draft |
+| **Relationship Lifecycle** | Ejecutar la evolución de profundidad mediante reglas declarativas por propiedad (R-L1…L7) | Relationship Lifecycle Engine (dominio Stay; candidato a Shared — Regla del Tres) | Draft |
+| **Relationship Intelligence** | Producir conocimiento validable sobre la relación (insights, propensiones) vía el Knowledge Engine del ecosistema | `@run72/knowledge` (Nivel 5, pendiente) + AI Gateway + Hotel Knowledge Adapter (Stay) | Draft |
+| **Direct Booking Attribution** | Juzgar si una reserva directa pertenece a una relación (ventana `T₂`) registrando SIEMPRE ambos valores: Recovered Direct Revenue + Estimated OTA Commission Avoided | AttributionService (dominio Stay) sobre `@run72/event-kit` + `@run72/analytics` | Draft |
+
+> Además: **Subject Timeline** (AD-B014) y **Analytics neutral** (AD-B015) ya existen como packages
+> con evidencia: `@run72/timeline` y `@run72/analytics` en `RUN72-monorepo`.

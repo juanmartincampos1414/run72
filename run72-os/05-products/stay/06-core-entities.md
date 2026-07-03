@@ -4,11 +4,11 @@
 |---|---|
 | **Producto** | Stay |
 | **Documento** | 06 Core Entities |
-| **Versión** | v1.0 |
+| **Versión** | **v1.1** |
 | **Estado** | **FROZEN** |
 | **Owner** | RUN72 |
-| **Última actualización** | Junio 2026 |
-| **Modificaciones** | Ninguna (mejoras futuras → nueva versión, sin reabrir la etapa) |
+| **Última actualización** | 2026-07-03 |
+| **Modificaciones** | v1.1 (Founder-approved, Phase 6 Domain Modeling de Stay): `RelationshipState` evoluciona a **aggregate `Relationship`** (root, estado dual profundidad×status); se incorpora **`EntryPoint`** como entidad core; historia append-only explícita. Fuente: `Stai/docs/domain/PHASE_6_DOMAIN_MODEL.md` (FROZEN) + `FOUNDER_DECISION_DOMAIN_FREEZE.md` |
 
 > **Decisión registrada:** `RelationshipState` (profundidad de relación · capa conceptual del
 > Lifecycle) y `Membership/Reward` (beneficios/club · capa comercial) se mantienen **separadas**
@@ -56,12 +56,22 @@ Property 1───* Stay *───1 Guest
 - **Engine dueño:** — (contexto; la consumen varios engines).
 - **Eventos:** `stay.guest.appeared` (alta de estadía).
 
-## 🏠 RelationshipState *(propia — núcleo del modelo; candidata a compartida)*
-- **Definición:** el **nivel de relación** de un Guest con una Property (Anonymous…Advocate) + historial de transiciones.
-- **Atributos:** guest · property · estado actual · historial (estado, evento, timestamp) · scores.
-- **Relaciones:** 1 Guest × 1 Property.
-- **Engine dueño:** Relationship Lifecycle Engine (transiciones según Business Rules 07).
-- **Eventos:** todas las `stay.guest.{identified…advocated}`.
+## 🏠 Relationship *(propia — AGGREGATE ROOT y núcleo del modelo; candidata a compartida)*
+> v1.1: evoluciona la entidad `RelationshipState` de v1.0 — mismo concepto, frontera de consistencia explícita.
+- **Definición:** **el activo del sistema** — el vínculo evolutivo entre un Guest y una Organization. "Stay no administra huéspedes: administra la evolución de la relación" (principio congelado).
+- **Estado dual:** `RelationshipState` (profundidad, VO: Anonymous…Advocate — **solo avanza**) × `RelationshipStatus` (condición operativa: Active · Dormant · Closed). Combinables (ej. Loyal+Dormant).
+- **Composición:** Relationship (root) + `StateTransition[]` (historial **append-only**: nunca se reescribe; si algo cambia, se registra un hecho nuevo).
+- **Atributos:** guest · organization · state · status · historial · scores · `version` (lock optimista).
+- **Invariantes:** transiciones solo vía Lifecycle Engine con regla declarada · nace en Identified con opt-in (Anonymous = "no existe relación") · `consent.revoked` cambia Status, jamás borra historia.
+- **Engine dueño:** Relationship Lifecycle Engine (reglas de Business Rules 07).
+- **Eventos:** `stay.relationship.started` · todas las `stay.guest.{identified…advocated}` · `stay.relationship.status_changed`.
+
+## 🏠 EntryPoint *(propia — AGGREGATE ROOT; incorporada en v1.1)*
+- **Definición:** una **oportunidad configurada de iniciar una relación** — el punto físico o digital del primer contacto. No es un QR/NFC (esos son connectors).
+- **Atributos (AD-B018):** id · organization · property · location · entry_point_type · channel · physical_context · campaign · created_by · status · metadata.
+- **Invariantes:** **único aggregate autorizado a iniciar el dominio** — produce siempre y únicamente el **Guest Capture Event** (`stay.guest.captured`, evento fundacional AD-B017) · solo captura estando `active` · token público inescrutable.
+- **Engine dueño:** Entry Point Engine.
+- **Eventos:** `stay.entrypoint.{created,activated,deactivated}` · ⭐ `stay.guest.captured`.
 
 ## 🏠 Moment / Interaction *(propia — candidata a compartida)*
 - **Definición:** una interacción registrada durante una estadía (la unidad event-driven).

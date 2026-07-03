@@ -46,6 +46,10 @@ los entregables, los chequeos de Freeze). Empezamos por el primero:
   — "¿qué sabe el sistema de esta entidad antes de hacer esto?". Incluye **Twin Health** como
   métrica operativa. Origen: JC AI Agency (Brand Twin, Reglas 28–30).
   → [AD-008](06-knowledge-library/architecture-decisions/AD-008-every-capability-consumes-the-twin.md)
+- **El pipeline del conocimiento (AD-009).** Fuente → Extractor → Procedencia → Twin →
+  Health/Confidence → Capabilities. Todo extractor responde las 4 preguntas (qué aprendimos,
+  con qué certeza, qué cambió, qué mejoró automáticamente); el Twin es motor de capacidades,
+  no repositorio. → [AD-009](06-knowledge-library/architecture-decisions/AD-009-knowledge-engine-pipeline.md)
 - Otras decisiones vivas: AD-002 (Relationship Lifecycle), AD-003 (Engines/Rules/Connectors/Shared),
   AD-004 (proponer, no imponer), AD-006 (Integration Runtime). Ver `06-knowledge-library/architecture-decisions/`.
 
