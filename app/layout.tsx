@@ -16,7 +16,7 @@ const display = Space_Grotesk({
 });
 
 const SITE_URL = "https://run72.app";
-const TITLE = "RUN72 — Tu negocio listo en 72 horas";
+const TITLE = "RUN72 — Tu proyecto, tu idea o tu necesidad lista en 72 horas";
 const DESCRIPTION =
   "Web, plataforma, marca y estrategia. RUN72 construye tu negocio digital completo y lo deja listo para vender en solo 72 horas.";
 
@@ -71,7 +71,7 @@ const jsonLd = {
   name: "RUN72",
   description: DESCRIPTION,
   url: SITE_URL,
-  slogan: "Tu negocio listo en 72 horas.",
+  slogan: "Tu proyecto, tu idea o tu necesidad lista en 72 horas.",
   areaServed: "Global",
   serviceType: [
     "Desarrollo web",

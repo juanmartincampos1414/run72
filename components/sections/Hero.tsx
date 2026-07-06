@@ -39,7 +39,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.08, ease }}
             className="mt-6 text-balance font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl md:text-7xl"
           >
-            Tu negocio listo en{" "}
+            Tu proyecto, tu idea o tu necesidad lista en{" "}
             <span className="text-gradient">72 horas.</span>
           </motion.h1>
 
