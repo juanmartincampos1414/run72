@@ -120,11 +120,35 @@ export async function POST(req: Request) {
     <p style="color:#6b7180;font-size:12px;margin-top:20px">Respondé este mail para contactar directamente a ${escapeHtml(name)}.</p>
   </div>`;
 
+  const text = [
+    "Nueva solicitud de reunión — run72.app",
+    "",
+    `Nombre: ${name}`,
+    `Email: ${email}`,
+    whatsapp ? `WhatsApp: ${whatsapp}` : "",
+    company ? `Empresa: ${company}` : "",
+    needs.length ? `Qué necesita: ${needs.join(", ")}` : "",
+    businessWhat ? `Negocio: ${businessWhat}` : "",
+    body.stage ? `Etapa: ${body.stage}` : "",
+    body.objective ? `Objetivo: ${body.objective}` : "",
+    availability ? `Disponibilidad: ${availability}` : "",
+    "",
+    "Qué quiere explicar en la reunión:",
+    explain,
+    "",
+    `Respondé este mail para contactar directamente a ${name}.`,
+  ]
+    .filter((l) => l !== "")
+    .join("\n");
+
   const emailed = await sendEmail({
+    // Remitente distinto del destinatario: evita el "self-send" que cae en spam.
+    from: process.env.RESEND_FROM_NOTIFY || "RUN72 Cotizador <notificaciones@run72.app>",
     to,
     replyTo: email,
     subject: `Solicitud de reunión — ${name}`,
     html,
+    text,
   });
 
   if (!emailed && !saved) {

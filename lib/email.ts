@@ -10,12 +10,14 @@ export async function sendEmail(opts: {
   to: string;
   subject: string;
   html: string;
+  text?: string;
   replyTo?: string;
+  from?: string;
 }): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return false;
 
-  const from = process.env.RESEND_FROM ?? "RUN72 <hola@run72.app>";
+  const from = opts.from ?? process.env.RESEND_FROM ?? "RUN72 <hola@run72.app>";
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -28,6 +30,7 @@ export async function sendEmail(opts: {
         to: opts.to,
         subject: opts.subject,
         html: opts.html,
+        ...(opts.text ? { text: opts.text } : {}),
         ...(opts.replyTo ? { reply_to: opts.replyTo } : {}),
       }),
     });
