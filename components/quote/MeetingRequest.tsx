@@ -34,37 +34,13 @@ const INITIAL: MeetingState = {
   contact: { name: "", email: "", whatsapp: "", company: "" },
 };
 
-function buildMailto(s: MeetingState): string {
-  const needLabels =
-    s.needs.map((slug) => PROJECT_TYPES.find((p) => p.slug === slug)?.label ?? slug).join(", ") || "—";
-  const stageLabel = STAGES.find((x) => x.value === s.stage)?.label ?? "—";
-  const objLabel = OBJECTIVES_V2.find((x) => x.value === s.objective)?.label ?? "—";
-  const lines = [
-    "Solicitud de reunión — RUN72",
-    "",
-    `Nombre: ${s.contact.name}`,
-    `Email: ${s.contact.email}`,
-    s.contact.whatsapp ? `WhatsApp: ${s.contact.whatsapp}` : "",
-    s.contact.company ? `Empresa: ${s.contact.company}` : "",
-    "",
-    `Qué necesita: ${needLabels}`,
-    `Negocio: ${s.businessWhat}`,
-    `Etapa: ${stageLabel}`,
-    `Objetivo: ${objLabel}`,
-    "",
-    "Qué quiere explicar en la reunión:",
-    s.explain,
-    s.availability ? `\nDisponibilidad: ${s.availability}` : "",
-  ].filter((l) => l !== "");
-  const subject = `Solicitud de reunión — ${s.contact.name || "RUN72"}`;
-  return `mailto:${MEETING_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
-}
-
 export function MeetingRequest({ onBack }: { onBack: () => void }) {
   const [state, setState] = useState<MeetingState>(INITIAL);
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const LAST_STEP = STEP_LABELS.length - 1;
 
@@ -97,9 +73,23 @@ export function MeetingRequest({ onBack }: { onBack: () => void }) {
     }));
   }
 
-  function send() {
-    if (typeof window !== "undefined") window.location.href = buildMailto(state);
-    setSent(true);
+  async function send() {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/meeting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(state),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) throw new Error(data.error ?? "No se pudo enviar la solicitud.");
+      setSent(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error inesperado. Escribinos a " + MEETING_EMAIL);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (sent) {
@@ -109,18 +99,18 @@ export function MeetingRequest({ onBack }: { onBack: () => void }) {
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
             <CheckIcon className="h-6 w-6" strokeWidth={2.5} />
           </span>
-          <h1 className="mt-5 font-display text-2xl font-semibold tracking-tight">Abrimos tu correo</h1>
+          <h1 className="mt-5 font-display text-2xl font-semibold tracking-tight">¡Solicitud enviada!</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Te preparamos un email a <span className="text-fg">{MEETING_EMAIL}</span> con toda tu info.
-            Revisá que se haya abierto y enviálo — coordinamos la reunión a la brevedad.
+            Recibimos tu solicitud con toda tu info. Nuestro equipo te contacta a la brevedad para
+            coordinar la reunión. Te escribimos a <span className="text-fg">{state.contact.email}</span>.
           </p>
-          <a
-            href={buildMailto(state)}
+          <Link
+            href="/"
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.02]"
           >
-            ¿No se abrió? Abrir mi correo
+            Volver al inicio
             <ArrowRight className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
       </Shell>
     );
@@ -302,11 +292,18 @@ export function MeetingRequest({ onBack }: { onBack: () => void }) {
           </motion.div>
         </div>
 
+        {error && (
+          <p className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </p>
+        )}
+
         <div className="mt-8 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => (step === 0 ? onBack() : go(-1))}
-            className="rounded-full px-4 py-2.5 text-sm text-muted transition-colors hover:text-fg"
+            disabled={submitting}
+            className="rounded-full px-4 py-2.5 text-sm text-muted transition-colors hover:text-fg disabled:opacity-40"
           >
             {step === 0 ? "Volver" : "Atrás"}
           </button>
@@ -325,11 +322,11 @@ export function MeetingRequest({ onBack }: { onBack: () => void }) {
             <button
               type="button"
               onClick={send}
-              disabled={!stepValid}
+              disabled={!stepValid || submitting}
               className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-40"
             >
-              Enviar a hola@run72.app
-              <ArrowRight className="h-4 w-4" />
+              {submitting ? "Enviando…" : "Enviar solicitud"}
+              {!submitting && <ArrowRight className="h-4 w-4" />}
             </button>
           )}
         </div>
