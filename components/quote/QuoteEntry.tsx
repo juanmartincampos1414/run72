@@ -6,17 +6,19 @@ import Link from "next/link";
 import { Logo } from "../Logo";
 import { QuoteConfigurator } from "./QuoteConfigurator";
 import { ChatConcierge } from "./ChatConcierge";
+import { MeetingRequest } from "./MeetingRequest";
 import { ArrowRight, BoltIcon } from "../icons";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-type Mode = "choose" | "form" | "chat";
+type Mode = "choose" | "form" | "chat" | "meeting";
 
 export function QuoteEntry() {
   const [mode, setMode] = useState<Mode>("choose");
 
   if (mode === "form") return <QuoteConfigurator />;
   if (mode === "chat") return <ChatConcierge onBack={() => setMode("choose")} />;
+  if (mode === "meeting") return <MeetingRequest onBack={() => setMode("choose")} />;
 
   return (
     <div className="min-h-screen">
@@ -36,16 +38,16 @@ export function QuoteEntry() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease }}
-          className="mx-auto max-w-3xl text-center"
+          className="mx-auto max-w-5xl text-center"
         >
           <h1 className="text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            ¿Cómo preferís cotizar?
+            ¿Cómo preferís avanzar?
           </h1>
           <p className="mt-3 text-pretty text-muted">
-            Las dos opciones llegan al mismo presupuesto, listo para pagar en minutos.
+            Cotizá al instante, hablá con Runit, o coordiná una reunión. Como te quede cómodo.
           </p>
 
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          <div className="mt-12 grid gap-5 sm:grid-cols-3">
             <OptionCard
               icon={<BoltIcon className="h-6 w-6" />}
               title="Cotización rápida"
@@ -55,11 +57,18 @@ export function QuoteEntry() {
             />
             <OptionCard
               icon={<ChatIcon className="h-6 w-6" />}
-              title="Hablar con un asistente"
-              text="Contanos qué querés construir y nuestro asistente arma la propuesta por vos."
-              cta="Hablar con Claude"
+              title="Hablar con un Runit, asistente IA"
+              text="Runit, nuestro asistente de IA, arma la propuesta con vos en una charla."
+              cta="Hablar con Runit"
               highlight
               onClick={() => setMode("chat")}
+            />
+            <OptionCard
+              icon={<MeetIcon className="h-6 w-6" />}
+              title="Necesito una reunión"
+              text="Para proyectos que se explican mejor en persona. Completás un proceso guiado y coordinamos una reunión — nos llega todo por mail."
+              cta="Coordinar una reunión"
+              onClick={() => setMode("meeting")}
             />
           </div>
         </motion.div>
@@ -113,6 +122,15 @@ function ChatIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.8}>
       <path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z" strokeLinejoin="round" />
       <path d="M8.5 11h7M8.5 14h4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MeetIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth={1.8}>
+      <rect x="3" y="5" width="13" height="14" rx="2" />
+      <path d="M16 10l5-3v10l-5-3" strokeLinejoin="round" />
     </svg>
   );
 }
