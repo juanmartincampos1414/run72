@@ -30,6 +30,7 @@ export function Services() {
           {SERVICES.map((service, i) => (
             <motion.article
               key={service.id}
+              data-runit={`${service.title.toLowerCase()} · lo hacemos`}
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}

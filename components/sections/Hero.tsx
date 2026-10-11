@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { QuoteButton } from "../ui/QuoteButton";
 import { PlayIcon, BoltIcon } from "../icons";
+import { RunitHero } from "../RunitHero";
 import { QUOTE } from "@/lib/content";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -106,6 +107,9 @@ function HeroVisual() {
       </div>
 
       <div className="relative">
+        {/* Runit, en grande, presentando */}
+        <RunitHero />
+
         {/* Glow halo */}
         <div
           aria-hidden

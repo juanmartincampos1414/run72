@@ -12,19 +12,20 @@ import { useEffect, useRef, useState } from "react";
 const BODY_D =
   "M110 14 C158 14 192 60 192 128 C192 188 158 222 110 222 C62 222 28 188 28 128 C28 60 62 14 110 14 Z";
 
-// Micro-frases por sección (id del <section>).
-const PHRASES: Record<string, string> = {
-  top: "72:00:00 · en espera",
-  servicios: "escaneando servicios…",
-  proceso: "3 pasos. 3 días.",
-  ideal: "¿es para vos? → sí",
-  experiencia: "verificando la entrega…",
-  proyectos: "cargando proyectos…",
-  propiedad: "todo queda a tu nombre",
-  faq: "preguntame lo que sea",
-  cotizar: "¿arrancamos? →",
+// Micro-frases por sección (id del <section>). Varias por sección, elige al azar.
+const PHRASES: Record<string, string[]> = {
+  top: ["72:00:00 · en espera", "sistema listo.", "decime qué querés construir"],
+  servicios: ["escaneando servicios…", "hay de todo por acá", "elegí tu stack"],
+  proceso: ["3 pasos. 3 días.", "cotizás → pagás → entregamos", "el reloj no miente"],
+  ideal: ["¿es para vos? → sí", "esto te sirve", "detectando buen match…"],
+  experiencia: ["verificando la entrega…", "todo documentado", "sin cabos sueltos"],
+  proyectos: ["cargando proyectos…", "ya lo hicimos antes", "evidencia > promesas"],
+  propiedad: ["todo queda a tu nombre", "0 dependencias ocultas", "las llaves son tuyas"],
+  faq: ["preguntame lo que sea", "dudas? las resuelvo", "sin letra chica"],
+  cotizar: ["¿arrancamos? →", "dale, te cotizo", "72h empiezan ya"],
 };
 const SECTION_IDS = Object.keys(PHRASES);
+const pick = (a: string[]) => a[Math.floor(Math.random() * a.length)];
 
 export function RunitCompanion() {
   const fabRef = useRef<HTMLButtonElement>(null);
@@ -42,8 +43,7 @@ export function RunitCompanion() {
     const fab = fabRef.current;
     if (!fab) return;
 
-    // aparecer
-    const showTO = window.setTimeout(() => fab.classList.add("rn-show"), reduce ? 0 : 1200);
+    // El compañero aparece recién al pasar el hero (ahí Runit ya vive en grande).
 
     // ---------- posición: recorre la página ----------
     let lastY = window.scrollY;
@@ -71,6 +71,10 @@ export function RunitCompanion() {
       y = Math.max(vh * 0.56, Math.min(vh * 0.85, y));
       fab.style.transform = `translate3d(calc(${x.toFixed(1)}px - 50%), calc(${y.toFixed(1)}px - 50%), 0)`;
 
+      // handoff: visible solo después del hero
+      if (window.scrollY > vh * 0.55) fab.classList.add("rn-show");
+      else fab.classList.remove("rn-show");
+
       // inclinación según dirección/velocidad del scroll
       if (!reduce && charRef.current) {
         const dv = window.scrollY - lastY;
@@ -96,6 +100,7 @@ export function RunitCompanion() {
     };
 
     if (reduce) {
+      fab.classList.add("rn-show");
       fab.style.transform = "none";
       fab.style.left = "auto";
       fab.style.right = "24px";
@@ -143,10 +148,12 @@ export function RunitCompanion() {
     const glitch = () => {
       const c = charRef.current;
       if (c) {
-        c.classList.add("rn-glitch");
-        window.setTimeout(() => c.classList.remove("rn-glitch"), 300);
+        const strong = Math.random() < 0.3;
+        const cls = strong ? "rn-glitch-strong" : "rn-glitch";
+        c.classList.add(cls);
+        window.setTimeout(() => c.classList.remove(cls), strong ? 420 : 300);
       }
-      glitchTO = window.setTimeout(glitch, 4200 + Math.random() * 6500);
+      glitchTO = window.setTimeout(glitch, 3200 + Math.random() * 5200);
     };
     if (!reduce) {
       blinkTO = window.setTimeout(blink, 2500);
@@ -197,15 +204,34 @@ export function RunitCompanion() {
         });
         if (best && best !== current) {
           current = best;
-          speak(PHRASES[best]);
+          speak(pick(PHRASES[best]));
         }
       },
       { threshold: [0.3, 0.55, 0.8], rootMargin: "-10% 0px -25% 0px" },
     );
     sections.forEach((s) => io.observe(s));
 
+    // frases reactivas: al pasar por algo con [data-runit] (sin frenar)
+    let hoverLast = "";
+    const onHover = (e: Event) => {
+      const t = (e.target as HTMLElement | null)?.closest?.("[data-runit]") as HTMLElement | null;
+      if (!t) return;
+      const txt = t.getAttribute("data-runit");
+      if (!txt || txt === hoverLast) return;
+      hoverLast = txt;
+      current = txt;
+      speak(txt);
+    };
+    const onOut = (e: Event) => {
+      const rel = (e as PointerEvent).relatedTarget as HTMLElement | null;
+      if (!rel || !rel.closest?.("[data-runit]")) hoverLast = "";
+    };
+    if (!reduce) {
+      document.addEventListener("pointerover", onHover, { passive: true });
+      document.addEventListener("pointerout", onOut, { passive: true });
+    }
+
     return () => {
-      window.clearTimeout(showTO);
       window.clearTimeout(blinkTO);
       window.clearTimeout(glitchTO);
       window.clearTimeout(typeTO);
@@ -215,6 +241,8 @@ export function RunitCompanion() {
       window.removeEventListener("resize", place);
       window.removeEventListener("load", place);
       window.removeEventListener("pointermove", onPointer);
+      document.removeEventListener("pointerover", onHover);
+      document.removeEventListener("pointerout", onOut);
       io.disconnect();
     };
   }, []);
