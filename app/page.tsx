@@ -10,6 +10,7 @@ import { Ownership } from "@/components/sections/Ownership";
 import { Faq } from "@/components/sections/Faq";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 import { Footer } from "@/components/sections/Footer";
+import { RunitCompanion } from "@/components/RunitCompanion";
 
 export default function Home() {
   return (
@@ -28,6 +29,7 @@ export default function Home() {
         <FinalCTA />
       </main>
       <Footer />
+      <RunitCompanion />
     </>
   );
 }
