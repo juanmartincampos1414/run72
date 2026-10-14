@@ -70,6 +70,19 @@ export function Hero() {
               Ver cómo funciona
             </Button>
           </motion.div>
+
+          <motion.a
+            href="/radar"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.34, ease }}
+            className="group mt-6 inline-flex items-center gap-2.5 rounded-full border border-line bg-white/[0.03] px-4 py-2 text-sm text-muted backdrop-blur transition-colors hover:border-brand-violet/50 hover:text-fg"
+          >
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-violet" />
+            ¿No sabés por dónde arrancar? Hacé tu{" "}
+            <span className="font-medium text-fg">Runit Scan</span>
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </motion.a>
         </div>
 
         {/* Isologo protagonist */}

@@ -4,9 +4,9 @@ import { Footer } from "@/components/sections/Footer";
 import { RadarQuiz } from "@/components/radar/RadarQuiz";
 
 export const metadata: Metadata = {
-  title: "Radar de IA — RUN72",
+  title: "Runit Scan — Diagnóstico de IA · RUN72",
   description:
-    "En 3 minutos, descubrí dónde está parado tu negocio con IA y qué hacer primero. Un diagnóstico de Runit, el asistente de RUN72.",
+    "En 2 minutos, descubrí dónde está parado tu negocio con IA y por dónde empezar. Un diagnóstico guiado por Runit, el asistente de RUN72.",
 };
 
 export default function RadarPage() {

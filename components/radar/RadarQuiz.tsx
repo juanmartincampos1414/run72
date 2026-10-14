@@ -185,7 +185,7 @@ function Result({ result, onRestart }: { result: RadarResult | null; onRestart: 
 
       <LeadForm result={result} />
       <div className="text-center">
-        <button onClick={onRestart} className="text-sm text-faint underline hover:text-fg">Rehacer el radar</button>
+        <button onClick={onRestart} className="text-sm text-faint underline hover:text-fg">Hacerlo de nuevo</button>
       </div>
     </div>
   );
@@ -410,7 +410,7 @@ export function RadarQuiz() {
         <RunitFigure idp="rqintro" className="relative z-10 !w-24" />
       </span>
       <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-        Radar de IA <span className="text-gradient">RUN72</span>
+        Runit <span className="text-gradient">Scan</span>
       </h1>
       <p className="mt-4 text-lg text-muted">
         Soy Runit. En 2 minutos te digo <strong className="text-fg">dónde está parado tu negocio con IA</strong> y por dónde conviene empezar.

@@ -118,7 +118,7 @@ export async function POST(req: Request) {
     from,
     to: admin,
     replyTo: email,
-    subject: `Radar de IA · videollamada — ${name} (${stage})`,
+    subject: `Runit Scan · videollamada — ${name} (${stage})`,
     html: adminHtml,
     text: adminText,
   });
