@@ -18,7 +18,7 @@ const display = Space_Grotesk({
 const SITE_URL = "https://run72.app";
 const TITLE = "RUN72 — Tu idea lista en 72 horas";
 const DESCRIPTION =
-  "Web, plataforma, marca y estrategia. RUN72 construye tu negocio digital completo y lo deja listo para vender en solo 72 horas.";
+  "Web, plataforma, marca, estrategia y automatización con IA. RUN72 ejecuta lo que tu negocio necesita —estés arrancando, creciendo o escalando— y te lo entrega funcionando en 72 horas.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
