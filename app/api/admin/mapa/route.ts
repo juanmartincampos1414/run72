@@ -34,8 +34,9 @@ const SCHEMA = {
             description: "Exactamente 4 acciones, una por fase (orden fase 1 a 4). Cortas, concretas, accionables.",
             items: { type: "string" },
           },
+          resultado: { type: "string", description: "El beneficio concreto para el negocio cuando el área llega a Nativo IA (una frase corta)." },
         },
-        required: ["area", "acciones"],
+        required: ["area", "acciones", "resultado"],
         additionalProperties: false,
       },
     },
@@ -48,7 +49,7 @@ type MapOut = {
   negocio: string;
   resumen: string;
   fases: { nombre: string; objetivo: string }[];
-  areas: { area: string; acciones: string[] }[];
+  areas: { area: string; acciones: string[]; resultado?: string }[];
 };
 
 const DEFAULT_FASES = [
@@ -87,6 +88,7 @@ Reglas:
 - Devolvé EXACTAMENTE estas 6 áreas, en este orden y con estos nombres:
 ${areaList}
 - Para cada área, devolvé EXACTAMENTE 4 acciones (una por fase, en orden de fase 1 a 4). Cada acción: una frase corta, concreta y realista para ESE negocio, que se note el avance fase a fase.
+- Para cada área, devolvé también un "resultado": el beneficio concreto para el negocio cuando esa área llega a Nativo IA (una frase corta y tangible).
 - Partí del diagnóstico y lo que surja de la call. Si falta info, proponé lo más razonable para ese rubro.`;
 
   const userContent = [
@@ -121,7 +123,7 @@ ${areaList}
     const found = byArea.get(a.name.toLowerCase());
     const acciones = (found?.acciones ?? []).slice(0, 4);
     while (acciones.length < 4) acciones.push("—");
-    return { area: a.name, short: a.short, service: a.service, acciones };
+    return { area: a.name, short: a.short, service: a.service, acciones, resultado: found?.resultado ?? "" };
   });
 
   const payload = {

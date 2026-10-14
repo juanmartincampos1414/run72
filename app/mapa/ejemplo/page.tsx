@@ -28,6 +28,7 @@ const EJEMPLO: MapData = {
         "Agente que arma la reposición y las compras sugeridas.",
         "Operación coordinada por agentes, con supervisión del encargado.",
       ],
+      resultado: "Menos tiempo en tareas manuales y cero quiebres de stock.",
     },
     {
       area: "Tus clientes", short: "Clientes", service: "Web + marketing con IA",
@@ -37,6 +38,7 @@ const EJEMPLO: MapData = {
         "Fidelización personalizada según lo que consume cada cliente.",
         "Ofertas predictivas por horario, clima y demanda.",
       ],
+      resultado: "Más ventas y clientes que vuelven, con atención 24/7.",
     },
     {
       area: "Tus datos y herramientas", short: "Herramientas", service: "Plataforma, datos y CRM a medida",
@@ -46,6 +48,7 @@ const EJEMPLO: MapData = {
         "Tablero con métricas por sucursal en tiempo real.",
         "Datos que alimentan decisiones de menú y precios.",
       ],
+      resultado: "Decisiones con datos reales, no a ojo.",
     },
     {
       area: "Tu equipo", short: "Equipo", service: "Formación e implementación con tu gente",
@@ -55,6 +58,7 @@ const EJEMPLO: MapData = {
         "Playbooks de uso para cada puesto.",
         "Cultura IA-first: el equipo propone mejoras.",
       ],
+      resultado: "Un equipo que usa IA todos los días, sin miedo.",
     },
     {
       area: "Tu estrategia", short: "Estrategia", service: "Estrategia y hoja de ruta de IA",
@@ -64,6 +68,7 @@ const EJEMPLO: MapData = {
         "Revisión trimestral de iniciativas.",
         "La IA guía la expansión y la apertura de locales.",
       ],
+      resultado: "La IA empuja el crecimiento, medido en plata.",
     },
     {
       area: "Tus reglas", short: "Reglas", service: "Buenas prácticas y uso responsable",
@@ -73,6 +78,7 @@ const EJEMPLO: MapData = {
         "Política de uso vigente y conocida por todos.",
         "Gobernanza demostrable ante proveedores y socios.",
       ],
+      resultado: "Usás IA con tranquilidad y confianza del cliente.",
     },
   ],
 };
