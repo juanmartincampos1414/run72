@@ -7,7 +7,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "semgrep": "bash scripts/semgrep.sh scan --config .semgrep/run72.yml --config p/secrets --config p/typescript --config p/react --config p/nextjs --config p/owasp-top-ten app/ components/ lib/ middleware.ts",
+    "semgrep:arch": "bash scripts/semgrep.sh scan --metrics=off --config .semgrep/run72.yml app/ components/ lib/ middleware.ts",
+    "semgrep:sec": "bash scripts/semgrep.sh scan --config p/secrets --config p/typescript --config p/react --config p/nextjs --config p/owasp-top-ten app/ components/ lib/ middleware.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.105.0",

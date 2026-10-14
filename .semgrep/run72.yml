@@ -1,0 +1,213 @@
+# ============================================================
+# Reglas de arquitectura propias de RUN72 (Semgrep)
+# ============================================================
+# RUN72 no es sólo la landing: tiene cotizador público con IA, cobro del anticipo por Mercado Pago, CRM en
+# /admin y el Business Hub por suscripción. Toda la base se toca con service role desde las rutas de
+# app/api (las tablas tienen RLS sin policies), así que CADA ruta es la única barrera de autorización.
+# Origen: auditoría de calidad y seguridad del 13/10/2026.
+# Correr: npm run semgrep:arch     Validar tras editar: bash scripts/semgrep.sh --validate --config .semgrep/run72.yml
+# ERROR = invariante (si salta y no es un hallazgo conocido, el cambio la rompió). WARNING = deuda a revisar.
+
+rules:
+  # ── 1. Código de servidor en el bundle del navegador ─────────────────────────
+  - id: run72-servidor-en-cliente
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Un componente cliente ("use client") importa un módulo de servidor (cliente de Supabase con service
+      role o de sesión, guard de admin, cifrado de la bóveda, Mercado Pago, correo, IA). Eso lleva acceso
+      total a la base o secretos al navegador. Hacelo en una ruta de app/api y pasá el resultado.
+    metadata:
+      category: security
+      cwe: "CWE-522: Insufficiently Protected Credentials"
+      confidence: HIGH
+    pattern-regex: '(?s)\A\s*["'']use client["''].*?^import\s+(?!type\b)[^;]*?from\s+["'']@/lib/(supabase/(admin|server)|admin/|crypto|mercadopago|email|activation|preview-gen|hub-guard|audit|storage|rate-limit|config)["'']'
+
+  # ── 2. Variables de entorno de servidor en el navegador ──────────────────────
+  - id: run72-env-no-publico-en-cliente
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Componente cliente ("use client") leyendo process.env que no es NEXT_PUBLIC_*. En el navegador queda
+      vacío, y exponerlo filtra un secreto (Mercado Pago, Anthropic, la clave de la bóveda). Leelo en el servidor.
+    metadata:
+      category: security
+      confidence: HIGH
+    patterns:
+      - pattern-inside: |
+          "use client";
+          ...
+      - pattern: process.env.$VAR
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: '^(?!NEXT_PUBLIC_)[A-Z].*'
+
+  # ── 3. Ruta de admin sin requireAdmin ────────────────────────────────────────
+  # Hoy las 26 rutas de /api/admin lo llaman. El middleware sólo protege PÁGINAS, no /api.
+  - id: run72-ruta-admin-sin-guard
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Handler de /api/admin que no llama a requireAdmin(). El middleware no cubre /api: sin esto la ruta
+      queda abierta a cualquiera (lee leads, cambia precios y la configuración de pagos).
+    metadata:
+      category: security
+      cwe: "CWE-862: Missing Authorization"
+      confidence: HIGH
+    paths:
+      include:
+        - "app/api/admin/**/route.ts"
+    patterns:
+      - pattern: |
+          export async function $M(...) { $...CUERPO }
+      - metavariable-regex:
+          metavariable: $M
+          regex: '^(GET|POST|PUT|PATCH|DELETE)$'
+      - metavariable-regex:
+          metavariable: $...CUERPO
+          regex: '^(?![\s\S]*\brequireAdmin\s*\()'
+
+  # ── 4. Ruta del Hub sin identificar al suscriptor ────────────────────────────
+  - id: run72-ruta-hub-sin-guard
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Handler de /api/hub que no identifica al usuario (requireActiveHub, hubUser o currentUser). El Hub
+      guarda documentos y credenciales cifradas de cada cliente: toda lectura y escritura va filtrada por
+      el usuario que pidió. (El webhook de Mercado Pago del Hub va por la regla de webhooks.)
+    metadata:
+      category: security
+      cwe: "CWE-639: Authorization Bypass Through User-Controlled Key"
+      confidence: HIGH
+    paths:
+      include:
+        - "app/api/hub/**/route.ts"
+      exclude:
+        - "app/api/hub/webhook/**"
+    patterns:
+      - pattern: |
+          export async function $M(...) { $...CUERPO }
+      - metavariable-regex:
+          metavariable: $M
+          regex: '^(GET|POST|PUT|PATCH|DELETE)$'
+      - metavariable-regex:
+          metavariable: $...CUERPO
+          regex: '^(?![\s\S]*\b(requireActiveHub|hubUser|currentUser)\s*\()'
+
+  # ── 5. IA alcanzable sin límite de uso ───────────────────────────────────────
+  - id: run72-ia-sin-limite
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Ruta que llama a la IA (Anthropic o generateLeadPreview) sin enforceRateLimit ni requireAdmin. Las
+      rutas de app/api son públicas salvo que se protejan: cualquiera puede gastar tokens sin tope.
+    metadata:
+      category: security
+      cwe: "CWE-770: Allocation of Resources Without Limits"
+      confidence: HIGH
+    paths:
+      include:
+        - "app/api/**/route.ts"
+    patterns:
+      - pattern: |
+          export async function $M(...) { $...CUERPO }
+      - metavariable-regex:
+          metavariable: $...CUERPO
+          regex: '^(?=[\s\S]*(\.messages\.(create|stream)\s*\(|\bgenerateLeadPreview\s*\())(?![\s\S]*\b(enforceRateLimit|requireAdmin)\s*\()'
+
+  # ── 6. Webhook de pagos sin verificar la firma, o verificándola sólo si hay secreto ──
+  # Auditoría S6: el webhook de pagos sólo valida la firma si MP_WEBHOOK_SECRET existe (si falta, procesa
+  # igual) y el del Hub no la valida nunca. Hoy están mitigados porque reconsultan a Mercado Pago, pero
+  # cualquiera puede dispararlos. Estas dos reglas marcan esos dos casos hasta que se corrijan.
+  - id: run72-webhook-sin-firma
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      Webhook que no verifica la firma (verifyWebhookSignature). Cualquiera puede llamarlo y disparar
+      re-sincronizaciones o reclamar suscripciones. Verificá la firma y rechazá si falla.
+    metadata:
+      category: security
+      cwe: "CWE-345: Insufficient Verification of Data Authenticity"
+      confidence: HIGH
+    paths:
+      include:
+        - "app/api/**/webhook/route.ts"
+    patterns:
+      - pattern: |
+          export async function POST(...) { $...CUERPO }
+      - metavariable-regex:
+          metavariable: $...CUERPO
+          regex: '^(?![\s\S]*\bverifyWebhookSignature\s*\()'
+
+  - id: run72-webhook-firma-opcional
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      La firma del webhook se verifica SÓLO si el secreto está configurado: si la variable falta en un
+      deploy, el webhook acepta cualquier pedido. Sin secreto, rechazá (500) en vez de seguir.
+    metadata:
+      category: security
+      cwe: "CWE-636: Not Failing Securely"
+      confidence: HIGH
+    pattern-either:
+      - pattern: |
+          if ($SECRET) { ... verifyWebhookSignature(...); ... }
+      - pattern: |
+          if (process.env.$S) { ... verifyWebhookSignature(...); ... }
+      - pattern: |
+          if ($SECRET) { ... $R = verifyWebhookSignature(...); ... }
+
+  # ── 7. HTML crudo ────────────────────────────────────────────────────────────
+  - id: run72-html-crudo
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      dangerouslySetInnerHTML con algo que no es JSON.stringify de datos propios. Lo que generan la IA o los
+      clientes (previews, intake, mensajes) se muestra como texto o dentro de un iframe con sandbox.
+    metadata:
+      category: security
+      cwe: "CWE-79: Cross-site Scripting"
+      confidence: HIGH
+    patterns:
+      - pattern: '<$E dangerouslySetInnerHTML={$X} />'
+      - pattern-not: '<$E dangerouslySetInnerHTML={{ __html: JSON.stringify(...) }} />'
+
+  # ── 8. HTML generado sin sandbox ─────────────────────────────────────────────
+  # Lo que hoy está bien y no se puede perder: el preview que escribe la IA se muestra en un iframe con
+  # sandbox="" (sin scripts, sin acceso al origen).
+  - id: run72-iframe-srcdoc-sin-sandbox
+    languages: [typescript]
+    severity: ERROR
+    message: >
+      <iframe srcDoc=...> sin sandbox. El HTML de los previews lo escribe la IA a partir de lo que carga
+      un cliente: sin sandbox="" sus scripts corren en run72 con la sesión de quien lo mira (incluido el admin).
+    metadata:
+      category: security
+      cwe: "CWE-79: Cross-site Scripting"
+      confidence: HIGH
+    patterns:
+      - pattern: '<iframe srcDoc={$X} />'
+      - pattern-not: '<iframe sandbox=$S srcDoc={$X} />'
+
+  # ── 9. (deuda) Escritura a Supabase sin mirar el error ───────────────────────
+  # Auditoría C5: 17 escrituras sin revisar `error`. supabase-js no lanza: si la escritura falla, el código
+  # sigue como si hubiera andado (un documento borrado del storage y no de la tabla, una activación perdida).
+  - id: run72-escritura-sin-mirar-error
+    languages: [typescript]
+    severity: WARNING
+    message: >
+      Escritura a Supabase cuyo resultado se descarta. supabase-js NO lanza: si falla, nadie se entera.
+      Tomá `{ error }` y decidí qué hacer (devolver 500, reintentar, avisar).
+    metadata:
+      category: correctness
+      confidence: HIGH
+    patterns:
+      - pattern: await $Q;
+      # Sólo cuando el resultado se tira: `const { error } = await …` sí lo mira.
+      - pattern-not-inside: const $V = await $Q;
+      - pattern-not-inside: let $V = await $Q;
+      - pattern-not-inside: $V = await $Q;
+      - pattern-not-inside: return await $Q;
+      - metavariable-regex:
+          metavariable: $Q
+          regex: '[\s\S]*\.from\([^)]*\)[\s\S]*\.(insert|update|upsert|delete)\('
