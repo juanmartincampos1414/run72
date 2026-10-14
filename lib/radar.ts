@@ -1,149 +1,120 @@
-// Radar de IA de RUN72 — config del diagnóstico (v1).
-// Inspirado en el radar de CESSI, reescrito para PyMEs y orientado a la acción.
+// Radar de IA de RUN72 — config del diagnóstico (v2).
+// Vocabulario 100% propio (no usa los términos del radar de CESSI).
+// 6 áreas · 1 pregunta por área · rápido de completar.
 
-export type Dimension = {
+export type Area = {
   code: string;
+  /** Nombre que ve el cliente. */
   name: string;
+  /** Etiqueta corta para el gráfico. */
   short: string;
-  /** Servicio RUN72 que levanta esta dimensión cuando está floja. */
+  /** Servicio RUN72 que empuja esta área cuando está floja. */
   service: string;
+  /** Qué hacer para subir de nivel (próximo paso). */
+  tip: string;
 };
 
-export const DIMENSIONS: Dimension[] = [
-  { code: "PO", name: "Procesos y Operaciones", short: "Procesos", service: "Automatizaciones y agentes de IA" },
-  { code: "CO", name: "Clientes y Ventas", short: "Clientes", service: "Web + marketing con IA" },
-  { code: "DT", name: "Datos y Herramientas", short: "Datos", service: "Plataforma, datos y CRM a medida" },
-  { code: "PC", name: "Equipo y Cultura", short: "Equipo", service: "Formación e implementación con tu equipo" },
-  { code: "ES", name: "Estrategia y Liderazgo", short: "Estrategia", service: "Estrategia y hoja de ruta de IA" },
-  { code: "GR", name: "Gobernanza y Riesgo", short: "Gobernanza", service: "Buenas prácticas y uso responsable" },
+export const AREAS: Area[] = [
+  { code: "OP", name: "Tu operación", short: "Operación",
+    service: "Automatizaciones y agentes de IA",
+    tip: "Elegí una tarea repetitiva y dejá que la IA la haga de punta a punta." },
+  { code: "CL", name: "Tus clientes", short: "Clientes",
+    service: "Web + marketing con IA",
+    tip: "Sumá IA a cómo conseguís y atendés clientes, y medí qué cambia." },
+  { code: "HE", name: "Tus datos y herramientas", short: "Herramientas",
+    service: "Plataforma, datos y CRM a medida",
+    tip: "Ordená tus datos y pasá a herramientas con accesos y seguridad." },
+  { code: "EQ", name: "Tu equipo", short: "Equipo",
+    service: "Formación e implementación con tu gente",
+    tip: "Nombrá un responsable y armá una capacitación corta y práctica." },
+  { code: "ES", name: "Tu estrategia", short: "Estrategia",
+    service: "Estrategia y hoja de ruta de IA",
+    tip: "Elegí 2 o 3 prioridades del año y ponéles una métrica." },
+  { code: "RG", name: "Tus reglas", short: "Reglas",
+    service: "Buenas prácticas y uso responsable",
+    tip: "Escribí reglas mínimas de uso y qué datos no se cargan." },
 ];
 
 export type Question = {
   id: string;
-  dim: string;
-  /** Línea con la que Runit presenta la pregunta. */
+  area: string;
+  /** Línea con la que Runit abre la pregunta. */
   runit: string;
   q: string;
-  /** 4 opciones; el índice (1-4) es el nivel. */
+  /** 4 opciones; el índice (1-4) es el nivel. También son la escala para el modo conversación. */
   options: [string, string, string, string];
 };
 
 export const QUESTIONS: Question[] = [
-  // Procesos
-  { id: "PO1", dim: "PO", runit: "Arranquemos por lo operativo.", q: "¿Dónde está la IA en tu trabajo diario?", options: [
-    "Casi no se usa, o solo cosas sueltas (redactar, resumir, buscar).",
-    "En una o dos áreas, a modo de prueba.",
-    "Integrada a procesos clave de varias áreas.",
-    "En los procesos principales de todo el equipo, como forma de trabajar.",
+  { id: "OP", area: "OP", runit: "Arranquemos por tu día a día.", q: "¿Cuánto usás IA para trabajar?", options: [
+    "Casi nada, alguna consulta suelta.",
+    "La probé en una o dos cosas.",
+    "Ya es parte de cómo trabajo en varias áreas.",
+    "Está metida en casi todo lo que hacemos.",
   ] },
-  { id: "PO2", dim: "PO", runit: "¿Y la parte repetitiva?", q: "¿Cómo automatizás las tareas?", options: [
-    "A mano, o con automatizaciones sin IA.",
-    "Algunas automatizaciones con IA, sueltas.",
-    "Procesos clave ya corren automatizados con IA.",
-    "Agentes de IA ejecutan tareas completas, con supervisión.",
+  { id: "CL", area: "CL", runit: "Vamos a tus clientes.", q: "¿Y para conseguirlos y atenderlos?", options: [
+    "No la uso para eso.",
+    "Algo puntual en contenido o respuestas.",
+    "La uso seguido y miro los resultados.",
+    "Personaliza y decide a quién y cuándo ofrecer.",
   ] },
-  // Clientes
-  { id: "CO1", dim: "CO", runit: "Pasemos a tus clientes.", q: "¿Cómo usás IA para atenderlos?", options: [
-    "No la uso.",
-    "En algún canal (ej. un bot que responde mensajes).",
-    "En los canales principales, con resultados medidos.",
-    "La atención se personaliza y se adelanta a lo que necesitan.",
+  { id: "HE", area: "HE", runit: "La base: tus datos.", q: "¿Cómo están tus datos y herramientas?", options: [
+    "Todo en planillas y cuentas sueltas.",
+    "Tengo un sistema, pero la info está desordenada.",
+    "Sistemas ordenados y herramientas con criterio.",
+    "Todo conectado y listo para IA a escala.",
   ] },
-  { id: "CO2", dim: "CO", runit: "¿Y para vender y comunicar?", q: "¿Cómo usás IA en ventas y marketing?", options: [
-    "No la uso.",
-    "Apoyo puntual en contenidos o campañas.",
-    "Integrada a cómo capto y sigo clientes, con métricas.",
-    "Me ayuda a decidir a quién, qué y cuándo ofrecer.",
+  { id: "EQ", area: "EQ", runit: "Hablemos de tu gente.", q: "¿Cómo viene tu equipo con la IA?", options: [
+    "Cada uno por su cuenta, sin rumbo.",
+    "Un par de curiosos que empujan.",
+    "Hay referentes y algo de formación.",
+    "Todo el equipo capacitado y sumando.",
   ] },
-  // Datos
-  { id: "DT1", dim: "DT", runit: "La base: datos y sistemas.", q: "¿Cómo están tus datos y sistemas?", options: [
-    "Planillas y sistemas sueltos; información dispersa.",
-    "Tengo un sistema de gestión, pero la info está dispersa.",
-    "Sistemas integrados; la información fluye y está disponible.",
-    "Listos para sumar IA a escala, de forma segura.",
+  { id: "ES", area: "ES", runit: "Mirada de arriba.", q: "¿Qué lugar tiene la IA en tus decisiones?", options: [
+    "Me interesa, pero no hay un plan.",
+    "Pruebo cosas sueltas cuando puedo.",
+    "Es una prioridad del año, con foco.",
+    "Guía hacia dónde va el negocio.",
   ] },
-  { id: "DT2", dim: "DT", runit: "¿Y las herramientas?", q: "¿Con qué herramientas de IA trabajás?", options: [
-    "Ninguna, o cuentas personales sueltas.",
-    "Licencias para algunos, sin criterio común.",
-    "Herramientas definidas, con accesos y seguridad.",
-    "Integradas a tus sistemas, con reglas de uso.",
-  ] },
-  // Equipo
-  { id: "PC1", dim: "PC", runit: "Hablemos del equipo.", q: "¿Quién impulsa la IA en tu organización?", options: [
-    "Nadie en particular, o entusiastas sueltos.",
-    "Referentes informales.",
-    "Responsables por área o un equipo dedicado.",
-    "Está en los objetivos de cada área.",
-  ] },
-  { id: "PC2", dim: "PC", runit: "¿Y la formación?", q: "¿Cómo se forma tu gente en IA?", options: [
-    "Cada uno aprende por su cuenta.",
-    "Capacitaciones puntuales.",
-    "Formación continua, según el puesto.",
-    "Además, hay tiempo para practicar y compartir aprendizajes.",
-  ] },
-  // Estrategia
-  { id: "ES1", dim: "ES", runit: "Mirada de dirección.", q: "¿Qué lugar tiene la IA en la dirección?", options: [
-    "Interés, pero sin una agenda.",
-    "Alguien impulsa iniciativas puntuales.",
-    "Es prioridad del año, con responsable y recursos.",
-    "Orienta las decisiones centrales del negocio.",
-  ] },
-  { id: "ES2", dim: "ES", runit: "¿Y los resultados?", q: "¿Cómo medís el impacto de la IA?", options: [
-    "No lo mido.",
-    "Mido el uso (quién usa qué).",
-    "Mido ahorros de tiempo, costos o mejoras de calidad.",
-    "Mido su efecto en ventas, satisfacción o metas.",
-  ] },
-  // Gobernanza
-  { id: "GR1", dim: "GR", runit: "Cerramos con lo serio: las reglas.", q: "¿Qué reglas tenés para usar IA?", options: [
-    "No hay reglas; el uso es informal.",
-    "Lineamientos mínimos comunicados.",
-    "Una política vigente, conocida y aplicada.",
-    "Se controla y se puede demostrar ante clientes.",
-  ] },
-  { id: "GR2", dim: "GR", runit: "¿Y los datos sensibles?", q: "¿Cómo protegés los datos frente a la IA?", options: [
-    "No se evalúa qué datos se exponen.",
-    "Restricciones básicas (qué no se puede cargar).",
-    "Controles técnicos y acuerdos con proveedores.",
-    "Cada nuevo uso se evalúa antes de arrancar.",
+  { id: "RG", area: "RG", runit: "Cerramos con lo importante.", q: "¿Tenés reglas para usarla con cuidado?", options: [
+    "Ninguna, es a pulmón.",
+    "Un par de pautas básicas.",
+    "Reglas claras de qué sí y qué no.",
+    "Todo prolijo y demostrable ante clientes.",
   ] },
 ];
 
-export type Stage = { level: number; key: string; name: string; tagline: string; desc: string };
+export type Stage = { level: number; key: string; name: string; desc: string };
 
 export const STAGES: Stage[] = [
-  { level: 1, key: "explorando", name: "Explorando", tagline: "Recién arrancando con IA.",
-    desc: "La IA todavía no cambió cómo trabajás. Hay mucho terreno fácil de ganar." },
-  { level: 2, key: "probando", name: "Probando", tagline: "Ya hay pruebas sueltas.",
-    desc: "Diste los primeros pasos. El salto está en integrarlas al día a día." },
-  { level: 3, key: "adoptando", name: "Adoptando", tagline: "La IA ya es parte de cómo trabajás.",
-    desc: "La incorporaste puertas adentro. Ahora toca llevarla a tus clientes y escalar." },
-  { level: 4, key: "liderando", name: "Liderando", tagline: "La IA está en el núcleo de tu negocio.",
-    desc: "Estás adelante. El foco es sostener la ventaja y seguir creando valor nuevo." },
+  { level: 1, key: "arranque", name: "En el arranque",
+    desc: "Estás empezando con la IA. Hay un montón de terreno fácil de ganar rápido." },
+  { level: 2, key: "ritmo", name: "Agarrando ritmo",
+    desc: "Ya diste los primeros pasos. Ahora toca ordenarlos y hacerlos rendir." },
+  { level: 3, key: "velocidad", name: "En velocidad",
+    desc: "La IA ya es parte de cómo trabajás. El próximo salto es llevarla a tus clientes y escalar." },
+  { level: 4, key: "cabeza", name: "A la cabeza",
+    desc: "Vas adelante. El foco es sostener la ventaja y seguir creando valor nuevo." },
 ];
 
-export type DimScore = Dimension & { level: number; raw: number };
+export type AreaScore = Area & { level: number };
 export type RadarResult = {
-  dims: DimScore[];
+  areas: AreaScore[];
   stageLevel: number;
   stage: Stage;
-  moves: DimScore[];
-  avg: number;
+  steps: AreaScore[];
 };
 
-/** Puntúa las respuestas. Estadio = la dimensión más baja manda (cuello de botella). */
+/** Puntúa las respuestas. El nivel general lo marca el área más floja. */
 export function scoreRadar(answers: Record<string, number>): RadarResult {
-  const dims: DimScore[] = DIMENSIONS.map((d) => {
-    const qs = QUESTIONS.filter((q) => q.dim === d.code);
-    const vals = qs.map((q) => answers[q.id]).filter((v): v is number => !!v);
-    const raw = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 1;
-    return { ...d, raw, level: Math.max(1, Math.round(raw)) };
-  });
-  const stageLevel = Math.min(...dims.map((d) => d.level));
+  const areas: AreaScore[] = AREAS.map((a) => ({
+    ...a,
+    level: Math.max(1, Math.min(4, answers[a.code] || 1)),
+  }));
+  const stageLevel = Math.min(...areas.map((a) => a.level));
   const stage = STAGES[stageLevel - 1] ?? STAGES[0];
-  const moves = [...dims].sort((a, b) => a.raw - b.raw).slice(0, 3);
-  const avg = dims.reduce((a, d) => a + d.raw, 0) / dims.length;
-  return { dims, stageLevel, stage, moves, avg };
+  const steps = [...areas].sort((a, b) => a.level - b.level).slice(0, 3);
+  return { areas, stageLevel, stage, steps };
 }
 
-export const NIVEL_NOMBRE = ["", "Explorando", "Probando", "Adoptando", "Liderando"];
+export const NIVEL = ["", "En el arranque", "Agarrando ritmo", "En velocidad", "A la cabeza"];
