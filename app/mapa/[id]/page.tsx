@@ -19,7 +19,7 @@ export default async function MapaPublicPage({ params }: { params: Promise<{ id:
 
   const { data, error } = await getSupabaseAdmin()
     .from("ia_maps")
-    .select("negocio, resumen, fases, areas")
+    .select("negocio, resumen, equipo, fases, areas")
     .eq("id", id)
     .maybeSingle();
 

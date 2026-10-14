@@ -11,3 +11,6 @@ create table if not exists public.ia_maps (
 
 -- Sin acceso anónimo directo; la lectura pública pasa por la API con service role.
 alter table public.ia_maps enable row level security;
+
+-- v2.1: equipo ficticio (responsables) por mapa.
+alter table public.ia_maps add column if not exists equipo jsonb not null default '[]'::jsonb;
