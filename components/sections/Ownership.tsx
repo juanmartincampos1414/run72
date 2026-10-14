@@ -43,6 +43,19 @@ export function Ownership() {
                 ))}
               </ul>
             </div>
+
+            <div className="mt-6 border-t border-line pt-6">
+              <a
+                href="/mapa/ejemplo"
+                className="group flex items-center justify-between gap-3 rounded-2xl border border-brand-violet/25 bg-brand-violet/[0.06] px-4 py-3.5 text-sm transition hover:border-brand-violet/50"
+              >
+                <span className="text-fg">
+                  Mirá un ejemplo de la entrega: tu{" "}
+                  <span className="font-medium text-brand-violet">Mapa de IA</span>
+                </span>
+                <span className="shrink-0 transition-transform group-hover:translate-x-0.5">→</span>
+              </a>
+            </div>
           </div>
         </Reveal>
       </div>
