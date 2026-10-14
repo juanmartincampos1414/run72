@@ -41,3 +41,23 @@ lista tiene que bajar, no subir.
 - `run72-escritura-sin-mirar-error` → 17 escrituras.
 
 Para silenciar un caso puntual y justificado: comentario `// nosemgrep: <id-de-la-regla> — motivo` en la línea.
+
+## Hook automático de Claude Code
+
+`scripts/semgrep-hook.sh` corre las reglas **ERROR** sobre cada archivo que Claude Code edita (un archivo,
+sin red). Si una regla salta, sale con código 2 y Claude Code recibe el aviso para corregirlo en el momento.
+Las WARNING no lo frenan.
+
+Está activado en `.claude/settings.local.json`, que es personal y no se versiona. Para activarlo en otra
+máquina, agregá:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      { "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/semgrep-hook.sh\"" }] }
+    ]
+  }
+}
+```
