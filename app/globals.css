@@ -360,3 +360,13 @@
 @media (max-width: 768px) {
   .rn-hero { width: 104px; right: 2%; top: -11%; }
 }
+
+/* ------------------------------------------------------------------ *
+ * Impresión del Mapa de IA (aísla #mapa-print)
+ * ------------------------------------------------------------------ */
+@media print {
+  @page { size: landscape; margin: 10mm; }
+  body * { visibility: hidden !important; }
+  #mapa-print, #mapa-print * { visibility: visible !important; }
+  #mapa-print { position: absolute; left: 0; top: 0; width: 100%; }
+}

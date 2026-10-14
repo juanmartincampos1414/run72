@@ -14,6 +14,7 @@ const LINKS = [
   { href: "/admin/microservicios", label: "Microservicios" },
   { href: "/admin/faqs", label: "FAQs" },
   { href: "/admin/propuesta", label: "Propuesta IA" },
+  { href: "/admin/mapa", label: "Mapa de IA" },
   { href: "/admin/hub", label: "Business Hub" },
   { href: "/admin/hub/partners", label: "Hub · Partners" },
   { href: "/admin/configuracion", label: "Configuración" },
