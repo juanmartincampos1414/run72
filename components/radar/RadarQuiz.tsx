@@ -434,6 +434,9 @@ export function RadarQuiz() {
         </button>
       </div>
       <p className="mt-5 text-xs text-faint">6 preguntas · sin registrarte para ver el resultado</p>
+      <a href="/mapa/ejemplo" className="mt-4 inline-block text-sm text-muted underline underline-offset-4 transition hover:text-fg">
+        ¿Querés ver qué te entregamos? Mirá un mapa de ejemplo →
+      </a>
     </div>
   );
 }
