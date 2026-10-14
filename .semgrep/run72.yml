@@ -116,15 +116,15 @@ rules:
           regex: '^(?=[\s\S]*(\.messages\.(create|stream)\s*\(|\bgenerateLeadPreview\s*\())(?![\s\S]*\b(enforceRateLimit|requireAdmin)\s*\()'
 
   # ── 6. Webhook de pagos sin verificar la firma, o verificándola sólo si hay secreto ──
-  # Auditoría S6: el webhook de pagos sólo valida la firma si MP_WEBHOOK_SECRET existe (si falta, procesa
-  # igual) y el del Hub no la valida nunca. Hoy están mitigados porque reconsultan a Mercado Pago, pero
-  # cualquiera puede dispararlos. Estas dos reglas marcan esos dos casos hasta que se corrijan.
+  # Auditoría S6: el webhook de pagos sólo validaba la firma si MP_WEBHOOK_SECRET existía (si faltaba,
+  # procesaba igual) y el del Hub no la validaba nunca. Corregido el 14/10/2026 con exigirFirmaDeMP, que
+  # falla cerrado. Estas dos reglas evitan que vuelva.
   - id: run72-webhook-sin-firma
     languages: [typescript]
     severity: ERROR
     message: >
-      Webhook que no verifica la firma (verifyWebhookSignature). Cualquiera puede llamarlo y disparar
-      re-sincronizaciones o reclamar suscripciones. Verificá la firma y rechazá si falla.
+      Webhook que no verifica la firma (exigirFirmaDeMP). Cualquiera puede llamarlo y disparar
+      re-sincronizaciones o reclamar suscripciones. Llamá a exigirFirmaDeMP y rechazá si falla.
     metadata:
       category: security
       cwe: "CWE-345: Insufficient Verification of Data Authenticity"
@@ -137,7 +137,7 @@ rules:
           export async function POST(...) { $...CUERPO }
       - metavariable-regex:
           metavariable: $...CUERPO
-          regex: '^(?![\s\S]*\bverifyWebhookSignature\s*\()'
+          regex: '^(?![\s\S]*\b(exigirFirmaDeMP|verifyWebhookSignature)\s*\()'
 
   - id: run72-webhook-firma-opcional
     languages: [typescript]

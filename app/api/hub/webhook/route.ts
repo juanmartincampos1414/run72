@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
-import { getPreapproval, mapPreapprovalStatus } from "@/lib/mercadopago";
+import { getPreapproval, mapPreapprovalStatus, exigirFirmaDeMP } from "@/lib/mercadopago";
 import { logEvent } from "@/lib/audit";
+import { clientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -10,13 +11,18 @@ export const dynamic = "force-dynamic";
  * Webhook de suscripciones del Hub (separado del webhook de pagos para no tocar
  * el flujo de anticipos en producción). Configurar esta URL en MercadoPago para
  * el topic de preapproval. Reconfirma el estado contra la API de MP.
+ *
+ * Exige la firma de MP (misma clave secreta que el webhook de pagos). Antes no la verificaba: cualquiera
+ * podía dispararlo con el id de una suscripción ajena y forzar su re-sincronización.
  */
 export async function POST(req: Request) {
+  const ip = clientIp(req);
   try {
     if (!isSupabaseConfigured()) return NextResponse.json({ ok: true });
 
     const url = new URL(req.url);
-    let id = url.searchParams.get("data.id") ?? url.searchParams.get("id");
+    const dataIdParam = url.searchParams.get("data.id"); // el que firma MercadoPago
+    let id = dataIdParam ?? url.searchParams.get("id");
     let type = url.searchParams.get("type") ?? url.searchParams.get("topic");
     try {
       const body = await req.json();
@@ -29,6 +35,24 @@ export async function POST(req: Request) {
     // Solo eventos de suscripción/preapproval.
     if (!id || (type && !/preapproval|subscription/i.test(`${type}`))) {
       return NextResponse.json({ ok: true });
+    }
+
+    // --- Firma de MP: obligatoria. Sin secreto configurado no se procesa nada (500 → MP reintenta). ---
+    const firma = exigirFirmaDeMP(req, dataIdParam ?? `${id}`);
+    if (!firma.ok) {
+      await logEvent(getSupabaseAdmin(), firma.status === 500 ? "webhook_secret_missing" : "webhook_signature_invalid", null, {
+        ip,
+        endpoint: "/api/hub/webhook",
+        reason: firma.reason,
+        request_id: req.headers.get("x-request-id"),
+        preapproval_id: `${id}`,
+      });
+      if (firma.status === 500) {
+        console.error("[hub/webhook] MP_WEBHOOK_SECRET no está configurado: no se procesan suscripciones hasta cargarlo");
+        return NextResponse.json({ error: "Webhook sin configurar." }, { status: 500 });
+      }
+      console.warn(`[hub/webhook] firma inválida (${firma.reason}) ip=${ip} preapproval=${id}`);
+      return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
     }
 
     const config = await getConfig();

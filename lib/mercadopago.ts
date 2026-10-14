@@ -51,6 +51,32 @@ export function verifyWebhookSignature(opts: {
   }
 }
 
+export type FirmaDeMP =
+  | { ok: true }
+  | { ok: false; status: 401 | 500; reason: string };
+
+/**
+ * Exige la firma de MercadoPago en un webhook. Falla CERRADO: sin MP_WEBHOOK_SECRET no se procesa nada.
+ *
+ * Antes la firma se validaba "sólo si hay secreto": si la variable faltaba en un deploy, el webhook de pagos
+ * aceptaba cualquier pedido, y el del Hub no la validaba nunca (auditoría 13/10/2026). Los dos reconsultan
+ * el estado a la API de MP, así que no se podía inventar un pago, pero cualquiera podía dispararlos.
+ *
+ * Sin secreto responde 500 (no 200): MP reintenta, y cuando se carga la variable las notificaciones entran.
+ * `dataId` es el `data.id` de la URL si vino (es el que firma MP); si no, el del body.
+ */
+export function exigirFirmaDeMP(req: Request, dataId: string | null): FirmaDeMP {
+  const secret = process.env.MP_WEBHOOK_SECRET;
+  if (!secret) return { ok: false, status: 500, reason: "webhook_secret_missing" };
+  const check = verifyWebhookSignature({
+    secret,
+    xSignature: req.headers.get("x-signature"),
+    xRequestId: req.headers.get("x-request-id"),
+    dataId,
+  });
+  return check.valid ? { ok: true } : { ok: false, status: 401, reason: check.reason ?? "invalid_signature" };
+}
+
 export type MPPreference = {
   id: string;
   init_point: string;
@@ -83,7 +109,9 @@ export async function createPreference(opts: {
       ],
       external_reference: opts.externalReference,
       ...(opts.payerEmail ? { payer: { email: opts.payerEmail } } : {}),
-      notification_url: `${opts.baseUrl}/api/payments/webhook`,
+      // source_news=webhooks: sólo notificaciones de tipo Webhook (firmadas), no las IPN viejas sin firma,
+      // que el webhook ahora rechaza.
+      notification_url: `${opts.baseUrl}/api/payments/webhook?source_news=webhooks`,
       back_urls: {
         success: `${opts.baseUrl}/proyecto/${opts.externalReference}`,
         pending: `${opts.baseUrl}/pago?status=pending&lead=${opts.externalReference}`,

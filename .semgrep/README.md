@@ -29,7 +29,7 @@ lista tiene que bajar, no subir.
 | `run72-ruta-admin-sin-guard` | ERROR | Todo handler de `/api/admin` llama a `requireAdmin()`. |
 | `run72-ruta-hub-sin-guard` | ERROR | Todo handler de `/api/hub` identifica al usuario (`requireActiveHub`, `hubUser`, `currentUser`). |
 | `run72-ia-sin-limite` | ERROR | Una ruta que llama a la IA tiene `enforceRateLimit` o `requireAdmin`. |
-| `run72-webhook-sin-firma` | ERROR | Un webhook verifica la firma. |
+| `run72-webhook-sin-firma` | ERROR | Un webhook exige la firma con `exigirFirmaDeMP`. |
 | `run72-webhook-firma-opcional` | ERROR | La firma no se verifica "sólo si hay secreto". |
 | `run72-html-crudo` | ERROR | `dangerouslySetInnerHTML` sólo con `JSON.stringify` de datos propios. |
 | `run72-iframe-srcdoc-sin-sandbox` | ERROR | El HTML que escribe la IA se muestra en un iframe con `sandbox`. |
@@ -37,8 +37,7 @@ lista tiene que bajar, no subir.
 
 ## Hallazgos abiertos al crear las reglas (14/10/2026)
 
-- `run72-webhook-sin-firma` → `app/api/hub/webhook/route.ts`: el webhook del Hub no verifica firma.
-- `run72-webhook-firma-opcional` → `app/api/payments/webhook/route.ts`: sin `MP_WEBHOOK_SECRET`, procesa igual.
+- Los dos webhooks sin firma obligatoria: corregidos el mismo día con `exigirFirmaDeMP` (falla cerrado).
 - `run72-escritura-sin-mirar-error` → 17 escrituras.
 
 Para silenciar un caso puntual y justificado: comentario `// nosemgrep: <id-de-la-regla> — motivo` en la línea.

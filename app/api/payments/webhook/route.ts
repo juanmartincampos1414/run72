@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
-import { getPayment, verifyWebhookSignature } from "@/lib/mercadopago";
+import { getPayment, exigirFirmaDeMP } from "@/lib/mercadopago";
 import { activateProduction } from "@/lib/activation";
 import { logEvent } from "@/lib/audit";
 import { clientIp } from "@/lib/rate-limit";
@@ -37,29 +37,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    // --- Validación de firma (oficial MP). Solo se activa si hay secreto configurado. ---
-    const secret = process.env.MP_WEBHOOK_SECRET;
-    if (secret) {
-      const xRequestId = req.headers.get("x-request-id");
-      const check = verifyWebhookSignature({
-        secret,
-        xSignature: req.headers.get("x-signature"),
-        xRequestId,
-        dataId: dataIdParam ?? `${paymentId}`,
+    // --- Firma de MP: obligatoria. Sin secreto configurado no se procesa nada (500 → MP reintenta). ---
+    const firma = exigirFirmaDeMP(req, dataIdParam ?? `${paymentId}`);
+    if (!firma.ok) {
+      const supabase = getSupabaseAdmin();
+      await logEvent(supabase, firma.status === 500 ? "webhook_secret_missing" : "webhook_signature_invalid", null, {
+        ip,
+        endpoint: "/api/payments/webhook",
+        reason: firma.reason,
+        request_id: req.headers.get("x-request-id"),
+        payment_id: `${paymentId}`,
       });
-      if (!check.valid) {
-        const supabase = getSupabaseAdmin();
-        await logEvent(supabase, "webhook_signature_invalid", null, {
-          ip,
-          endpoint: "/api/payments/webhook",
-          reason: check.reason,
-          request_id: xRequestId,
-          payment_id: `${paymentId}`,
-        });
-        console.warn(`[webhook] firma inválida (${check.reason}) ip=${ip} payment=${paymentId}`);
-        // Nunca procesamos un pago con firma inválida.
-        return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
+      if (firma.status === 500) {
+        console.error("[webhook] MP_WEBHOOK_SECRET no está configurado: no se procesan pagos hasta cargarlo");
+        return NextResponse.json({ error: "Webhook sin configurar." }, { status: 500 });
       }
+      console.warn(`[webhook] firma inválida (${firma.reason}) ip=${ip} payment=${paymentId}`);
+      // Nunca procesamos un pago con firma inválida.
+      return NextResponse.json({ error: "Firma inválida." }, { status: 401 });
     }
 
     const config = await getConfig();
