@@ -50,8 +50,9 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.16, ease }}
             className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted md:text-lg"
           >
-            Web, plataforma, marca y estrategia. Todo lo necesario para lanzar tu
-            proyecto y empezar a vender en solo 72 horas.
+            Web, plataforma, marca, estrategia y automatización con IA.
+            Ejecutamos lo que tu negocio necesita —estés arrancando, creciendo o
+            escalando— y te lo entregamos funcionando en 72 horas.
           </motion.p>
 
           <motion.div
