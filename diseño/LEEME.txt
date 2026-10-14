@@ -1,0 +1,50 @@
+RUN72 — Kit de diseño
+=====================
+
+Colores de marca (degradé del isologo):
+  Cyan    #38bdf8
+  Indigo  #6366f1
+  Violeta #a855f7
+  Fondo   #050505 (ink)
+
+----------------------------------------------------------------
+/logo  — Isologo "72" de RUN72
+----------------------------------------------------------------
+  run72-logo-1254.png   original (máxima calidad)
+  run72-logo-1024/512/256/128/64.png   tamaños listos para usar
+
+----------------------------------------------------------------
+/runit — El personaje (asistente IA)
+----------------------------------------------------------------
+VECTORIAL (escala infinita, ideal para print / Figma / Illustrator):
+  runit.svg             personaje, fondo transparente
+  runit-glow.svg        personaje con aura violeta (para fondos oscuros)
+  runit-icon.svg        cuadrado 256, transparente (avatar / app icon)
+  runit-icon-dark.svg   cuadrado con fondo oscuro redondeado (app icon)
+
+PNG — personaje, FONDO TRANSPARENTE (para superponer en cualquier lado):
+  runit-1024.png  runit-512.png  runit-256.png  runit-128.png  runit-64.png
+
+PNG — personaje SOBRE FONDO OSCURO (para apps que no soportan transparencia):
+  runit-on-dark-1024.png  runit-on-dark-512.png
+
+PNG — con AURA / glow:
+  runit-glow-1024.png            transparente
+  runit-glow-on-dark-1024.png    sobre fondo oscuro
+
+PNG — ICONO cuadrado (avatar, app icon, redes):
+  runit-icon-512/256/128.png     transparente
+  runit-icon-dark-512/256.png    con fondo oscuro redondeado
+
+----------------------------------------------------------------
+¿Cuál uso?
+----------------------------------------------------------------
+- Web / presentaciones / redes      -> PNG transparente (runit-512/1024)
+- Logo o personaje a gran tamaño     -> SVG (no pierde calidad)
+- Avatar / foto de perfil / app icon -> runit-icon-* (cuadrado)
+- Fondo claro o herramienta sin alpha -> versiones "on-dark"
+- Impresión / edición vectorial       -> los .svg
+
+Nota: el personaje funciona mejor sobre fondos oscuros (es su hábitat).
+Sobre fondos claros, usá las versiones "icon-dark" o ponelo dentro de
+un recuadro oscuro.
