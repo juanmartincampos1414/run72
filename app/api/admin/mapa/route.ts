@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAdmin } from "@/lib/admin/auth";
+import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { AREAS } from "@/lib/radar";
 
 export const dynamic = "force-dynamic";
@@ -123,10 +124,28 @@ ${areaList}
     return { area: a.name, short: a.short, service: a.service, acciones };
   });
 
-  return NextResponse.json({
+  const payload = {
     negocio: parsed.negocio ?? "",
     resumen: parsed.resumen ?? "",
     fases,
     areas,
-  });
+  };
+
+  // Guardar para compartir vía /mapa/{id} (best-effort).
+  let id: string | null = null;
+  if (isSupabaseConfigured()) {
+    try {
+      const { data, error } = await getSupabaseAdmin()
+        .from("ia_maps")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (!error) id = data?.id ?? null;
+    } catch {
+      id = null;
+    }
+  }
+
+  return NextResponse.json({ id, ...payload });
 }
+
