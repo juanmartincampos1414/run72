@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Logo } from "./Logo";
 import { QuoteButton } from "./ui/QuoteButton";
@@ -10,6 +11,9 @@ import { cn } from "@/lib/cn";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  // Fuera del home, los anclas de sección (#x) van a "/#x" para volver al home y scrollear.
+  const resolve = (href: string) => (href.startsWith("#") && pathname !== "/" ? `/${href}` : href);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -34,7 +38,7 @@ export function Navbar() {
               : "border border-transparent",
           )}
         >
-          <a href="#top" aria-label="RUN72 — inicio">
+          <a href={resolve("#top")} aria-label="RUN72 — inicio">
             <Logo />
           </a>
 
@@ -42,7 +46,7 @@ export function Navbar() {
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={resolve(link.href)}
                   className="rounded-full px-3.5 py-2 text-sm text-muted transition-colors hover:text-fg"
                 >
                   {link.label}
@@ -102,7 +106,7 @@ export function Navbar() {
             {NAV_LINKS.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={resolve(link.href)}
                 onClick={() => setOpen(false)}
                 className="rounded-2xl px-4 py-3 text-sm text-muted transition-colors hover:bg-white/[0.04] hover:text-fg"
               >
