@@ -32,7 +32,7 @@ export const NAV_LINKS = [
   { label: "Cómo funciona", href: "#proceso" },
   { label: "Ideal para", href: "#ideal" },
   { label: "Experiencia", href: "#experiencia" },
-  { label: "Runit Scan", href: "/radar" },
+  { label: "Runit Scan", href: "/runit-scan" },
   { label: "FAQ", href: "#faq" },
 ] as const;
 
