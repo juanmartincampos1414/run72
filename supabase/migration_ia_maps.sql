@@ -14,3 +14,6 @@ alter table public.ia_maps enable row level security;
 
 -- v2.1: equipo ficticio (responsables) por mapa.
 alter table public.ia_maps add column if not exists equipo jsonb not null default '[]'::jsonb;
+
+-- v2.2: conexiones cruzadas entre áreas.
+alter table public.ia_maps add column if not exists conexiones jsonb not null default '[]'::jsonb;

@@ -88,6 +88,13 @@ const EJEMPLO: MapData = {
       ],
     },
   ],
+  conexiones: [
+    { desde: "Tus datos y herramientas", hasta: "Tus clientes", etiqueta: "Datos de consumo" },
+    { desde: "Tu operación", hasta: "Tus datos y herramientas", etiqueta: "Ventas y stock" },
+    { desde: "Tus clientes", hasta: "Tu estrategia", etiqueta: "Feedback y demanda" },
+    { desde: "Tu equipo", hasta: "Tu operación", etiqueta: "Ejecución diaria" },
+    { desde: "Tus reglas", hasta: "Tus datos y herramientas", etiqueta: "Qué se puede usar" },
+  ],
 };
 
 export default function MapaEjemploPage() {

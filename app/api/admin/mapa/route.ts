@@ -62,18 +62,35 @@ const SCHEMA = {
         additionalProperties: false,
       },
     },
+    conexiones: {
+      type: "array",
+      description:
+        "3 a 5 conexiones cruzadas entre áreas: cómo una alimenta o depende de otra (intercambio de información). Usá los nombres exactos de las áreas.",
+      items: {
+        type: "object",
+        properties: {
+          desde: { type: "string", description: "Nombre exacto del área de origen." },
+          hasta: { type: "string", description: "Nombre exacto del área de destino." },
+          etiqueta: { type: "string", description: "Qué se intercambia, 1 a 3 palabras (ej: 'Datos de ventas', 'Feedback de clientes')." },
+        },
+        required: ["desde", "hasta", "etiqueta"],
+        additionalProperties: false,
+      },
+    },
   },
-  required: ["negocio", "resumen", "equipo", "fases", "areas"],
+  required: ["negocio", "resumen", "equipo", "fases", "areas", "conexiones"],
   additionalProperties: false,
 } as const;
 
 type Celda = { accion: string; responsable: string; herramienta: string; tipo: string };
+type Conexion = { desde: string; hasta: string; etiqueta: string };
 type MapOut = {
   negocio: string;
   resumen: string;
   equipo: { nombre: string; rol: string }[];
   fases: { nombre: string; objetivo: string }[];
   areas: { area: string; resultado?: string; celdas: Celda[] }[];
+  conexiones: Conexion[];
 };
 
 const DEFAULT_FASES = [
@@ -122,6 +139,7 @@ ${areaList}
   · herramienta: una herramienta o proveedor concreto (WhatsApp Business, ChatGPT, n8n, Make, un CRM, Google Sheets, Looker, etc.).
   · tipo: uno de ${TIPOS.join(", ")}.
 - Para cada área, un "resultado": el beneficio concreto al llegar a Nativo IA.
+- Agregá 3 a 5 "conexiones" cruzadas entre áreas: cómo una alimenta o depende de otra (ej: los datos alimentan a clientes, el equipo ejecuta la operación). Cada una con una etiqueta corta de qué se intercambia. Usá los nombres exactos de las áreas.
 - Que se note el avance fase a fase. Si falta info, proponé lo más razonable para el rubro.`;
 
   const userContent = [
@@ -164,7 +182,17 @@ ${areaList}
     return { area: a.name, short: a.short, service: a.service, resultado: found?.resultado ?? "", celdas };
   });
 
-  const payload = { negocio: parsed.negocio ?? "", resumen: parsed.resumen ?? "", equipo, fases, areas };
+  const areaNames = new Map(AREAS.map((a) => [a.name.toLowerCase().trim(), a.name]));
+  const conexiones: Conexion[] = (Array.isArray(parsed.conexiones) ? parsed.conexiones : [])
+    .map((c) => ({
+      desde: areaNames.get(String(c?.desde ?? "").toLowerCase().trim()) ?? "",
+      hasta: areaNames.get(String(c?.hasta ?? "").toLowerCase().trim()) ?? "",
+      etiqueta: String(c?.etiqueta ?? "").trim().slice(0, 40),
+    }))
+    .filter((c) => c.desde && c.hasta && c.desde !== c.hasta)
+    .slice(0, 6);
+
+  const payload = { negocio: parsed.negocio ?? "", resumen: parsed.resumen ?? "", equipo, fases, areas, conexiones };
 
   let id: string | null = null;
   if (isSupabaseConfigured()) {

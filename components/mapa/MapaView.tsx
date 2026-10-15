@@ -9,6 +9,7 @@ import {
   MiniMap,
   Handle,
   Position,
+  MarkerType,
   getNodesBounds,
   getViewportForBounds,
   type Node,
@@ -23,7 +24,8 @@ export type MapArea = {
 };
 export type MapFase = { nombre: string; objetivo: string };
 export type MapMember = { nombre: string; rol: string };
-export type MapData = { negocio: string; resumen: string; equipo?: MapMember[]; fases: MapFase[]; areas: MapArea[] };
+export type MapConexion = { desde: string; hasta: string; etiqueta: string };
+export type MapData = { negocio: string; resumen: string; equipo?: MapMember[]; fases: MapFase[]; areas: MapArea[]; conexiones?: MapConexion[] };
 
 const COLORS = ["#38bdf8", "#a855f7", "#22c55e", "#f59e0b", "#ec4899", "#6366f1"];
 
@@ -63,10 +65,12 @@ function RootNode({ data }: { data: { negocio: string } }) {
 function AreaNode({ data }: { data: { name: string; service: string; color: string } }) {
   return (
     <div className="w-[180px] rounded-xl border px-3 py-2.5" style={{ borderColor: data.color + "66", background: data.color + "1f" }}>
-      <Handle type="target" position={Position.Left} className="!bg-white/40" />
+      <Handle id="in" type="target" position={Position.Left} className="!bg-white/40" />
+      <Handle id="xt" type="target" position={Position.Top} className="!bg-white/30" />
       <p className="font-display text-[13px] font-semibold leading-tight text-white">{data.name}</p>
       <p className="mt-0.5 text-[10px] leading-snug text-white/60">{data.service}</p>
-      <Handle type="source" position={Position.Right} style={{ background: data.color }} />
+      <Handle id="out" type="source" position={Position.Right} style={{ background: data.color }} />
+      <Handle id="xb" type="source" position={Position.Bottom} className="!bg-white/30" />
     </div>
   );
 }
@@ -143,12 +147,13 @@ function buildGraph(data: MapData): { nodes: Node[]; edges: Edge[] } {
     const y = ai * ROW;
     const color = COLORS[ai % COLORS.length];
     nodes.push({ id: `a${ai}`, type: "area", position: { x: AREA_X, y }, data: { name: a.area, service: a.service, color } });
-    edges.push({ id: `e-root-a${ai}`, source: "root", target: `a${ai}`, type: "smoothstep", style: { stroke: "rgba(255,255,255,0.18)", strokeWidth: 1.5 } });
+    edges.push({ id: `e-root-a${ai}`, source: "root", target: `a${ai}`, targetHandle: "in", type: "smoothstep", style: { stroke: "rgba(255,255,255,0.18)", strokeWidth: 1.5 } });
     cells(a).slice(0, 4).forEach((cel, fi) => {
       const id = `a${ai}f${fi}`;
       nodes.push({ id, type: "cell", position: { x: F0 + fi * DX, y }, data: { ...cel, color } });
       const src = fi === 0 ? `a${ai}` : `a${ai}f${fi - 1}`;
-      edges.push({ id: `e-${src}-${id}`, source: src, target: id, type: "smoothstep", style: { stroke: color, strokeWidth: 2, opacity: 0.7 } });
+      const srcHandle = fi === 0 ? "out" : undefined;
+      edges.push({ id: `e-${src}-${id}`, source: src, sourceHandle: srcHandle, target: id, type: "smoothstep", style: { stroke: color, strokeWidth: 2, opacity: 0.7 } });
     });
     const resultado = (a.resultado ?? "").trim();
     if (resultado) {
@@ -156,6 +161,34 @@ function buildGraph(data: MapData): { nodes: Node[]; edges: Edge[] } {
       nodes.push({ id: rid, type: "result", position: { x: F0 + 4 * DX, y }, data: { text: resultado, color } });
       edges.push({ id: `e-a${ai}f3-${rid}`, source: `a${ai}f3`, target: rid, type: "smoothstep", style: { stroke: color, strokeWidth: 2 }, animated: true });
     }
+  });
+
+  // Conexiones cruzadas entre áreas (intercambio de información).
+  const areaIdx = new Map(data.areas.map((a, i) => [a.area.toLowerCase().trim(), i]));
+  (data.conexiones ?? []).forEach((c, ci) => {
+    const i = areaIdx.get((c.desde ?? "").toLowerCase().trim());
+    const j = areaIdx.get((c.hasta ?? "").toLowerCase().trim());
+    if (i == null || j == null || i === j) return;
+    // Enrutamos siempre de arriba hacia abajo para que las curvas se lean prolijas.
+    const [top, bot] = i < j ? [i, j] : [j, i];
+    const forward = i < j; // la flecha apunta a "hasta"
+    edges.push({
+      id: `x-${i}-${j}-${ci}`,
+      source: `a${top}`,
+      sourceHandle: "xb",
+      target: `a${bot}`,
+      targetHandle: "xt",
+      type: "bezier",
+      label: c.etiqueta,
+      labelShowBg: true,
+      labelStyle: { fill: "#e5e7eb", fontSize: 10, fontWeight: 600 },
+      labelBgStyle: { fill: "#0d0d12", fillOpacity: 0.9 },
+      labelBgPadding: [6, 3] as [number, number],
+      labelBgBorderRadius: 6,
+      style: { stroke: "rgba(226,232,240,0.5)", strokeWidth: 1.4, strokeDasharray: "5 4" },
+      markerEnd: forward ? { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.7)", width: 16, height: 16 } : undefined,
+      markerStart: forward ? undefined : { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.7)", width: 16, height: 16 },
+    });
   });
 
   return { nodes, edges };
@@ -250,6 +283,7 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
 
       <p className="mt-4 text-xs text-faint">
         Movete por el mapa: arrastrá para desplazarte y usá la rueda para zoom. Cada celda muestra la acción, la herramienta y el responsable.
+        {(data.conexiones?.length ?? 0) > 0 && " Las líneas punteadas son las conexiones entre áreas: cómo se intercambian información."}
       </p>
 
       {cta && (
