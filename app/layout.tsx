@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   },
   icons: { icon: "/logo.png", apple: "/logo.png" },
   robots: { index: true, follow: true },
+  other: {
+    "facebook-domain-verification": "h0xe0a7tp2hivyyflukxgxhlf3480a",
+  },
 };
 
 export const viewport: Viewport = {
