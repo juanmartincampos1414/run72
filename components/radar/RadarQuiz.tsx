@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RunitFigure } from "@/components/runit/RunitFigure";
+import { fbTrack } from "@/lib/meta-pixel";
 import {
   QUESTIONS,
   STAGES,
@@ -85,6 +86,7 @@ function LeadForm({ result }: { result: RadarResult }) {
       const data = await res.json();
       if (!res.ok) { setError(data.error || "No pudimos enviarlo. Probá de nuevo."); setState("error"); return; }
       setState("sent");
+      fbTrack("Lead", { content_name: "Runit Scan", content_category: result.stage.name });
     } catch { setError("No pudimos enviarlo. Probá de nuevo."); setState("error"); }
   };
 
