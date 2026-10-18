@@ -1,63 +1,43 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
+import { ConsentManager } from "@/components/marketing/ConsentManager";
 
-const META_PIXEL_ID = "1125099563395216";
+// Fuentes legacy: se conservan para módulos operativos (Hub, cotizador, admin).
+// El marketing usa Switzer/Geist Mono vía su propio shell.
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["500", "600", "700"] });
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const display = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-  weight: ["500", "600", "700"],
-});
-
-const SITE_URL = "https://run72.app";
-const TITLE = "RUN72 — Tu idea lista en 72 horas";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.run72.app";
+const TITLE = "RUN · Software a medida y agentes de IA";
 const DESCRIPTION =
-  "Web, plataforma, marca, estrategia y automatización con IA. RUN72 ejecuta lo que tu negocio necesita —estés arrancando, creciendo o escalando— y te lo entrega funcionando en 72 horas.";
+  "Desarrollamos software a medida, agentes de inteligencia artificial e integraciones para mejorar la operación de tu empresa. Contanos qué necesitás resolver.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: TITLE,
-    template: "%s · RUN72",
-  },
+  title: { default: TITLE, template: "%s · RUN" },
   description: DESCRIPTION,
   keywords: [
-    "RUN72",
-    "negocio digital en 72 horas",
-    "desarrollo web rápido",
-    "landing page",
-    "ecommerce",
-    "branding",
-    "estrategia comercial",
-    "startup",
+    "RUN",
+    "software a medida",
+    "agentes de IA",
+    "inteligencia artificial para empresas",
+    "integraciones",
+    "automatización",
+    "desarrollo de software",
   ],
-  authors: [{ name: "RUN72" }],
-  creator: "RUN72",
+  authors: [{ name: "RUN" }],
+  creator: "RUN",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    locale: "es_ES",
+    locale: "es_AR",
     url: SITE_URL,
-    siteName: "RUN72",
+    siteName: "RUN",
     title: TITLE,
     description: DESCRIPTION,
-    images: [{ url: "/logo.png", width: 1240, height: 1240, alt: "RUN72" }],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-    images: ["/logo.png"],
-  },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
   icons: { icon: "/logo.png", apple: "/logo.png" },
   robots: { index: true, follow: true },
   other: {
@@ -66,67 +46,39 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "ProfessionalService",
-  name: "RUN72",
+  "@type": "Organization",
+  name: "RUN",
   description: DESCRIPTION,
   url: SITE_URL,
-  slogan: "Tu necesidad lista en 72 horas.",
-  areaServed: "Global",
-  serviceType: [
-    "Desarrollo web",
-    "Ecommerce",
-    "Branding",
-    "Estrategia comercial",
+  email: "hola@run72.app",
+  makesOffer: [
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Software a medida" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Agentes de inteligencia artificial" } },
+    { "@type": "Offer", itemOffered: { "@type": "Service", name: "Integraciones y automatización" } },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${display.variable}`}>
+    <html lang="es-AR" className={`${inter.variable} ${display.variable}`}>
       <body className="bg-ink text-fg antialiased">
-        {/* Meta Pixel */}
-        <Script id="meta-pixel" strategy="afterInteractive">
-          {`!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');`}
-        </Script>
-        <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
         <a
-          href="#top"
+          href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:text-ink"
         >
           Saltar al contenido
         </a>
         {children}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {/* Consentimiento + Pixel de Meta (solo con consentimiento de Marketing) */}
+        <ConsentManager />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </body>
     </html>
   );
