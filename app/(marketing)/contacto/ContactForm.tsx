@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SITE } from "@/lib/marketing/content";
 import { track } from "@/lib/marketing/analytics";
@@ -118,7 +119,7 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
           consulta no inicia producción ni confirma una contratación.
         </p>
         <p className="ct-success-id m-mono">Consulta #{result.id.slice(0, 8)}</p>
-        <a href="/" className="m-btn-ghost">Volver al inicio</a>
+        <Link href="/" className="m-btn-ghost">Volver al inicio</Link>
       </div>
     );
   }

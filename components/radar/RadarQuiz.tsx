@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { RunitFigure } from "@/components/runit/RunitFigure";
 import { fbTrack } from "@/lib/meta-pixel";
 import {
@@ -14,6 +15,20 @@ import {
 
 type Mode = "botones" | "chat" | "audio";
 type Phase = "intro" | "quiz" | "result";
+
+// Tipos mínimos de la Web Speech API (no estándar en lib.dom).
+type SpeechRecEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
+type SpeechRecLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((e: SpeechRecEvent) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+type SpeechRecCtor = new () => SpeechRecLike;
 
 /* ---------- Runit avatar + línea ---------- */
 function RunitAvatar({ size = 44 }: { size?: number }) {
@@ -246,7 +261,7 @@ function ChatQuiz({ withMic, onDone }: { withMic: boolean; onDone: (a: Record<st
   const [busy, setBusy] = useState(false);
   const [listening, setListening] = useState(false);
   const answers = useRef<Record<string, number>>({});
-  const recRef = useRef<any>(null);
+  const recRef = useRef<SpeechRecLike | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const posted = useRef<Set<number>>(new Set());
 
@@ -309,13 +324,14 @@ function ChatQuiz({ withMic, onDone }: { withMic: boolean; onDone: (a: Record<st
 
   // Micrófono (Web Speech API).
   const toggleMic = () => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const w = window as unknown as { SpeechRecognition?: SpeechRecCtor; webkitSpeechRecognition?: SpeechRecCtor };
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!SR) { setBubbles((b) => [...b, { who: "bot", text: "Tu navegador no soporta audio. Escribí o tocá una opción." }]); return; }
     if (listening) { recRef.current?.stop(); return; }
     const rec = new SR();
     rec.lang = "es-AR"; rec.interimResults = true; rec.continuous = false;
-    rec.onresult = (e: any) => {
-      const t = Array.from(e.results).map((r: any) => r[0].transcript).join(" ");
+    rec.onresult = (e: SpeechRecEvent) => {
+      const t = Array.from(e.results).map((r) => r[0].transcript).join(" ");
       setInput(t);
     };
     rec.onend = () => setListening(false);
@@ -439,9 +455,9 @@ export function RadarQuiz() {
         </button>
       </div>
       <p className="mt-5 text-xs text-faint">6 preguntas · sin registrarte para ver el resultado</p>
-      <a href="/mapa/ejemplo" className="mt-4 inline-block text-sm text-muted underline underline-offset-4 transition hover:text-fg">
+      <Link href="/mapa/ejemplo" className="mt-4 inline-block text-sm text-muted underline underline-offset-4 transition hover:text-fg">
         ¿Querés ver qué te entregamos? Mirá un mapa de ejemplo →
-      </a>
+      </Link>
     </div>
   );
 }
