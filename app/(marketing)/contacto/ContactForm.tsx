@@ -33,8 +33,20 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
   const formRef = useRef<HTMLFormElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
 
+  const [prefillProblem, setPrefillProblem] = useState("");
+
   useEffect(() => {
     keyRef.current = crypto.randomUUID();
+    // Resumen traído por Runit en la misma sesión (no viene por URL ni analytics).
+    try {
+      const summary = sessionStorage.getItem("run-runit-summary");
+      if (summary) {
+        setPrefillProblem(summary);
+        sessionStorage.removeItem("run-runit-summary");
+      }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const onFirstInput = () => {
@@ -165,6 +177,7 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
       <div className="ct-field">
         <label htmlFor="ct-problem">El proceso y el resultado esperado</label>
         <textarea id="ct-problem" name="problem" rows={6} required minLength={20} maxLength={3000}
+          key={prefillProblem ? "prefilled" : "empty"} defaultValue={prefillProblem}
           aria-invalid={!!errors.problem} aria-describedby={errors.problem ? "ct-problem-err" : "ct-problem-help"} />
         <p id="ct-problem-help" className="ct-help">Contanos qué proceso querés mejorar y qué resultado buscás.</p>
         {errors.problem && <p id="ct-problem-err" className="ct-err">{errors.problem}</p>}
