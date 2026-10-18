@@ -1,33 +1,24 @@
-import { Navbar } from "@/components/Navbar";
-import { Hero } from "@/components/sections/Hero";
-import { Problem } from "@/components/sections/Problem";
-import { Services } from "@/components/sections/Services";
-import { HowItWorks } from "@/components/sections/HowItWorks";
-import { IdealFor } from "@/components/sections/IdealFor";
-import { Credentials } from "@/components/sections/Credentials";
-import { Ownership } from "@/components/sections/Ownership";
-import { Faq } from "@/components/sections/Faq";
-import { FinalCTA } from "@/components/sections/FinalCTA";
-import { Footer } from "@/components/sections/Footer";
-import { RunitCompanion } from "@/components/RunitCompanion";
+import "./marketing.css";
+import { MarketingShell } from "@/components/marketing/MarketingShell";
+import { EditorialHero } from "@/components/marketing/home/EditorialHero";
+import { Principles } from "@/components/marketing/home/Principles";
+import { CapabilitiesGrid } from "@/components/marketing/home/CapabilitiesGrid";
+import { StickyProcess } from "@/components/marketing/home/StickyProcess";
+import { WorkRows } from "@/components/marketing/home/WorkRows";
+import { ClosingCTA } from "@/components/marketing/home/ClosingCTA";
 
+// Home de RUN (sección 5). Orden obligatorio:
+// Hero → Principio → Capacidades → Proceso → Trabajos → Cierre → Footer.
+// Usa el mismo shell que las rutas (marketing) sin mover la URL "/".
 export default function Home() {
   return (
-    <>
-      <Navbar />
-      <main>
-        <Hero />
-        <Problem />
-        <Services />
-        <HowItWorks />
-        <IdealFor />
-        <Credentials />
-        <Ownership />
-        <Faq />
-        <FinalCTA />
-      </main>
-      <Footer />
-      <RunitCompanion />
-    </>
+    <MarketingShell>
+      <EditorialHero />
+      <Principles />
+      <CapabilitiesGrid />
+      <StickyProcess />
+      <WorkRows />
+      <ClosingCTA />
+    </MarketingShell>
   );
 }
