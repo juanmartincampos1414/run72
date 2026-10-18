@@ -3,6 +3,7 @@ import { marketingFontVars } from "@/lib/marketing/fonts";
 import { MarketingHeader } from "./MarketingHeader";
 import { MarketingFooter } from "./MarketingFooter";
 import { RunitLauncher } from "./RunitLauncher";
+import { SmoothScroll } from "./SmoothScroll";
 
 // Shell visual de RUN (marketing). Aplica el namespace .marketing, las
 // variables de fuente propias y monta header/footer. Lo usan tanto las rutas
@@ -11,6 +12,7 @@ import { RunitLauncher } from "./RunitLauncher";
 export function MarketingShell({ children, withFooter = true }: { children: ReactNode; withFooter?: boolean }) {
   return (
     <div className={`marketing ${marketingFontVars}`}>
+      <SmoothScroll />
       <MarketingHeader />
       <main id="main-content">{children}</main>
       {withFooter && <MarketingFooter />}
