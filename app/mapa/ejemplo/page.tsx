@@ -4,7 +4,7 @@ import { Footer } from "@/components/sections/Footer";
 import { MapaView, type MapData } from "@/components/mapa/MapaView";
 
 export const metadata: Metadata = {
-  title: "Mapa de IA — Ejemplo · RUN72",
+  title: "Mapa de IA — Ejemplo",
   description:
     "Un ejemplo del Mapa de IA que te entregamos: tu roadmap de adopción de IA por fases y áreas, con herramientas y responsables, listo para ejecutar.",
 };
@@ -29,7 +29,7 @@ const EJEMPLO: MapData = {
   areas: [
     {
       area: "Tu operación", short: "Operación", service: "Automatizaciones y agentes de IA",
-      resultado: "Menos tareas manuales y cero quiebres de stock.",
+      resultado: "Menos tareas manuales y mejor seguimiento de faltantes y reposición.",
       celdas: [
         { accion: "Resúmenes del día y pedidos a proveedores con IA.", responsable: "Martín Herrera", herramienta: "ChatGPT", tipo: "contenido" },
         { accion: "Control de stock automático con alertas de faltantes.", responsable: "Diego Ponce", herramienta: "Sheets + n8n", tipo: "automatizacion" },
@@ -39,7 +39,7 @@ const EJEMPLO: MapData = {
     },
     {
       area: "Tus clientes", short: "Clientes", service: "Web + marketing con IA",
-      resultado: "Más ventas y clientes que vuelven, 24/7.",
+      resultado: "Seguimiento de consultas y acciones de atención.",
       celdas: [
         { accion: "Respuestas automáticas por WhatsApp e Instagram.", responsable: "Lucía Benítez", herramienta: "WhatsApp Business", tipo: "chatbot" },
         { accion: "Contenido y promos con IA, medidos por sucursal.", responsable: "Sofía Giménez", herramienta: "ChatGPT", tipo: "contenido" },
@@ -61,7 +61,7 @@ const EJEMPLO: MapData = {
       area: "Tu equipo", short: "Equipo", service: "Formación e implementación con tu gente",
       resultado: "Un equipo que usa IA todos los días, sin miedo.",
       celdas: [
-        { accion: "Capacitación práctica de IA para encargados.", responsable: "Carla Ríos", herramienta: "RUN72 Academy", tipo: "capacitacion" },
+        { accion: "Capacitación práctica de IA para encargados.", responsable: "Carla Ríos", herramienta: "Capacitación acordada", tipo: "capacitacion" },
         { accion: "Un referente de IA por sucursal.", responsable: "Martín Herrera", herramienta: "Playbook", tipo: "capacitacion" },
         { accion: "Playbooks de uso para cada puesto.", responsable: "Lucía Benítez", herramienta: "Notion", tipo: "contenido" },
         { accion: "Cultura IA-first: el equipo propone mejoras.", responsable: "Carla Ríos", herramienta: "", tipo: "capacitacion" },
@@ -111,7 +111,16 @@ export default function MapaEjemploPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-brand-violet" />
               Ejemplo de entrega
             </span>
-            <MapaView data={EJEMPLO} print cta />
+            <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              Ejemplo de un mapa de implementación de IA
+            </h1>
+            <p className="mt-3 max-w-2xl text-muted">
+              Empresa, personas y acciones ficticias para mostrar el formato de trabajo. Es una
+              propuesta ilustrativa, no resultados ya logrados.
+            </p>
+            <div className="mt-8">
+              <MapaView data={EJEMPLO} print cta />
+            </div>
           </div>
         </div>
       </main>

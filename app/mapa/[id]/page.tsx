@@ -8,7 +8,7 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Mapa de IA — RUN72",
+  title: "Mapa de IA",
   description: "Tu roadmap de adopción de IA por fases, armado por RUN72.",
   robots: { index: false, follow: false },
 };

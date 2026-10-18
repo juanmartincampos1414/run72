@@ -93,9 +93,9 @@ function LeadForm({ result }: { result: RadarResult }) {
   if (state === "sent") {
     return (
       <div className="rounded-3xl border border-brand-violet/30 bg-surface/50 p-8 text-center">
-        <h3 className="font-display text-2xl font-semibold">¡Listo! Ya coordinamos.</h3>
+        <h3 className="font-display text-2xl font-semibold">Recibimos tu solicitud de contacto.</h3>
         <p className="mt-2 text-muted">
-          Te vamos a escribir para agendar la <strong className="text-fg">videollamada</strong>, profundizar en tu caso y armarte el presupuesto a medida. Te mandamos una copia de tu diagnóstico por mail.
+          Vamos a escribirte para coordinar una <strong className="text-fg">videollamada</strong>, profundizar en tu caso y armar el presupuesto a medida. No hay una reunión agendada hasta que exista una confirmación real. Te mandamos una copia de tu autodiagnóstico por mail.
         </p>
       </div>
     );
@@ -147,6 +147,9 @@ function Result({ result, onRestart }: { result: RadarResult | null; onRestart: 
           Estás <span className="text-gradient">{stage.name.toLowerCase()}</span> con IA.
         </h2>
         <p className="mt-3 max-w-xl text-muted">{stage.desc}</p>
+        <p className="mt-4 text-xs text-faint">
+          Autodiagnóstico orientativo basado en tus respuestas. No es una auditoría técnica ni una evaluación certificada.
+        </p>
       </div>
 
       <div className="grid items-center gap-8 rounded-3xl border border-line bg-surface/40 p-7 sm:p-9 lg:grid-cols-[auto_1fr]">

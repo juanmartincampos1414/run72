@@ -197,6 +197,7 @@ function buildGraph(data: MapData): { nodes: Node[]; edges: Edge[] } {
 /* ---------- Vista ---------- */
 export function MapaView({ data, print = false, cta = false }: { data: MapData; print?: boolean; cta?: boolean }) {
   const [mounted, setMounted] = useState(false);
+  const [view, setView] = useState<"diagram" | "list">("diagram");
   useEffect(() => setMounted(true), []);
   const { nodes, edges } = useMemo(() => buildGraph(data), [data]);
 
@@ -227,33 +228,80 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-violet">
             <span className="inline-block h-4 w-4 rounded bg-[conic-gradient(from_210deg,#38bdf8,#6366f1,#a855f7)]" />
-            Mapa de IA · RUN72
+            Mapa de IA · RUN
           </div>
           <h2 className="mt-2 font-display text-2xl font-semibold">{data.negocio || "Tu negocio"}</h2>
           {data.resumen && <p className="mt-1 max-w-2xl text-sm text-muted">{data.resumen}</p>}
         </div>
-        {print && (
-          <button onClick={download} className="shrink-0 rounded-full border border-line px-5 py-2.5 text-sm text-muted transition hover:border-brand-violet hover:text-fg">
-            Descargar imagen (PNG)
-          </button>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          <div role="tablist" aria-label="Vista del mapa" className="flex rounded-full border border-line p-1 text-sm">
+            <button role="tab" aria-selected={view === "diagram"} onClick={() => setView("diagram")}
+              className={`rounded-full px-3.5 py-1.5 transition ${view === "diagram" ? "bg-white/10 text-fg" : "text-muted hover:text-fg"}`}>
+              Diagrama
+            </button>
+            <button role="tab" aria-selected={view === "list"} onClick={() => setView("list")}
+              className={`rounded-full px-3.5 py-1.5 transition ${view === "list" ? "bg-white/10 text-fg" : "text-muted hover:text-fg"}`}>
+              Lista
+            </button>
+          </div>
+          {print && (
+            <button onClick={download} className="rounded-full border border-line px-5 py-2.5 text-sm text-muted transition hover:border-brand-violet hover:text-fg">
+              Descargar imagen (PNG)
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="h-[74vh] min-h-[560px] w-full overflow-hidden rounded-3xl border border-line bg-[#060608]">
-        {mounted ? (
-          <ReactFlow
-            nodes={nodes} edges={edges} nodeTypes={nodeTypes}
-            fitView fitViewOptions={{ padding: 0.15 }} minZoom={0.12} maxZoom={2}
-            nodesConnectable={false} edgesFocusable={false}
-          >
-            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="rgba(255,255,255,0.08)" />
-            <MiniMap pannable zoomable nodeColor={(nd) => ((nd.data as { color?: string })?.color ?? "#6366f1")} maskColor="rgba(0,0,0,0.6)" style={{ background: "#0d0d12" }} />
-            <Controls showInteractive={false} />
-          </ReactFlow>
-        ) : (
-          <div className="flex h-full items-center justify-center text-sm text-faint">Cargando mapa…</div>
-        )}
-      </div>
+      {view === "diagram" ? (
+        <div className="h-[74vh] min-h-[560px] w-full overflow-hidden rounded-3xl border border-line bg-[#060608]">
+          {mounted ? (
+            <ReactFlow
+              nodes={nodes} edges={edges} nodeTypes={nodeTypes}
+              fitView fitViewOptions={{ padding: 0.15 }} minZoom={0.12} maxZoom={2}
+              nodesConnectable={false} edgesFocusable={false}
+            >
+              <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="rgba(255,255,255,0.08)" />
+              <MiniMap pannable zoomable nodeColor={(nd) => ((nd.data as { color?: string })?.color ?? "#6366f1")} maskColor="rgba(0,0,0,0.6)" style={{ background: "#0d0d12" }} />
+              <Controls showInteractive={false} />
+            </ReactFlow>
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-faint">Cargando mapa…</div>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-3xl border border-line bg-[#060608] p-1">
+          <table className="w-full border-collapse text-left text-sm">
+            <caption className="sr-only">Mapa de IA en formato de lista: área, fase, acción, herramienta y responsable.</caption>
+            <thead>
+              <tr className="text-xs uppercase tracking-wider text-faint">
+                <th scope="col" className="p-3">Área</th>
+                <th scope="col" className="p-3">Fase</th>
+                <th scope="col" className="p-3">Acción</th>
+                <th scope="col" className="p-3">Herramienta</th>
+                <th scope="col" className="p-3">Responsable</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.areas.map((a, ai) =>
+                cells(a).map((cel, fi) => (
+                  <tr key={`${ai}-${fi}`} className="border-t border-line/60 align-top">
+                    <th scope="row" className="p-3 font-medium text-fg">
+                      <span className="inline-flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ background: COLORS[ai % COLORS.length] }} />
+                        {a.area}
+                      </span>
+                    </th>
+                    <td className="p-3 text-muted">{data.fases[fi]?.nombre ?? `Fase ${fi + 1}`}</td>
+                    <td className="p-3 text-fg">{cel.accion}</td>
+                    <td className="p-3 text-muted">{cel.herramienta || "—"}</td>
+                    <td className="p-3 text-muted">{cel.responsable || "—"}</td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Equipo */}
       {equipo.length > 0 && (
@@ -292,8 +340,8 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
             <p className="font-display text-lg font-semibold">¿Lo ejecutamos juntos?</p>
             <p className="text-sm text-muted">Coordinemos una videollamada y arrancamos por tu primera fase.</p>
           </div>
-          <a href="/#cotizar" className="shrink-0 rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110">
-            Hablar con RUN72
+          <a href="/contacto?origen=mapa-ejemplo" className="shrink-0 rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110">
+            Hablar con RUN
           </a>
         </div>
       )}
