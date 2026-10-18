@@ -65,7 +65,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 text-xs text-faint sm:flex-row">
-          <p>© {new Date().getFullYear()} RUN72. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} RUN. Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">
             <Link href="/terminos" className="transition-colors hover:text-fg">
               Términos y Condiciones

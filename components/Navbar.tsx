@@ -38,7 +38,7 @@ export function Navbar() {
               : "border border-transparent",
           )}
         >
-          <a href={resolve("#top")} aria-label="RUN72 — inicio">
+          <a href={resolve("#top")} aria-label="RUN — inicio">
             <Logo />
           </a>
 
