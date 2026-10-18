@@ -1,0 +1,665 @@
+/* ------------------------------------------------------------------ *
+ * Servicios — índice y fichas de especialidad (secciones 3.2, 4.2, 6)
+ * Todas las clases llevan prefijo `svc-`. Usan los tokens --m-* del shell.
+ * Breakpoints de referencia: 390 / 768 / 1024 / 1440.
+ * ------------------------------------------------------------------ */
+
+/* ---------- Breadcrumb flotante (3.2) ---------- */
+.marketing .svc-crumbs {
+  position: absolute;
+  z-index: 40;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 448px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .marketing .svc-crumbs { top: 104px; }
+}
+.marketing .svc-crumbs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+}
+.marketing .svc-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+/* El actual cede espacio al final: es el que se trunca primero. */
+.marketing .svc-crumb.is-current { flex: 1 1 0; position: relative; }
+.marketing .svc-crumb:not(.is-current) { flex-shrink: 0; }
+.marketing .svc-crumb-label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--m-faint);
+  text-decoration: none;
+}
+.marketing .svc-crumb-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  transition: color 0.3s var(--m-ease);
+}
+.marketing .svc-crumb-link:hover,
+.marketing .svc-crumb-link:focus-visible { color: var(--m-text); }
+.marketing .svc-crumb.is-current .svc-crumb-label { color: var(--m-text); }
+.marketing .svc-crumb-sep { color: var(--m-faint); opacity: 0.6; }
+/* Línea superior en gradiente sobre la página actual */
+.marketing .svc-crumbs::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #18acff, #5583ff 33%, #8960ff 66%, #ffd873);
+  opacity: 0.9;
+}
+
+/* ---------- Estructura de página ---------- */
+.marketing .svc-detail { position: relative; }
+
+.marketing .svc-hero {
+  position: relative;
+  isolation: isolate;
+  padding-top: 144px;
+  padding-bottom: 48px;
+}
+.marketing .svc-hero--detail { padding-top: 152px; }
+@media (min-width: 768px) {
+  .marketing .svc-hero { padding-top: 184px; padding-bottom: 64px; }
+  .marketing .svc-hero--detail { padding-top: 192px; }
+}
+@media (min-width: 1024px) {
+  .marketing .svc-hero { padding-bottom: 80px; }
+}
+.marketing .svc-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, #000 100%),
+    radial-gradient(110% 80% at 50% 0%, rgba(137, 96, 255, 0.2) 0%, rgba(24, 172, 255, 0.08) 40%, rgba(5, 5, 8, 0) 75%);
+}
+.marketing .svc-hero-eyebrow { margin-bottom: 20px; }
+
+/* ---------- Tipografía (4.2) ---------- */
+/* H1 servicios: clamp(2.75rem, 7vw, 5.5rem), línea 1, peso 500, -.03em */
+.marketing .svc-h1 {
+  margin: 0;
+  max-width: 17ch;
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--m-text);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.marketing .svc-bajada {
+  margin: 28px 0 0;
+  max-width: 44rem;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+@media (min-width: 768px) {
+  .marketing .svc-bajada { font-size: 20px; margin-top: 32px; }
+}
+/* H2 servicios: 32/35.2 móvil (P) → 48/48 escritorio, peso 500, -.025em */
+.marketing .svc-h2 {
+  margin: 12px 0 0;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--m-text);
+  text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .marketing .svc-h2 { font-size: 3rem; line-height: 1; }
+}
+/* H3 capacidad: 28/35, peso 500 */
+.marketing .svc-h3 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 35px;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .svc-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 36px;
+}
+.marketing .svc-hero-actions .m-btn,
+.marketing .svc-hero-actions .m-btn-ghost { width: auto; }
+@media (max-width: 479px) {
+  .marketing .svc-hero-actions { flex-direction: column; align-items: stretch; }
+  .marketing .svc-hero-actions .m-btn,
+  .marketing .svc-hero-actions .m-btn-ghost { justify-content: center; }
+}
+.marketing .svc-hero-actions .m-arrow,
+.marketing .svc-closing .m-btn .m-arrow { width: 16px; height: 16px; }
+
+/* ---------- Índice: bandas ---------- */
+.marketing .svc-bands-section { padding-top: 16px; }
+.marketing .svc-bands {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  overflow: hidden;
+}
+.marketing .svc-band { border-top: 1px solid var(--m-line); }
+.marketing .svc-band:first-child { border-top: 0; }
+.marketing .svc-band-glow { background: transparent; }
+.marketing .svc-band-link {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 24px;
+  padding: 28px 20px;
+  text-decoration: none;
+  transition: background 0.4s var(--m-ease);
+}
+.marketing .svc-band-link:hover,
+.marketing .svc-band-link:focus-visible { background: rgba(255, 255, 255, 0.02); }
+.marketing .svc-band-n { color: var(--m-category); }
+.marketing .svc-band-title,
+.marketing .svc-band-text { display: block; }
+.marketing .svc-band-title {
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--m-text);
+}
+.marketing .svc-band-text {
+  margin-top: 12px;
+  max-width: 46ch;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+@media (min-width: 768px) {
+  .marketing .svc-band-text { font-size: 20px; }
+}
+.marketing .svc-band-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  min-height: 24px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--m-text);
+}
+.marketing .svc-band-cta .m-arrow { width: 14px; height: 14px; }
+.marketing .svc-band-ex { display: grid; gap: 12px; align-content: start; }
+.marketing .svc-band-exlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+.marketing .svc-band-exlist li {
+  padding-block: 10px;
+  border-top: 1px solid var(--m-line);
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--m-muted);
+}
+@media (min-width: 768px) {
+  .marketing .svc-band-link { padding: 40px 32px; grid-template-columns: 56px minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+}
+@media (min-width: 1024px) {
+  .marketing .svc-band-link { padding: 48px 40px; gap: 48px; }
+}
+.marketing .svc-note {
+  margin: 20px 4px 0;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: var(--m-faint);
+}
+
+/* ---------- Cierre (índice y fichas) ---------- */
+.marketing .svc-closing { padding-top: 96px; padding-bottom: 112px; }
+.marketing .svc-closing-inner { display: grid; justify-items: start; gap: 8px; }
+/* Pregunta comercial: Geist Mono 36/40 en escritorio */
+.marketing .svc-question {
+  margin: 0;
+  max-width: 24ch;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.11;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--m-gray);
+}
+.marketing .svc-closing-text {
+  margin: 0 0 24px;
+  max-width: 28ch;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.11;
+  letter-spacing: -0.01em;
+  color: var(--m-text);
+}
+.marketing .svc-closing-text .m-gradient-text { color: transparent; }
+
+/* ---------- Ficha: recurso visual 16:10 + problema ---------- */
+.marketing .svc-intro { padding-block: 16px 24px; }
+.marketing .svc-intro-grid { display: grid; gap: 32px; }
+.marketing .svc-visual {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background:
+    radial-gradient(90% 120% at 12% 0%, rgba(24, 172, 255, 0.22) 0%, rgba(24, 172, 255, 0) 55%),
+    radial-gradient(80% 100% at 100% 100%, rgba(137, 96, 255, 0.28) 0%, rgba(137, 96, 255, 0) 60%),
+    radial-gradient(60% 60% at 90% 0%, rgba(255, 216, 115, 0.1) 0%, rgba(255, 216, 115, 0) 60%),
+    var(--m-deep, #050508);
+}
+.marketing .svc-visual-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+.marketing .svc-visual-inner {
+  position: absolute;
+  inset: 6% 6% 10%;
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+}
+.marketing .svc-visual-cap {
+  position: absolute;
+  left: 20px;
+  bottom: 14px;
+  font-size: 10px;
+  color: var(--m-faint);
+}
+.marketing .svc-problem { align-self: end; display: grid; gap: 16px; }
+.marketing .svc-problem .m-eyebrow { margin: 0; }
+.marketing .svc-problem-text {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  line-height: 1.38;
+  font-weight: 400;
+  color: var(--m-text);
+}
+@media (min-width: 1024px) {
+  .marketing .svc-intro { padding-block: 24px 32px; }
+  .marketing .svc-intro-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 48px; align-items: end; }
+}
+
+/* Piezas compartidas de los recursos */
+.marketing .svc-visual i {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.marketing .svc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--m-line);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(8px, 2.2cqw, 11px);
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--m-muted);
+}
+.marketing .svc-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.marketing .svc-chip--ok { color: var(--m-success); border-color: rgba(96, 216, 165, 0.35); }
+.marketing .svc-chip--wip { color: var(--m-cyan); border-color: rgba(24, 172, 255, 0.4); }
+.marketing .svc-chip--wait { color: var(--m-gold); border-color: rgba(255, 216, 115, 0.4); }
+.marketing .svc-chip--src { color: var(--m-violet); border-color: rgba(137, 96, 255, 0.45); }
+
+/* Software: interfaz */
+.marketing .svc-ui {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 11% minmax(0, 1fr);
+  border: 1px solid var(--m-line-active);
+  border-radius: 14px;
+  background: rgba(5, 5, 8, 0.82);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.marketing .svc-ui-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10%;
+  align-items: center;
+  padding: 8% 0;
+  border-right: 1px solid var(--m-line);
+}
+.marketing .svc-ui-side i { width: 38%; height: 5px; }
+.marketing .svc-ui-side i.is-on { background: var(--m-cyan); }
+.marketing .svc-ui-side .svc-ui-logo { width: 38%; height: 12px; border-radius: 4px; background: linear-gradient(90deg, #18acff, #8960ff); }
+.marketing .svc-ui-main { display: grid; grid-template-rows: auto auto 1fr; gap: 6%; padding: 5%; min-width: 0; }
+.marketing .svc-ui-top { display: flex; align-items: center; justify-content: space-between; }
+.marketing .svc-ui-top b { width: 9%; aspect-ratio: 1; border-radius: 50%; background: linear-gradient(135deg, #5583ff, #8960ff); }
+.marketing .svc-ui-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4%; }
+.marketing .svc-ui-stats div {
+  display: grid;
+  gap: 4px;
+  padding: 8% 9%;
+  border: 1px solid var(--m-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.marketing .svc-ui-stats em {
+  font-style: normal;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(7px, 1.9cqw, 10px);
+  color: var(--m-faint);
+}
+.marketing .svc-ui-stats strong {
+  font-size: clamp(14px, 4.4cqw, 26px);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .svc-ui-table { display: grid; align-content: start; }
+.marketing .svc-ui-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 3.2%;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .svc-ui-row i { height: 5px; }
+
+/* Agentes: conversación con fuente y acción */
+.marketing .svc-chat { width: 100%; max-width: 560px; display: grid; gap: 4%; }
+.marketing .svc-msg {
+  display: grid;
+  gap: 8px;
+  padding: 4% 5%;
+  border: 1px solid var(--m-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.marketing .svc-msg--user { justify-self: end; width: 72%; border-bottom-right-radius: 4px; }
+.marketing .svc-msg--agent {
+  justify-self: start;
+  width: 86%;
+  border-bottom-left-radius: 4px;
+  background: rgba(5, 5, 8, 0.82);
+  border-color: var(--m-line-active);
+}
+.marketing .svc-chat-chips { margin-top: 4px; }
+.marketing .svc-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 3.5% 5%;
+  border: 1px dashed rgba(255, 216, 115, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 216, 115, 0.05);
+}
+.marketing .svc-action-k {
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(8px, 2.1cqw, 11px);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--m-gold);
+}
+.marketing .svc-action-v { flex: 1 1 100%; font-size: clamp(11px, 2.8cqw, 15px); color: var(--m-text); }
+
+/* Integraciones: flujo con estados */
+.marketing .svc-flow { width: 100%; display: grid; gap: 8%; }
+.marketing .svc-flow-track { display: flex; align-items: stretch; }
+.marketing .svc-flow-step { display: flex; align-items: center; flex: 1 1 0; min-width: 0; }
+.marketing .svc-flow-step:last-child { flex: 0 0 auto; }
+.marketing .svc-node {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 7% 8%;
+  min-width: 0;
+  border: 1px solid var(--m-line-active);
+  border-radius: 12px;
+  background: rgba(5, 5, 8, 0.82);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+.marketing .svc-node-n {
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(8px, 2cqw, 11px);
+  color: var(--m-category);
+}
+.marketing .svc-node-k {
+  font-size: clamp(11px, 3cqw, 17px);
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .svc-flow-link {
+  flex: 1 1 auto;
+  min-width: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--m-cyan), var(--m-violet));
+  opacity: 0.8;
+}
+.marketing .svc-flow-log {
+  display: grid;
+  gap: 10px;
+  padding: 5%;
+  border: 1px solid var(--m-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+@media (max-width: 479px) {
+  .marketing .svc-node { padding: 8px; }
+  .marketing .svc-chip::before { display: none; }
+  .marketing .svc-chip { padding: 2px 6px; white-space: normal; }
+}
+
+/* ---------- Capacidades 2×2 ---------- */
+.marketing .svc-caps { padding-top: 80px; }
+.marketing .svc-cap-grid {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--m-line);
+}
+.marketing .svc-cap { background: var(--m-bg); }
+.marketing .svc-cap-glow { height: 100%; }
+.marketing .svc-cap-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  height: 100%;
+  padding: 28px 24px 32px;
+}
+.marketing .svc-cap-n { color: var(--m-category); }
+.marketing .svc-cap-text {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+@media (min-width: 768px) {
+  .marketing .svc-cap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .marketing .svc-cap-body { padding: 36px 32px 40px; min-height: 260px; }
+  .marketing .svc-cap-text { font-size: 20px; }
+}
+@media (min-width: 1024px) {
+  .marketing .svc-cap-body { padding: 44px 40px 48px; min-height: 300px; }
+}
+
+/* ---------- Método ---------- */
+.marketing .svc-method-grid { display: grid; gap: 24px; border-top: 1px solid var(--m-line); padding-top: 48px; }
+.marketing .svc-method-text {
+  margin: 0;
+  max-width: 40rem;
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--m-text);
+}
+@media (min-width: 1024px) {
+  .marketing .svc-method-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; padding-top: 64px; }
+  .marketing .svc-method-text { align-self: end; }
+}
+
+/* ---------- Demo relacionada ---------- */
+.marketing .svc-demo { padding-block: 16px; }
+.marketing .svc-demo-card {
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background: var(--m-panel);
+  transition: border-color 0.4s var(--m-ease);
+}
+.marketing .svc-demo-card:hover,
+.marketing .svc-demo-card:focus-within { border-color: var(--m-line-active); }
+.marketing .svc-demo-link {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 16px;
+  padding: 28px 24px;
+  text-decoration: none;
+}
+.marketing .svc-demo-eyebrow { display: block; }
+.marketing .svc-demo-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .svc-demo-arrow { width: 28px; height: 28px; flex: none; }
+.marketing .svc-demo-badge {
+  justify-self: start;
+  padding: 6px 12px;
+  border: 1px solid var(--m-line);
+  border-radius: 999px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16.5px;
+  color: var(--m-category);
+}
+@media (min-width: 768px) {
+  .marketing .svc-demo-link { padding: 40px 40px; gap: 20px; }
+  .marketing .svc-demo-arrow { width: 36px; height: 36px; }
+}
+
+/* ---------- FAQ (details/summary, varias abiertas a la vez) ---------- */
+.marketing .svc-faq-grid { display: grid; gap: 32px; }
+.marketing .svc-faq-grid .svc-h2 { margin-top: 0; }
+.marketing .svc-faq-list { border-top: 1px solid var(--m-line); }
+.marketing .svc-faq-item { border-bottom: 1px solid var(--m-line); }
+.marketing .svc-faq-q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding-block: 22px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--m-text);
+  border-radius: 8px;
+}
+.marketing .svc-faq-q::-webkit-details-marker { display: none; }
+.marketing .svc-faq-q:focus-visible { outline: 2px solid var(--m-cyan); outline-offset: 2px; }
+.marketing .svc-faq-ico {
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+.marketing .svc-faq-ico::before,
+.marketing .svc-faq-ico::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  background: var(--m-text);
+  border-radius: 2px;
+  transition: transform 0.3s var(--m-ease), opacity 0.3s var(--m-ease);
+}
+.marketing .svc-faq-ico::before { width: 14px; height: 2px; }
+.marketing .svc-faq-ico::after { width: 2px; height: 14px; }
+.marketing .svc-faq-item[open] .svc-faq-ico::after { transform: rotate(90deg); opacity: 0; }
+.marketing .svc-faq-a {
+  margin: 0;
+  max-width: 44rem;
+  padding-bottom: 24px;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+@media (min-width: 1024px) {
+  .marketing .svc-faq-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: start; }
+}
+
+/* ---------- Movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .marketing .svc-faq-ico::before,
+  .marketing .svc-faq-ico::after,
+  .marketing .svc-band-link,
+  .marketing .svc-demo-card,
+  .marketing .svc-crumb-link { transition: none; }
+}

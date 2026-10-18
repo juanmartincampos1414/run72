@@ -1,0 +1,469 @@
+/* Trabajos (sección 10). Todas las clases llevan prefijo work- y se anteponen
+   a .marketing para ganar a reglas base como `.marketing p`. */
+
+.marketing .work-page {
+  --work-accent: var(--m-violet);
+  --work-header-offset: 160px;
+  position: relative;
+  padding-bottom: 96px;
+}
+@media (max-width: 767px) {
+  .marketing .work-page { --work-header-offset: 128px; padding-bottom: 64px; }
+}
+
+/* ---------- Rótulos y badge ---------- */
+.marketing .work-label {
+  margin: 0;
+  font-size: 11px;
+  line-height: 17.6px;
+  font-weight: 400;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--m-category);
+}
+.marketing .work-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 10px;
+  border: 1px solid var(--m-line-active);
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 17.6px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--m-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Índice ---------- */
+.marketing .work-index-head {
+  padding-top: var(--work-header-offset);
+  padding-bottom: 48px;
+}
+.marketing .work-index-title {
+  margin: 0;
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.marketing .work-index-lede {
+  max-width: 640px;
+  margin: 24px 0 0;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--m-muted);
+}
+@media (max-width: 767px) {
+  .marketing .work-index-lede { font-size: 18px; line-height: 28px; }
+}
+
+.marketing .work-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.marketing .work-filter {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--m-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--m-muted);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.3s var(--m-ease), color 0.3s var(--m-ease), background 0.3s var(--m-ease);
+}
+.marketing .work-filter:hover {
+  border-color: var(--m-line-active);
+  color: var(--m-text);
+}
+.marketing .work-filter[aria-pressed="true"] {
+  background: var(--m-text);
+  border-color: var(--m-text);
+  color: #000;
+}
+.marketing .work-filter:focus-visible,
+.marketing .work-card:focus-visible,
+.marketing .work-next:focus-visible,
+.marketing .work-close:focus-visible,
+.marketing .svc-crumb-link:focus-visible {
+  outline: 2px solid var(--m-cyan);
+  outline-offset: 3px;
+}
+
+.marketing .work-count {
+  margin: 20px 0 32px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--m-gray);
+}
+
+.marketing .work-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marketing .work-cell { display: flex; min-width: 0; }
+@media (min-width: 768px) {
+  .marketing .work-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; }
+  .marketing .work-cell { grid-column: span 5; }
+  .marketing .work-cell[data-wide="true"] { grid-column: span 7; }
+}
+
+/* ---------- Tarjeta ---------- */
+.marketing .work-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background: var(--m-panel);
+  color: var(--m-text);
+  text-decoration: none;
+  transition: border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Gradiente de portfolio (4.1): acento al 12%, 20% en hover, 700 ms. */
+.marketing .work-card::before,
+.marketing .work-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.marketing .work-card::before {
+  background: radial-gradient(120% 220% at 4% 50%, color-mix(in srgb, var(--work-accent) 12%, transparent), transparent 85%);
+}
+.marketing .work-card::after {
+  background: radial-gradient(120% 220% at 4% 50%, color-mix(in srgb, var(--work-accent) 20%, transparent), transparent 85%);
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.marketing .work-card:hover,
+.marketing .work-card:focus-visible { border-color: var(--m-line-active); }
+.marketing .work-card:hover::after,
+.marketing .work-card:focus-visible::after { opacity: 1; }
+
+.marketing .work-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+}
+@media (min-width: 1024px) {
+  .marketing .work-card-body { padding: 32px; }
+}
+.marketing .work-card-title {
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.marketing .work-card-meta {
+  font-size: 11px;
+  line-height: 17.6px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--m-category);
+}
+.marketing .work-card-summary {
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+.marketing .work-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 14px;
+}
+
+/* ---------- Portada (gradiente CSS con la paleta) ---------- */
+.marketing .work-poster {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 90% at 22% 18%, color-mix(in srgb, var(--work-accent) 55%, transparent), transparent 70%),
+    radial-gradient(60% 80% at 92% 90%, color-mix(in srgb, var(--m-blue) 40%, transparent), transparent 70%),
+    radial-gradient(50% 60% at 70% 10%, color-mix(in srgb, var(--m-violet) 30%, transparent), transparent 70%),
+    #050508;
+}
+.marketing .work-poster-ui {
+  position: absolute;
+  inset: 14% 10% 16%;
+  display: flex;
+  flex-direction: column;
+  gap: 4%;
+  padding: 5%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+.marketing .work-poster-ui i {
+  display: block;
+  flex: 1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.marketing .work-poster-ui i:first-child { flex: 0 0 18%; background: color-mix(in srgb, var(--work-accent) 28%, transparent); }
+.marketing .work-poster-ui i:last-child { flex: 0 0 22%; width: 62%; }
+.marketing .work-poster-tag {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 11px;
+  line-height: 17.6px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--m-text);
+}
+
+/* ---------- Ficha: X de salida (el breadcrumb es DetailBreadcrumbs) ---------- */
+.marketing .work-detail { position: relative; }
+.marketing .work-close {
+  position: absolute;
+  z-index: 40;
+  top: 132px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--m-text);
+  transition: border-color 0.3s var(--m-ease), background 0.3s var(--m-ease);
+}
+@media (min-width: 640px) {
+  /* A la derecha de la cápsula centrada de 448 px. */
+  .marketing .work-close { top: 80px; right: auto; left: calc(50% + 224px + 8px); }
+}
+@media (min-width: 768px) {
+  .marketing .work-close { top: 104px; }
+}
+.marketing .work-close svg { width: 20px; height: 20px; }
+.marketing .work-close:hover { border-color: var(--m-line-active); background: rgba(255, 255, 255, 0.08); }
+
+/* ---------- Ficha: cabecera ---------- */
+.marketing .work-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 208px;
+  padding-bottom: 40px;
+}
+.marketing .work-title {
+  margin: 0;
+  max-width: 1120px;
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 768px) {
+  .marketing .work-title { font-size: 72px; line-height: 72px; }
+}
+.marketing .work-subtitle {
+  max-width: 720px;
+  margin: 0;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--m-muted);
+}
+@media (max-width: 767px) {
+  .marketing .work-subtitle { font-size: 18px; line-height: 28px; }
+}
+
+.marketing .work-cover { margin: 0; }
+.marketing .work-poster-wide {
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+}
+@media (min-width: 768px) {
+  .marketing .work-poster-wide { aspect-ratio: 21 / 9; }
+}
+.marketing .work-poster-wide .work-poster-ui { inset: 12% 8% 14%; border-radius: 20px; }
+
+@media (min-width: 640px) {
+  .marketing .work-hero { padding-top: 160px; }
+}
+@media (min-width: 768px) {
+  .marketing .work-hero { padding-top: 204px; }
+}
+
+/* ---------- Ficha: cuerpo ---------- */
+.marketing .work-body {
+  display: grid;
+  gap: 16px;
+  padding-top: 72px;
+}
+.marketing .work-lead {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(1.375rem, 3vw, 2rem);
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--m-text);
+}
+.marketing .work-text {
+  margin: 0;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--m-muted);
+}
+@media (max-width: 767px) {
+  .marketing .work-text { font-size: 18px; line-height: 28px; }
+}
+
+.marketing .work-pair {
+  display: grid;
+  gap: 40px;
+  margin-top: 72px;
+  padding-top: 40px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--m-line);
+  /* El borde se ve dentro del padding del contenedor: se recorta con el fondo. */
+}
+.marketing .work-pair-col { display: grid; gap: 16px; align-content: start; }
+@media (min-width: 768px) {
+  .marketing .work-pair { grid-template-columns: 1fr 1fr; gap: 64px; }
+}
+
+.marketing .work-scope {
+  display: grid;
+  gap: 16px;
+  margin-top: 64px;
+}
+.marketing .work-scope .work-text { max-width: 720px; }
+.marketing .work-credits {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin: 16px 0 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .work-credits div { display: grid; gap: 4px; }
+.marketing .work-credits dd {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-text);
+}
+@media (min-width: 768px) {
+  .marketing .work-credits { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+}
+
+.marketing .work-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 64px;
+}
+.marketing .work-cta > * { max-width: 100%; }
+
+/* ---------- Siguiente trabajo (gigante, ajustado al ancho) ---------- */
+.marketing .work-next-wrap {
+  margin-top: 96px;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .work-next {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  container-type: inline-size;
+  padding-block: 40px 56px;
+  color: var(--m-text);
+  text-decoration: none;
+}
+.marketing .work-next::before {
+  content: "";
+  position: absolute;
+  inset: 0 -24px;
+  z-index: -1;
+  background: radial-gradient(120% 220% at 4% 50%, color-mix(in srgb, var(--work-accent) 12%, transparent), transparent 85%);
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.marketing .work-next:hover::before,
+.marketing .work-next:focus-visible::before { opacity: 1; }
+.marketing .work-next-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.marketing .work-next-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--m-line-active);
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--m-text);
+  transition: background 0.4s var(--m-ease), color 0.4s var(--m-ease);
+}
+.marketing .work-next:hover .work-next-counter,
+.marketing .work-next:focus-visible .work-next-counter { background: var(--m-text); color: #000; }
+/* Tamaño por ancho: móvil por palabra más larga (puede partir en líneas),
+   desde 768 px por nombre completo en una línea. Tope ~150 px. */
+.marketing .work-next-name {
+  display: block;
+  font-size: min(150px, calc(100cqw / (var(--work-next-word, 10) * 0.56)));
+  line-height: 0.9;
+  font-weight: 600;
+  letter-spacing: -0.033em;
+  overflow-wrap: anywhere;
+  opacity: 0.85;
+  transition: opacity 0.4s var(--m-ease);
+}
+@media (min-width: 768px) {
+  .marketing .work-next-name {
+    font-size: min(150px, calc(100cqw / (var(--work-next-chars, 20) * 0.56)));
+    white-space: nowrap;
+  }
+}
+.marketing .work-next:hover .work-next-name,
+.marketing .work-next:focus-visible .work-next-name { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .work-card,
+  .marketing .work-card::after,
+  .marketing .work-next::before,
+  .marketing .work-next-counter,
+  .marketing .work-next-name,
+  .marketing .work-filter,
+  .marketing .work-close { transition: none; }
+}

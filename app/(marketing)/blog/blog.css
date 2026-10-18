@@ -1,0 +1,190 @@
+/* Blog de RUN. Todas las clases llevan prefijo blog- (escala tipográfica 4.2). */
+
+.marketing .blog-page { padding-top: 136px; padding-bottom: 96px; }
+@media (min-width: 1024px) { .marketing .blog-page { padding-top: 176px; padding-bottom: 128px; } }
+
+/* ---------- Índice ---------- */
+.marketing .blog-head { max-width: 760px; }
+.marketing .blog-h1 {
+  margin: 20px 0 0;
+  font-size: clamp(36px, 8vw, 64px);
+  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--m-text);
+}
+@media (min-width: 1024px) { .marketing .blog-h1 { font-size: 72px; line-height: 64.8px; } }
+.marketing .blog-lede {
+  margin: 24px 0 0;
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-gray);
+}
+
+.marketing .blog-index { margin-top: 56px; display: grid; gap: 24px; }
+@media (min-width: 1024px) { .marketing .blog-index { margin-top: 80px; gap: 32px; } }
+
+.marketing .blog-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px;
+  border: 1px solid var(--m-line);
+  border-radius: 16px;
+  background: var(--m-panel);
+  color: var(--m-text);
+  text-decoration: none;
+  transition: border-color 0.4s var(--m-ease), background 0.4s var(--m-ease);
+}
+.marketing .blog-card:hover { border-color: var(--m-line-active); background: #0c0c0c; }
+.marketing .blog-card:focus-visible { outline: 2px solid var(--m-cyan); outline-offset: 3px; }
+
+.marketing .blog-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-category);
+}
+.marketing .blog-card-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .blog-card-summary { margin: 0; font-size: 16px; line-height: 28px; color: var(--m-muted); max-width: 560px; }
+.marketing .blog-card-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .blog-card-cta .m-arrow { width: 16px; height: 16px; }
+
+/* Destacado */
+.marketing .blog-card--featured { padding: 32px 24px; background: radial-gradient(120% 220% at 4% 50%, rgba(137, 96, 255, 0.12), transparent 85%), var(--m-panel); }
+.marketing .blog-card--featured:hover { background: radial-gradient(120% 220% at 4% 50%, rgba(137, 96, 255, 0.2), transparent 85%), var(--m-panel); }
+.marketing .blog-card--featured .blog-card-title {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  max-width: 640px;
+}
+@media (min-width: 768px) {
+  .marketing .blog-card--featured { padding: 48px; gap: 20px; }
+  .marketing .blog-card--featured .blog-card-title { font-size: 30px; line-height: 37.5px; }
+}
+
+.marketing .blog-list { display: grid; gap: 24px; }
+.marketing .blog-list > li > .blog-card { flex: 1; min-width: 0; }
+@media (min-width: 768px) { .marketing .blog-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.marketing .blog-list-label { margin: 8px 0 0; }
+
+/* ---------- Artículo ---------- */
+.marketing .blog-article { max-width: 680px; margin-inline: auto; }
+
+.marketing .blog-crumbs { margin-bottom: 40px; }
+.marketing .blog-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-gray);
+}
+.marketing .blog-crumbs li + li::before { content: "/"; margin-right: 10px; color: var(--m-line-active); }
+.marketing .blog-crumbs a { color: var(--m-category); text-decoration: none; transition: color 0.3s var(--m-ease); }
+.marketing .blog-crumbs a:hover { color: var(--m-text); }
+.marketing .blog-crumbs a:focus-visible { outline: 2px solid var(--m-cyan); outline-offset: 3px; }
+.marketing .blog-crumbs [aria-current="page"] {
+  color: var(--m-gray);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marketing .blog-article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--m-category);
+}
+.marketing .blog-article-h1 {
+  margin: 20px 0 0;
+  font-size: 36px;
+  line-height: 39.6px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--m-text);
+  text-wrap: balance;
+}
+@media (min-width: 768px) { .marketing .blog-article-h1 { font-size: 48px; line-height: 48px; } }
+
+.marketing .blog-lead { margin: 32px 0 0; font-size: 18px; line-height: 28px; font-weight: 400; color: var(--m-text); }
+
+.marketing .blog-body { margin-top: 8px; }
+.marketing .blog-h2 {
+  margin: 48px 0 0;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--m-text);
+}
+.marketing .blog-p { margin: 16px 0 0; font-size: 16px; line-height: 28px; font-weight: 400; color: var(--m-muted); }
+
+.marketing .blog-close {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .blog-close-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 600;
+  color: var(--m-text);
+}
+.marketing .blog-close .blog-p { margin-top: 8px; }
+.marketing .blog-close-links { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; }
+.marketing .blog-back {
+  margin-top: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--m-category);
+  text-decoration: none;
+  transition: color 0.3s var(--m-ease);
+}
+.marketing .blog-back:hover { color: var(--m-text); }
+.marketing .blog-back:focus-visible { outline: 2px solid var(--m-cyan); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .blog-card, .marketing .blog-crumbs a, .marketing .blog-back { transition: none; }
+}
