@@ -28,8 +28,8 @@ export function FinalCTA() {
 
           <div className="relative mx-auto max-w-2xl">
             <h2 className="text-balance font-display text-3xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-              Tu proyecto puede estar funcionando en{" "}
-              <span className="text-gradient">72 horas.</span>
+              Tu proyecto puede estar funcionando,{" "}
+              <span className="text-gradient">definido por alcance.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted md:text-lg">
               Contanos qué querés construir y prepararemos una propuesta

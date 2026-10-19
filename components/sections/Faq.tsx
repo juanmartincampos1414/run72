@@ -31,7 +31,7 @@ export function Faq() {
               Preguntas <span className="text-gradient">frecuentes.</span>
             </>
           }
-          subtitle="Lo que necesitás saber antes de lanzar tu proyecto con RUN72."
+          subtitle="Lo que necesitás saber antes de lanzar tu proyecto con RUN."
         />
 
         <Reveal>

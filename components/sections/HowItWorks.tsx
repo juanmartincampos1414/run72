@@ -14,10 +14,10 @@ export function HowItWorks() {
           eyebrow="Cómo funciona"
           title={
             <>
-              72 horas. <span className="text-gradient">Tres pasos.</span>
+              Un proceso. <span className="text-gradient">Tres pasos.</span>
             </>
           }
-          subtitle="Un proceso lineal y sin esperas. Cada día tiene un objetivo claro y un entregable concreto."
+          subtitle="Un proceso lineal y sin esperas. Cada fase tiene un objetivo claro y un entregable concreto."
         />
 
         <div className="relative mt-16">

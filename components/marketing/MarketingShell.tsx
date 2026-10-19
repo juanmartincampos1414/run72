@@ -9,14 +9,26 @@ import { SmoothScroll } from "./SmoothScroll";
 // variables de fuente propias y monta header/footer. Lo usan tanto las rutas
 // del grupo (marketing) como el Home de raíz, sin mover URLs ni duplicar
 // <html>/<body> (sección 13.2).
-export function MarketingShell({ children, withFooter = true }: { children: ReactNode; withFooter?: boolean }) {
+// En páginas-herramienta (Scan, Mapa) se desactiva el smooth-scroll (Lenis
+// interfiere con el wheel de React Flow) y, si hace falta, el launcher.
+export function MarketingShell({
+  children,
+  withFooter = true,
+  withSmooth = true,
+  withRunit = true,
+}: {
+  children: ReactNode;
+  withFooter?: boolean;
+  withSmooth?: boolean;
+  withRunit?: boolean;
+}) {
   return (
     <div className={`marketing ${marketingFontVars}`}>
-      <SmoothScroll />
+      {withSmooth && <SmoothScroll />}
       <MarketingHeader />
       <main id="main-content">{children}</main>
       {withFooter && <MarketingFooter />}
-      <RunitLauncher />
+      {withRunit && <RunitLauncher />}
     </div>
   );
 }

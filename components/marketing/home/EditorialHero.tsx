@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { HOME } from "@/lib/marketing/content";
 import { WordReveal } from "@/components/marketing/WordReveal";
 import { GradientText } from "@/components/marketing/GradientText";
-import { RunMark } from "@/components/marketing/RunMark";
+import { HeroScene } from "@/components/marketing/HeroScene";
 
 // Hero del Inicio (5.1). 100svh, rótulo mono, H1 por líneas, última palabra
 // con gradiente + icono RUN; bajada y enlace discreto a #servicios.
@@ -16,13 +16,12 @@ export function EditorialHero() {
     <Fragment key="last-line">
       {before}{" "}
       <GradientText>{gradientWord}</GradientText>
-      <RunMark className="m-hero-mark" size={88} />
     </Fragment>,
   ];
 
   return (
     <section className="m-hero" id="top">
-      <div className="m-home-bg" aria-hidden="true" />
+      <HeroScene />
       <div className="m-container m-hero-inner">
         <p className="m-eyebrow m-hero-eyebrow">{eyebrow}</p>
         <WordReveal as="h1" className="m-hero-title" lines={lines} />

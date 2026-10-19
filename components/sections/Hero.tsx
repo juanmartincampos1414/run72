@@ -30,7 +30,7 @@ export function Hero() {
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/[0.03] px-3.5 py-1.5 text-xs font-medium tracking-tight text-muted backdrop-blur">
               <BoltIcon className="h-3.5 w-3.5 text-brand-cyan" />
-              Ejecución completa en 72 horas
+              Ejecución completa, definida por alcance
             </span>
           </motion.div>
 
@@ -40,8 +40,8 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.08, ease }}
             className="mt-6 text-balance font-display text-4xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl md:text-7xl"
           >
-            Tu proyecto listo en{" "}
-            <span className="text-gradient">72 horas.</span>
+            Tu proyecto, listo{" "}
+            <span className="text-gradient">por alcance.</span>
           </motion.h1>
 
           <motion.p
@@ -52,7 +52,7 @@ export function Hero() {
           >
             Web, plataforma, marca, estrategia y automatización con IA.
             Ejecutamos lo que tu negocio necesita —estés arrancando, creciendo o
-            escalando— y te lo entregamos funcionando en 72 horas.
+            escalando— y te lo entregamos funcionando, con plazos definidos según el alcance.
           </motion.p>
 
           <motion.div
@@ -137,7 +137,7 @@ function HeroVisual() {
           <div className="rounded-[24px] bg-ink-soft p-8 sm:p-12">
             <Image
               src="/logo.png"
-              alt="Isologo de RUN72"
+              alt="Isologo de RUN"
               width={520}
               height={520}
               priority
@@ -149,19 +149,19 @@ function HeroVisual() {
           <FloatingChip
             className="left-3 top-6 sm:left-4 sm:top-10"
             dot="bg-brand-cyan"
-            label="Día 1 · Estrategia"
+            label="Fase 1 · Estrategia"
             delay={0.6}
           />
           <FloatingChip
             className="right-3 top-1/2 sm:right-5"
             dot="bg-brand-blue"
-            label="Día 2 · Diseño + Dev"
+            label="Fase 2 · Diseño + Dev"
             delay={0.9}
           />
           <FloatingChip
             className="bottom-6 left-1/2 -translate-x-1/2 sm:bottom-8"
             dot="bg-brand-violet"
-            label="Día 3 · Lanzamiento"
+            label="Fase 3 · Lanzamiento"
             delay={1.2}
           />
         </motion.div>

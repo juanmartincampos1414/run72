@@ -1,11 +1,11 @@
 /**
- * RUN72 — Single source of truth for landing copy.
+ * RUN — Single source of truth for landing copy.
  * Centralised so sections stay presentational and copy is easy to iterate.
  */
 
 export const SITE = {
-  name: "RUN72",
-  tagline: "Tu negocio listo en 72 horas.",
+  name: "RUN",
+  tagline: "Tu operación, lista por alcance.",
   email: "hola@run72.app",
   linkedin: "https://www.linkedin.com/company/run72",
 } as const;
@@ -88,19 +88,19 @@ export type Step = {
 
 export const STEPS: Step[] = [
   {
-    day: "Día 1",
+    day: "Fase 1",
     title: "Descubrimiento y estrategia",
     description:
-      "Definimos propuesta de valor, audiencia y mensaje. Salís del día 1 con un plan claro de ejecución.",
+      "Definimos propuesta de valor, audiencia y mensaje. Salís de esta fase con un plan claro de ejecución.",
   },
   {
-    day: "Día 2",
+    day: "Fase 2",
     title: "Diseño y desarrollo",
     description:
       "Construimos marca, interfaz y producto en paralelo. Todo el equipo ejecutando sobre un mismo objetivo.",
   },
   {
-    day: "Día 3",
+    day: "Fase 3",
     title: "Ajustes finales y lanzamiento",
     description:
       "Pulido, optimización y entrega lista para operar. Tu negocio queda en línea y listo para vender.",
@@ -155,7 +155,7 @@ export const METRICS: Metric[] = [
   { value: "+10", label: "Años de experiencia acumulada del equipo" },
   { value: "+300", label: "Proyectos desarrollados por el equipo" },
   { value: "12", label: "Industrias atendidas" },
-  { value: "72h", label: "Tiempo de entrega" },
+  { value: "Por alcance", label: "Plazo del proyecto" },
 ];
 
 export type Project = {
@@ -264,4 +264,4 @@ export const TRADITIONAL_FLOW = [
   "Lanzamiento",
 ] as const;
 
-export const RUN72_FLOW = ["Idea", "RUN72", "Lanzamiento"] as const;
+export const RUN72_FLOW = ["Idea", "RUN", "Lanzamiento"] as const;

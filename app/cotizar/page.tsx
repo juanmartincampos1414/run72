@@ -4,7 +4,7 @@ import { QuoteEntry } from "@/components/quote/QuoteEntry";
 export const metadata: Metadata = {
   title: "Cotizá tu proyecto",
   description:
-    "Armá tu negocio digital y obtené un presupuesto en tiempo real, por formulario o hablando con nuestro asistente. RUN72 lo deja listo en 72 horas.",
+    "Armá tu proyecto y obtené una estimación con las reglas de RUN, por formulario o hablando con nuestro asistente.",
   robots: { index: false, follow: true },
 };
 

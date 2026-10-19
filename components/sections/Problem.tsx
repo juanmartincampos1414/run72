@@ -15,7 +15,7 @@ export function Problem() {
               <span className="text-gradient">Nosotros no.</span>
             </>
           }
-          subtitle="Lanzar un negocio normalmente significa coordinar diseñadores, programadores, estrategas, marketers y proveedores. Semanas de reuniones antes de vender el primer producto. RUN72 resuelve todo en un único proceso de ejecución."
+          subtitle="Lanzar un negocio normalmente significa coordinar diseñadores, programadores, estrategas, marketers y proveedores. Semanas de reuniones antes de vender el primer producto. RUN resuelve todo en un único proceso de ejecución."
         />
 
         <div className="mx-auto mt-16 max-w-4xl space-y-5">
@@ -31,7 +31,7 @@ export function Problem() {
             </div>
           </Reveal>
 
-          {/* RUN72 */}
+          {/* RUN */}
           <Reveal delay={1}>
             <div className="ring-gradient relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-brand-blue/[0.08] to-brand-violet/[0.05] p-6 md:p-7">
               <div
@@ -40,9 +40,9 @@ export function Problem() {
               />
               <div className="mb-5 flex items-center gap-2 text-sm font-semibold">
                 <BoltIcon className="h-4 w-4 text-brand-cyan" />
-                Con RUN72
+                Con RUN
                 <span className="ml-auto rounded-full bg-white/[0.06] px-2.5 py-1 text-xs font-medium text-fg">
-                  72 horas
+                  Por alcance
                 </span>
               </div>
               <FlowRow steps={[...RUN72_FLOW]} />
@@ -58,7 +58,7 @@ function FlowRow({ steps, muted = false }: { steps: string[]; muted?: boolean })
   return (
     <div className="flex flex-wrap items-center gap-2 md:gap-3">
       {steps.map((step, i) => {
-        const highlight = !muted && step === "RUN72";
+        const highlight = !muted && step === "RUN";
         return (
           <div key={step} className="flex items-center gap-2 md:gap-3">
             <span
