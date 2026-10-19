@@ -3,22 +3,30 @@ import { LegalShell, LegalSection } from "@/components/LegalShell";
 import { SITE } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones — RUN72",
-  description: "Términos y condiciones del servicio de RUN72.",
+  title: "Términos y Condiciones",
+  description: "Términos y condiciones del servicio de RUN.",
   robots: { index: true, follow: true },
 };
 
 export default function TerminosPage() {
   return (
-    <LegalShell title="Términos y Condiciones" updated="Junio 2026">
+    <LegalShell title="Términos y Condiciones" updated="Octubre 2026">
       <p className="text-sm leading-relaxed text-muted">
-        Estos Términos y Condiciones regulan la contratación de los servicios de RUN72.
+        Estos Términos y Condiciones regulan la contratación de los servicios de RUN.
         Al contratar y abonar el anticipo, aceptás lo aquí descripto.
+      </p>
+      <p className="mt-3 rounded-2xl border border-line bg-surface/40 p-4 text-sm leading-relaxed text-muted">
+        <strong className="text-fg">Dos recorridos.</strong> Las condiciones de pago, anticipo y plazo
+        descriptas a continuación aplican a <strong className="text-fg">RUN Express</strong>, la
+        contratación online por el cotizador. Para desarrollos a medida (software, agentes de IA e
+        integraciones), el alcance, los plazos, los pagos, la propiedad y el soporte se definen en la
+        propuesta y el contrato de cada proyecto. Enviar una consulta no inicia producción ni confirma
+        una contratación.
       </p>
 
       <LegalSection heading="1. Alcance del servicio">
         <p>
-          RUN72 desarrolla y entrega proyectos digitales (sitios web, landing pages,
+          RUN desarrolla y entrega proyectos digitales (sitios web, landing pages,
           ecommerce, plataformas, CRM, branding, redes y automatizaciones) con un modelo
           de ejecución rápida. El alcance de cada proyecto es exactamente el que el cliente
           selecciona en el cotizador y queda reflejado en el resumen y el presupuesto.
@@ -45,20 +53,21 @@ export default function TerminosPage() {
           Para iniciar la producción se abona un anticipo del 30% del total. El 70%
           restante se abona al finalizar la entrega. El anticipo puede abonarse por
           MercadoPago o por transferencia bancaria; en este último caso, el cliente envía
-          el comprobante y RUN72 lo valida antes de iniciar.
+          el comprobante y RUN lo valida antes de iniciar.
         </p>
       </LegalSection>
 
-      <LegalSection heading="4. Validación de proyectos y plazo de 72 horas">
+      <LegalSection heading="4. RUN Express: validación y plazo">
         <p>
-          El plazo de 72 horas comienza una vez confirmado el anticipo y recibida toda la
+          Esta sección aplica solo a proyectos contratados por RUN Express. El plazo de 72 horas de
+          esa modalidad comienza una vez confirmado el anticipo y recibida toda la
           información, materiales y accesos necesarios por parte del cliente. Las demoras en
           la entrega de materiales o accesos por parte del cliente extienden el plazo en la
           misma medida.
         </p>
         <p>
           Si luego de revisar el proyecto determinamos que no puede ejecutarse dentro del
-          alcance de RUN72, te informaremos esta situación antes de comenzar y te
+          alcance de RUN, te informaremos esta situación antes de comenzar y te
           devolveremos el 100% del anticipo abonado.
         </p>
       </LegalSection>
@@ -71,8 +80,8 @@ export default function TerminosPage() {
           cualquier proveedor en el futuro.
         </p>
         <p>
-          RUN72 puede utilizar componentes, librerías y herramientas de terceros sujetas a
-          sus propias licencias. RUN72 podrá mencionar el proyecto como caso de referencia,
+          RUN puede utilizar componentes, librerías y herramientas de terceros sujetas a
+          sus propias licencias. RUN podrá mencionar el proyecto como caso de referencia,
           salvo solicitud expresa del cliente en contrario.
         </p>
       </LegalSection>
@@ -88,7 +97,7 @@ export default function TerminosPage() {
 
       <LegalSection heading="7. Limitaciones de responsabilidad">
         <p>
-          RUN72 entrega el proyecto según el alcance contratado. No nos responsabilizamos
+          RUN entrega el proyecto según el alcance contratado. No nos responsabilizamos
           por: contenidos, datos o materiales provistos por el cliente; servicios de
           terceros (hosting, dominios, pasarelas de pago, APIs externas) y sus eventuales
           fallas o costos; usos del proyecto distintos a los previstos; ni por resultados
@@ -96,7 +105,7 @@ export default function TerminosPage() {
           desarrollo.
         </p>
         <p>
-          En todos los casos, la responsabilidad de RUN72 se limita al monto efectivamente
+          En todos los casos, la responsabilidad de RUN se limita al monto efectivamente
           abonado por el cliente por el proyecto en cuestión.
         </p>
       </LegalSection>
@@ -122,7 +131,7 @@ export default function TerminosPage() {
       <LegalSection heading="10. Política de reembolso">
         <p>
           Reintegramos el 100% del anticipo si, tras revisar el proyecto, determinamos que
-          no puede ejecutarse dentro del alcance de RUN72 y lo informamos antes de comenzar.
+          no puede ejecutarse dentro del alcance de RUN y lo informamos antes de comenzar.
           Los reintegros se realizan por el mismo medio de pago utilizado, dentro de los
           plazos operativos del proveedor de pago correspondiente.
         </p>

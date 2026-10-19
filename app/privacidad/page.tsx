@@ -3,18 +3,49 @@ import { LegalShell, LegalSection } from "@/components/LegalShell";
 import { SITE } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Política de Privacidad — RUN72",
-  description: "Cómo RUN72 recopila, usa y protege tus datos.",
+  title: "Política de Privacidad — RUN",
+  description: "Cómo RUN recopila, usa y protege tus datos.",
   robots: { index: true, follow: true },
 };
 
 export default function PrivacidadPage() {
   return (
-    <LegalShell title="Política de Privacidad" updated="Junio 2026">
+    <LegalShell title="Política de Privacidad" updated="Octubre 2026">
       <p className="text-sm leading-relaxed text-muted">
-        En RUN72 cuidamos tus datos. Esta política explica qué información recopilamos,
+        En RUN cuidamos tus datos. Esta política explica qué información recopilamos,
         cómo la usamos y qué derechos tenés sobre ella.
       </p>
+      <p className="mt-3 rounded-2xl border border-line bg-surface/40 p-4 text-xs leading-relaxed text-faint">
+        Esta versión incorpora las consultas de proyectos a medida, el asistente Runit y las
+        preferencias de privacidad. Su redacción final está sujeta a revisión de los responsables de RUN.
+      </p>
+
+      <LegalSection heading="Consultas de proyectos a medida">
+        <p>
+          Si nos escribís por el formulario de Contacto, recopilamos el nombre, el email y,
+          opcionalmente, la empresa, junto con la descripción del proceso que querés mejorar y las
+          herramientas que usás. Usamos esa información para evaluar el alcance y responderte. Enviar
+          una consulta no inicia una contratación.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Asistente Runit">
+        <p>
+          Runit es un asistente de orientación. Lo que escribís o dictás por voz se procesa para
+          generar una respuesta mediante un proveedor de modelos de IA (Anthropic). No le pidas claves
+          ni datos sensibles. No guardamos la conversación completa de forma persistente ni la usamos
+          para otra cosa que responderte en el momento; podés trasladar un resumen al formulario si lo
+          elegís. El reconocimiento de voz, cuando lo activás, usa las capacidades de tu navegador.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Preferencias de privacidad">
+        <p>
+          Las cookies necesarias permiten que el sitio funcione. La analítica y el marketing (incluido
+          el píxel de Meta) solo se activan si das tu consentimiento, que podés cambiar cuando quieras
+          desde “Ajustes de privacidad” en el pie de página.
+        </p>
+      </LegalSection>
 
       <LegalSection heading="Datos que recopilamos">
         <p>Cuando usás el cotizador o nos contactás, podemos recopilar:</p>
@@ -49,7 +80,7 @@ export default function PrivacidadPage() {
       <LegalSection heading="Archivos adjuntos">
         <p>
           Los archivos que subís se almacenan en un repositorio privado y solo son accesibles
-          por el equipo de RUN72 mediante enlaces temporales. Se utilizan exclusivamente para
+          por el equipo de RUN mediante enlaces temporales. Se utilizan exclusivamente para
           ejecutar tu proyecto.
         </p>
       </LegalSection>

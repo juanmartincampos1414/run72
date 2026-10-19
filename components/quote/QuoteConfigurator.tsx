@@ -278,12 +278,17 @@ export function QuoteConfigurator() {
           </p>
           <p className="mt-2 text-sm text-muted">
             {comingSoon
-              ? "En unos minutos vas a poder armar tu proyecto y obtener tu presupuesto al instante."
+              ? "El cotizador no está disponible en este momento. Mientras tanto, contanos tu proyecto y te respondemos."
               : loadError}
           </p>
-          <Link href="/" className="mt-5 inline-block text-sm text-brand-cyan hover:underline">
-            Volver al inicio
-          </Link>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link href="/contacto" className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110">
+              Contanos tu proyecto
+            </Link>
+            <Link href="/" className="rounded-full border border-line px-5 py-2.5 text-sm text-muted transition hover:text-fg">
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </Shell>
     );

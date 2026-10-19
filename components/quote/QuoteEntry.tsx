@@ -57,7 +57,7 @@ export function QuoteEntry() {
             />
             <OptionCard
               icon={<ChatIcon className="h-6 w-6" />}
-              title="Hablar con un Runit, asistente IA"
+              title="Hablar con Runit"
               text="Runit, nuestro asistente de IA, arma la propuesta con vos en una charla."
               cta="Hablar con Runit"
               highlight
