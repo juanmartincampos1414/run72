@@ -413,9 +413,10 @@
   font-weight: 400;
   font-size: clamp(1rem, 7.5vw, 6rem);
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--m-text);
   max-width: 15ch;
+  position: relative;
 }
 @media (min-width: 1024px) {
   .marketing .m-hero-title { line-height: 0.95; }
@@ -495,7 +496,7 @@
 
 /* Proceso (5.4 / 4.4) */
 .marketing .m-process-title { margin-top: 12px; margin-bottom: 8px; font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 500; line-height: 1.05; letter-spacing: -0.025em; color: var(--m-text); max-width: 20ch; }
-.marketing .m-process-wrap.is-interactive { height: 500dvh; }
+.marketing .m-process-wrap.is-interactive { height: 340dvh; }
 .marketing .m-process-scene { }
 .marketing .is-interactive .m-process-scene { position: sticky; top: 0; height: 100dvh; display: flex; align-items: center; }
 .marketing .m-process-cols { display: grid; gap: 32px; width: 100%; }
@@ -686,7 +687,7 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes hs-grid { from { transform: translateY(0); } to { transform: translateY(64px); } }
 
 /* Orbes de luz */
-.marketing .hs-orb { position: absolute; border-radius: 50%; filter: blur(44px); opacity: 0.6; }
+.marketing .hs-orb { position: absolute; border-radius: 50%; filter: blur(44px); opacity: 0.42; }
 .marketing .hs-orb-1 { width: 300px; height: 300px; right: 8%; top: 6%; background: radial-gradient(circle, rgba(137,96,255,0.6), transparent 70%); animation: hs-float1 12s ease-in-out infinite; transform: translate3d(calc(var(--px) * 26px), calc(var(--py) * 20px), 0); }
 .marketing .hs-orb-2 { width: 220px; height: 220px; right: 32%; top: 44%; background: radial-gradient(circle, rgba(24,172,255,0.5), transparent 70%); animation: hs-float2 15s ease-in-out infinite; transform: translate3d(calc(var(--px) * 18px), calc(var(--py) * 14px), 0); }
 .marketing .hs-orb-3 { width: 180px; height: 180px; right: 60%; top: 18%; background: radial-gradient(circle, rgba(255,216,115,0.28), transparent 70%); animation: hs-float1 17s ease-in-out infinite reverse; transform: translate3d(calc(var(--px) * 10px), calc(var(--py) * 8px), 0); }
@@ -694,10 +695,12 @@ html.lenis, html.lenis body { height: auto; }
 /* Escenario 3D con paneles */
 .marketing .hs-stage {
   position: absolute;
-  right: 4%; top: 50%;
-  width: 48%; height: 80%;
+  right: -3%; top: 50%;
+  width: 42%; height: 76%;
+  opacity: 0.9;
   transform-style: preserve-3d;
-  transform: translateY(-50%) rotateY(calc(var(--px) * -8deg)) rotateX(calc(var(--py) * 5deg));
+  /* --sy (0..1) = progreso de scroll dentro del hero: la escena gana profundidad */
+  transform: translateY(calc(-50% + var(--sy, 0) * -36px)) scale(calc(1 - var(--sy, 0) * 0.08)) rotateY(calc(var(--px) * -8deg)) rotateX(calc(var(--py) * 5deg));
   transition: transform 0.2s ease-out;
 }
 .marketing .hs-panel {
@@ -737,7 +740,7 @@ html.lenis, html.lenis body { height: auto; }
 /* Viñeta izquierda para legibilidad del titular */
 .marketing .hs-veil {
   position: absolute; inset: 0;
-  background: linear-gradient(90deg, #050508 0%, rgba(5,5,8,0.82) 26%, rgba(5,5,8,0.2) 52%, transparent 72%);
+  background: linear-gradient(90deg, #050508 0%, rgba(5,5,8,0.92) 32%, rgba(5,5,8,0.4) 58%, rgba(5,5,8,0.05) 82%, transparent 100%);
 }
 
 @keyframes hs-float1 { 0%,100%{ translate: 0 0; } 50%{ translate: 0 -24px; } }

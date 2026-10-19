@@ -5,7 +5,9 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import {
   CATEGORY_LABELS,
-  DEMO_LABEL,
+  PENDING,
+  hasPendingFields,
+  isPending,
   isWorkCategory,
   type Work,
   type WorkCategory,
@@ -35,7 +37,7 @@ function readInitialFilter(): Filter {
 }
 
 function countText(n: number, filterLabel: string): string {
-  const noun = n === 1 ? "trabajo" : "trabajos";
+  const noun = n === 1 ? "producto" : "productos";
   return `Mostrando ${n} ${noun}${filterLabel ? ` en ${filterLabel}` : ""}`;
 }
 
@@ -88,41 +90,56 @@ export function WorksBrowser({ works }: { works: Work[] }) {
         {countText(visible.length, activeLabel)}
       </p>
 
-      <ul className="work-grid" role="list">
-        {visible.map((w, i) => (
-          <li
-            key={w.slug}
-            className="work-cell"
-            data-wide={i % 4 === 0 || i % 4 === 3 ? "true" : "false"}
-          >
-            <Link
-              href={`/trabajos/${w.slug}`}
-              className="work-card"
-              style={{ "--work-accent": w.media.poster } as CSSProperties}
-            >
-              <span className="work-poster" aria-hidden="true">
-                <span className="work-poster-ui">
-                  <i />
-                  <i />
-                  <i />
+      {visible.length === 0 ? (
+        <p className="work-empty">Todavía no hay productos publicados en esta categoría.</p>
+      ) : (
+        <ul className="work-rows" role="list">
+          {visible.map((w, i) => (
+            <li key={w.slug} className="work-row-item">
+              <Link
+                href={`/trabajos/${w.slug}`}
+                className="work-card work-row"
+                style={{ "--work-accent": w.media.poster } as CSSProperties}
+              >
+                <span className="work-poster" aria-hidden="true">
+                  <span className="work-poster-ui">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
                 </span>
-                {w.kind === "demo" && <span className="work-poster-tag m-mono">Datos ficticios</span>}
-              </span>
-              <span className="work-card-body">
-                {w.kind === "demo" && <span className="work-badge m-mono">{DEMO_LABEL}</span>}
-                <span className="work-card-title">{w.title}</span>
-                <span className="work-card-meta m-mono">
-                  {w.categories.map((c) => CATEGORY_LABELS[c]).join(" · ")} · {w.year}
+                <span className="work-card-body">
+                  <span className="work-row-top">
+                    <span className="work-card-meta m-mono">
+                      {String(i + 1).padStart(2, "0")} · {w.categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}
+                    </span>
+                    {hasPendingFields(w) && <span className="work-badge m-mono">Contenido en validación</span>}
+                  </span>
+                  <span className="work-card-title">{w.title}</span>
+                  <span className="work-card-summary">{w.summary}</span>
+                  <dl className="work-row-facts">
+                    <div>
+                      <dt className="work-label m-mono">Usuario</dt>
+                      <dd data-pending={isPending(w.userType)}>{w.userType ?? PENDING}</dd>
+                    </div>
+                    <div>
+                      <dt className="work-label m-mono">Estado</dt>
+                      <dd data-pending={isPending(w.status)}>{w.status ?? PENDING}</dd>
+                    </div>
+                    <div>
+                      <dt className="work-label m-mono">Evidencia</dt>
+                      <dd data-pending={isPending(w.evidence?.[0])}>{w.evidence?.[0] ?? PENDING}</dd>
+                    </div>
+                  </dl>
+                  <span className="work-card-link m-mono">
+                    Ver ficha <AnimatedArrow />
+                  </span>
                 </span>
-                <span className="work-card-summary">{w.summary}</span>
-                <span className="work-card-link m-mono">
-                  Ver trabajo <AnimatedArrow />
-                </span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
 }

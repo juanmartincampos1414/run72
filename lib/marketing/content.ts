@@ -17,6 +17,7 @@ export type NavLink = { label: string; href: string };
 // Header: misma secuencia y jerarquía que Nubi (3.1).
 export const NAV_LINKS: NavLink[] = [
   { label: "Servicios", href: "/servicios" },
+  { label: "Soluciones", href: "/soluciones" },
   { label: "Trabajos", href: "/trabajos" },
   { label: "Blog", href: "/blog" },
   { label: "Labs", href: "/labs" },
@@ -94,7 +95,7 @@ export const HOME = {
   closing: {
     muted: "No necesitás tener la solución.",
     strong: "Contanos qué querés resolver.",
-    cta: { label: "Hablemos de tu proyecto", href: "/contacto" },
+    cta: { label: "Contanos qué necesitás resolver", href: "/contacto" },
   },
 } as const;
 
@@ -107,6 +108,7 @@ export const FOOTER = {
       title: "Explorar",
       links: [
         { label: "Servicios", href: "/servicios" },
+        { label: "Agentes por industria", href: "/soluciones" },
         { label: "Trabajos", href: "/trabajos" },
         { label: "Blog", href: "/blog" },
         { label: "Labs", href: "/labs" },

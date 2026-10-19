@@ -467,3 +467,122 @@
   .marketing .work-filter,
   .marketing .work-close { transition: none; }
 }
+
+/* ---------- Secciones del índice ---------- */
+.marketing .work-section-title {
+  margin: 0 0 24px;
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.marketing .work-section-title-sm { font-size: clamp(1.375rem, 2.4vw, 1.75rem); margin-bottom: 12px; }
+.marketing .work-empty {
+  margin: 0;
+  padding: 32px;
+  border: 1px dashed var(--m-line-active);
+  border-radius: 24px;
+  color: var(--m-muted);
+}
+
+/* ---------- Productos reales: filas editoriales ---------- */
+.marketing .work-rows {
+  display: grid;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marketing .work-row-item { display: flex; min-width: 0; }
+@media (min-width: 900px) {
+  .marketing .work-row { flex-direction: row; align-items: stretch; }
+  .marketing .work-row .work-poster { flex: 0 0 38%; aspect-ratio: auto; min-height: 280px; }
+}
+.marketing .work-row-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.marketing .work-row-facts {
+  display: grid;
+  gap: 16px;
+  margin: 8px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--m-line);
+}
+@media (min-width: 640px) {
+  .marketing .work-row-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.marketing .work-row-facts div { display: grid; gap: 4px; align-content: start; }
+.marketing .work-row-facts dd { margin: 0; font-size: 15px; line-height: 22px; color: var(--m-text); }
+
+/* Campos sin validar: visibles pero atenuados. */
+.marketing [data-pending="true"] { color: var(--m-faint); font-style: italic; }
+
+/* ---------- Labs: demos (secundario) ---------- */
+.marketing .work-labs {
+  margin-top: 96px;
+  padding-top: 48px;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .work-labs-head { display: grid; gap: 8px; margin-bottom: 24px; }
+.marketing .work-labs-note { max-width: 640px; margin: 0; font-size: 16px; line-height: 24px; color: var(--m-muted); }
+.marketing .work-demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.marketing .work-demo-item { display: flex; min-width: 0; }
+@media (min-width: 768px) {
+  .marketing .work-demo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.marketing .work-card-demo { border-style: dashed; border-radius: 20px; }
+.marketing .work-card-demo .work-card-body { padding: 20px; gap: 8px; }
+.marketing .work-card-demo .work-card-title { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+.marketing .work-card-demo .work-card-summary { font-size: 15px; line-height: 22px; }
+
+/* ---------- Ficha de producto ---------- */
+.marketing .work-block { display: grid; gap: 12px; margin-top: 48px; align-content: start; }
+.marketing .work-field { max-width: 720px; }
+.marketing .work-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.marketing .work-stack {
+  display: grid;
+  gap: 20px;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--m-line);
+}
+.marketing .work-stack div { display: grid; gap: 4px; }
+.marketing .work-stack dd { margin: 0; font-size: 18px; line-height: 28px; color: var(--m-text); }
+@media (min-width: 768px) {
+  .marketing .work-stack { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+}
+.marketing .work-credits dd[data-pending="true"] { color: var(--m-faint); }
+.marketing .work-media-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  padding: 24px;
+  border: 1px dashed var(--m-line-active);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+.marketing .work-note {
+  max-width: 720px;
+  margin: 0;
+  padding: 16px 20px;
+  border: 1px solid var(--m-line-active);
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--m-muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+.marketing .work-note strong { color: var(--m-text); font-weight: 500; }

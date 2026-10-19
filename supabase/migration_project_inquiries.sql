@@ -12,7 +12,7 @@ create table if not exists public.project_inquiries (
   interest             text not null check (interest in ('software','agentes','automatizacion','orientacion')),
   problem              text not null,
   systems              text,
-  budget               text check (budget in ('unsure','under_3000','3000_10000','over_10000')),
+  budget               text check (budget in ('unsure','3000_7500','7500_15000','15000_30000','over_30000')),
   status               text not null default 'nuevo' check (status in ('nuevo','revisando','contactado','cerrado')),
   privacy_version      text not null,
   privacy_accepted_at  timestamptz not null default now(),

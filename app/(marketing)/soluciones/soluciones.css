@@ -1,0 +1,350 @@
+/* ------------------------------------------------------------------ *
+ * Agentes por industria — índice y fichas de vertical
+ * Todas las clases llevan prefijo `sol-`. Usan los tokens --m-* del shell.
+ * ------------------------------------------------------------------ */
+
+/* ---------- Hero ---------- */
+.marketing .sol-hero {
+  position: relative;
+  isolation: isolate;
+  padding-top: 144px;
+  padding-bottom: 48px;
+}
+.marketing .sol-hero--detail { padding-top: 152px; }
+@media (min-width: 768px) {
+  .marketing .sol-hero { padding-top: 184px; padding-bottom: 64px; }
+  .marketing .sol-hero--detail { padding-top: 192px; }
+}
+@media (min-width: 1024px) {
+  .marketing .sol-hero { padding-bottom: 80px; }
+}
+.marketing .sol-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, #000 100%),
+    radial-gradient(110% 80% at 50% 0%, rgba(137, 96, 255, 0.2) 0%, rgba(24, 172, 255, 0.08) 40%, rgba(5, 5, 8, 0) 75%);
+}
+.marketing .sol-hero-eyebrow { margin-bottom: 20px; }
+.marketing .sol-hero-badge { margin: 0 0 24px; }
+
+/* ---------- Tipografía ---------- */
+.marketing .sol-h1 {
+  margin: 0;
+  max-width: 17ch;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--m-text);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.marketing .sol-bajada {
+  margin: 28px 0 0;
+  max-width: 44rem;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+@media (min-width: 768px) {
+  .marketing .sol-bajada { font-size: 20px; margin-top: 32px; }
+}
+.marketing .sol-promise {
+  margin: 20px 0 0;
+  max-width: 44rem;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--m-faint);
+}
+.marketing .sol-h2 {
+  margin: 12px 0 20px;
+  font-size: 1.75rem;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--m-text);
+  text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .marketing .sol-h2 { font-size: 2.5rem; }
+}
+.marketing .sol-h3 {
+  margin: 8px 0 16px;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+  color: var(--m-text);
+}
+.marketing .sol-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 36px;
+}
+.marketing .sol-hero-actions .m-btn { width: auto; }
+@media (max-width: 479px) {
+  .marketing .sol-hero-actions { flex-direction: column; align-items: stretch; }
+  .marketing .sol-hero-actions .m-btn { justify-content: center; }
+}
+.marketing .sol-hero-actions .m-arrow,
+.marketing .sol-closing .m-btn .m-arrow { width: 16px; height: 16px; }
+
+/* ---------- Badge de estado ---------- */
+.marketing .sol-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--m-line-active);
+  border-radius: 999px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--m-gold);
+  background: rgba(255, 216, 115, 0.06);
+  white-space: nowrap;
+}
+.marketing .sol-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--m-gold);
+}
+
+/* ---------- Índice: tarjetas ---------- */
+.marketing .sol-cards-section { padding-top: 16px; }
+.marketing .sol-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .marketing .sol-cards { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}
+.marketing .sol-card {
+  display: flex;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background: var(--m-panel);
+  overflow: hidden;
+  transition: border-color 0.4s var(--m-ease);
+}
+.marketing .sol-card:hover,
+.marketing .sol-card:focus-within { border-color: var(--m-line-active); }
+.marketing .sol-card-glow { display: flex; flex: 1; background: transparent; }
+.marketing .sol-card-link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 24px;
+  text-decoration: none;
+  color: inherit;
+}
+.marketing .sol-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.marketing .sol-card-title {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  color: var(--m-text);
+}
+.marketing .sol-card-text {
+  flex: 1;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--m-muted);
+}
+.marketing .sol-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--m-text);
+}
+.marketing .sol-card-cta .m-arrow { width: 16px; height: 16px; }
+.marketing .sol-note {
+  margin: 28px 0 0;
+  max-width: 44rem;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--m-faint);
+}
+
+/* ---------- Ficha: problema y usuario ---------- */
+.marketing .sol-intro { padding-block: 16px 8px; }
+.marketing .sol-intro-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .marketing .sol-intro-grid { grid-template-columns: 1.4fr 1fr; gap: 64px; }
+}
+.marketing .sol-problem-text {
+  margin: 16px 0 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--m-text);
+}
+.marketing .sol-user-text {
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--m-muted);
+}
+
+/* ---------- Ficha: bloques ---------- */
+.marketing .sol-block-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .marketing .sol-block-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+.marketing .sol-block {
+  display: flex;
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background: var(--m-panel);
+  overflow: hidden;
+}
+.marketing .sol-block-glow { display: flex; flex: 1; background: transparent; }
+.marketing .sol-block-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 28px 24px;
+}
+
+.marketing .sol-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.marketing .sol-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--m-muted);
+}
+.marketing .sol-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--m-cyan), var(--m-violet));
+}
+
+/* ---------- Ficha: controles y adaptación ---------- */
+.marketing .sol-split-grid {
+  display: grid;
+  gap: 48px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .marketing .sol-split-grid { grid-template-columns: 1fr 1fr; gap: 64px; }
+}
+.marketing .sol-split-text {
+  margin: 0;
+  font-size: 17px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+
+/* ---------- Ficha: estado ---------- */
+.marketing .sol-status-card {
+  border: 1px solid var(--m-line);
+  border-radius: 24px;
+  background: var(--m-panel);
+}
+.marketing .sol-status-body {
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px;
+}
+@media (min-width: 768px) {
+  .marketing .sol-status-body { padding: 48px 48px; }
+}
+.marketing .sol-status-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin: 16px 0 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--m-text);
+}
+.marketing .sol-status-text {
+  margin: 20px 0 0;
+  max-width: 44rem;
+  font-size: 17px;
+  line-height: 28px;
+  color: var(--m-muted);
+}
+.marketing .sol-status-next strong { color: var(--m-text); font-weight: 500; }
+
+/* ---------- Cierre ---------- */
+.marketing .sol-closing-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+.marketing .sol-question {
+  margin: 0;
+  max-width: 20ch;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--m-gray);
+  text-wrap: balance;
+}
+.marketing .sol-closing-text {
+  margin: 0;
+  max-width: 40rem;
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  line-height: 1.4;
+}
+.marketing .sol-closing .m-btn { width: auto; margin-top: 8px; }
+@media (max-width: 479px) {
+  .marketing .sol-closing-inner { align-items: stretch; }
+  .marketing .sol-closing .m-btn { justify-content: center; }
+}

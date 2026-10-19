@@ -28,9 +28,10 @@ export function HeroScene() {
       if (!raf) raf = requestAnimationFrame(loop);
     };
     const onScroll = () => {
+      // Progreso de scroll dentro del hero → profundidad de la escena (--sy).
       const r = el.getBoundingClientRect();
-      ty = Math.max(-1, Math.min(1, -r.top / Math.max(1, r.height))) + ty * 0;
-      if (!raf) raf = requestAnimationFrame(loop);
+      const sy = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height)));
+      el.style.setProperty("--sy", sy.toFixed(3));
     };
     const loop = () => {
       cx += (tx - cx) * 0.06;

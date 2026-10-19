@@ -2,10 +2,17 @@
 // navegación, el índice, la ficha, generateStaticParams y el sitemap.
 // Server-safe: solo datos.
 
-export type WorkKind = "demo" | "client";
+export type WorkKind = "producto" | "demo" | "client";
 export type WorkCategory = "software" | "ia" | "automatizacion";
 
 export const DEMO_LABEL = "Demo conceptual · Datos ficticios";
+
+/** Marcador literal para todo dato sin verificar. Nunca se reemplaza por un valor inventado. */
+export const PENDING = "[Pendiente de validar]";
+
+export function isPending(value: string | null | undefined): boolean {
+  return typeof value === "string" && value.includes(PENDING);
+}
 
 export const CATEGORY_LABELS: Record<WorkCategory, string> = {
   software: "Software",
@@ -28,16 +35,16 @@ export type Work = {
   subtitle: string;
   kind: WorkKind;
   categories: WorkCategory[];
-  /** Año real de creación de la demo; nunca una fecha inventada de cliente. */
-  year: number;
+  /** Año real de creación; null cuando no está validado (nunca una fecha inventada). */
+  year: number | null;
   summary: string;
   problem: string;
   solution: string;
   scope: string;
-  /** Demo funcional en Labs. */
-  demoHref: string;
+  /** Demo funcional en Labs (solo demos). */
+  demoHref?: string;
   labDataHref?: string;
-  ctaDemoLabel: string;
+  ctaDemoLabel?: string;
   ctaContacto: WorkLink;
   media: WorkMedia;
   published: boolean;
@@ -45,9 +52,87 @@ export type Work = {
   evidence?: string[];
   publicationPermission?: boolean;
   teamRole?: string;
+  /** Ficha de producto (kind=producto). Todo dato sin verificar es PENDING. */
+  context?: string;
+  userType?: string;
+  built?: string;
+  features?: string[];
+  flow?: string;
+  stack?: WorkStack;
+  decisions?: string;
+  status?: string;
 };
 
+export type WorkStack = {
+  architecture: string;
+  technologies: string;
+  integrations: string;
+};
+
+function pendingProduct(
+  base: Pick<Work, "slug" | "title" | "subtitle" | "categories"> & { poster: string },
+): Work {
+  return {
+    slug: base.slug,
+    title: base.title,
+    subtitle: base.subtitle,
+    kind: "producto",
+    categories: base.categories,
+    year: null,
+    summary: `${base.title} es un producto real del portafolio de RUN. La ficha completa está en validación.`,
+    problem: PENDING,
+    solution: PENDING,
+    scope: PENDING,
+    ctaContacto: {
+      label: "Hablar de un proyecto como este",
+      href: `/contacto?interes=${base.categories.includes("ia") ? "agentes" : "software"}`,
+    },
+    media: { poster: base.poster },
+    published: true,
+    context: PENDING,
+    userType: PENDING,
+    built: PENDING,
+    features: [PENDING],
+    flow: PENDING,
+    stack: { architecture: PENDING, technologies: PENDING, integrations: PENDING },
+    decisions: PENDING,
+    status: PENDING,
+    evidence: [PENDING],
+  };
+}
+
 export const WORKS: Work[] = [
+  // ---- Productos reales (fichas en validación: no se inventan datos) ----
+  pendingProduct({
+    slug: "aikestar",
+    title: "Aikestar",
+    subtitle: "Producto de software del portafolio de RUN.",
+    categories: ["software", "ia"],
+    poster: "#18ACFF",
+  }),
+  pendingProduct({
+    slug: "margin",
+    title: "Margin",
+    subtitle: "Producto del portafolio de RUN.",
+    categories: ["software"],
+    poster: "#8960FF",
+  }),
+  pendingProduct({
+    slug: "tips",
+    title: "Tips",
+    subtitle: "Producto del portafolio de RUN.",
+    categories: ["software"],
+    poster: "#FFD873",
+  }),
+  pendingProduct({
+    slug: "j",
+    title: "J",
+    subtitle: "Producto de la marca propia de RUN.",
+    categories: ["ia"],
+    poster: "#5583FF",
+  }),
+
+  // ---- Labs: demos conceptuales con datos ficticios ----
   {
     slug: "sistema-operativo-demo",
     title: "Sistema operativo",
@@ -126,13 +211,14 @@ export const WORKS: Work[] = [
 ];
 
 /**
- * Regla de publicación (sección 10): una demo siempre es publicable si está
- * marcada published; un caso client exige medios reales, rol acreditado,
- * permiso de publicación y evidencia.
+ * Regla de publicación (sección 10): una demo o un producto propio es
+ * publicable si está marcado published (los productos muestran sus campos
+ * pendientes de forma visible); un caso client exige medios reales, rol
+ * acreditado, permiso de publicación y evidencia.
  */
 export function isPublishable(work: Work): boolean {
   if (!work.published) return false;
-  if (work.kind === "demo") return true;
+  if (work.kind === "demo" || work.kind === "producto") return true;
   return Boolean(
     work.media.images?.length &&
       work.teamRole &&
@@ -143,6 +229,38 @@ export function isPublishable(work: Work): boolean {
 
 export function getPublishedWorks(): Work[] {
   return WORKS.filter(isPublishable);
+}
+
+export function getProducts(): Work[] {
+  return getPublishedWorks().filter((w) => w.kind === "producto");
+}
+
+export function getDemos(): Work[] {
+  return getPublishedWorks().filter((w) => w.kind === "demo");
+}
+
+/** Etiquetas de los campos de ficha de producto que siguen pendientes. */
+export function getPendingFields(work: Work): string[] {
+  if (work.kind !== "producto") return [];
+  const checks: [string, boolean][] = [
+    ["Contexto", isPending(work.context)],
+    ["Tipo de usuario", isPending(work.userType)],
+    ["Qué construyó RUN", isPending(work.built)],
+    ["Funcionalidades", !work.features?.length || work.features.some(isPending)],
+    ["Flujo", isPending(work.flow)],
+    ["Arquitectura", isPending(work.stack?.architecture)],
+    ["Tecnologías", isPending(work.stack?.technologies)],
+    ["Integraciones", isPending(work.stack?.integrations)],
+    ["Decisiones", isPending(work.decisions)],
+    ["Estado", isPending(work.status)],
+    ["Evidencia", !work.evidence?.length || work.evidence.some(isPending)],
+    ["Año", work.year === null],
+  ];
+  return checks.filter(([, pending]) => pending).map(([label]) => label);
+}
+
+export function hasPendingFields(work: Work): boolean {
+  return getPendingFields(work).length > 0;
 }
 
 export function getWork(slug: string): Work | undefined {

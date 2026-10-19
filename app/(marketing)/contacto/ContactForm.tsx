@@ -7,7 +7,7 @@ import { track } from "@/lib/marketing/analytics";
 import { fbTrack } from "@/lib/meta-pixel";
 
 type Interest = "software" | "agentes" | "automatizacion" | "orientacion";
-type Budget = "unsure" | "under_3000" | "3000_10000" | "over_10000";
+type Budget = "unsure" | "3000_7500" | "7500_15000" | "15000_30000" | "over_30000";
 
 const INTERESTS: { value: Interest; label: string }[] = [
   { value: "software", label: "Software a medida" },
@@ -16,10 +16,11 @@ const INTERESTS: { value: Interest; label: string }[] = [
   { value: "orientacion", label: "Necesito orientación" },
 ];
 const BUDGETS: { value: Budget; label: string }[] = [
-  { value: "unsure", label: "Todavía necesito dimensionarla" },
-  { value: "under_3000", label: "Hasta USD 3.000" },
-  { value: "3000_10000", label: "USD 3.000 a 10.000" },
-  { value: "over_10000", label: "Más de USD 10.000" },
+  { value: "unsure", label: "Necesito dimensionarlo" },
+  { value: "3000_7500", label: "USD 3.000–7.500" },
+  { value: "7500_15000", label: "USD 7.500–15.000" },
+  { value: "15000_30000", label: "USD 15.000–30.000" },
+  { value: "over_30000", label: "Más de USD 30.000" },
 ];
 
 export function ContactForm({ initialInterest }: { initialInterest?: Interest }) {

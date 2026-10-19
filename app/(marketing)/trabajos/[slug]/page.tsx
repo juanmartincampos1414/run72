@@ -8,10 +8,13 @@ import { GradientButton } from "@/components/marketing/GradientButton";
 import {
   CATEGORY_LABELS,
   DEMO_LABEL,
+  PENDING,
   formatCounter,
+  getPendingFields,
   getWork,
   getWorkSequence,
   getWorkSlugs,
+  isPending,
   workPath,
 } from "@/lib/marketing/cases";
 import "../trabajos.css";
@@ -37,6 +40,29 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
+/** Texto de ficha: los campos sin validar se muestran tal cual, atenuados. */
+function Field({ value }: { value: string | undefined }) {
+  const text = value || PENDING;
+  return (
+    <p className="work-text work-field" data-pending={isPending(text)}>
+      {text}
+    </p>
+  );
+}
+
+function FieldList({ items }: { items: string[] | undefined }) {
+  const list = items?.length ? items : [PENDING];
+  return (
+    <ul className="work-list" role="list">
+      {list.map((item, i) => (
+        <li key={`${i}-${item}`} className="work-text work-field" data-pending={isPending(item)}>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function longestWord(text: string): number {
   return text.split(/\s+/).reduce((max, w) => Math.max(max, w.length), 1);
 }
@@ -50,6 +76,9 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
   const { next, index, total } = seq;
   const nextIndex = (index % total) + 1;
   const isDemo = work.kind === "demo";
+  const isProduct = work.kind === "producto";
+  const pendingFields = getPendingFields(work);
+  const typeLabel = isDemo ? DEMO_LABEL : isProduct ? "Producto real" : "Caso de cliente";
   const categories = work.categories.map((c) => CATEGORY_LABELS[c]).join(" · ");
 
   const nextStyle = {
@@ -75,11 +104,15 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
 
       <header className="m-container work-hero">
         <p className="work-label m-mono">
-          {categories} · {work.year}
+          {categories}
+          {work.year ? ` · ${work.year}` : ""}
         </p>
         <h1 className="work-title">{work.title}</h1>
         <p className="work-subtitle">{work.subtitle}</p>
         {isDemo && <p className="work-badge m-mono">{DEMO_LABEL}</p>}
+        {isProduct && pendingFields.length > 0 && (
+          <p className="work-badge m-mono">Contenido en validación</p>
+        )}
       </header>
 
       <div className="m-container">
@@ -102,6 +135,100 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
         <p className="work-lead">{work.summary}</p>
       </section>
 
+      {isProduct ? (
+        <>
+      <section className="m-container work-pair" aria-label="Contexto y usuario">
+        <div className="work-pair-col">
+          <h2 className="work-label m-mono">Contexto</h2>
+          <Field value={work.context} />
+        </div>
+        <div className="work-pair-col">
+          <h2 className="work-label m-mono">Tipo de usuario</h2>
+          <Field value={work.userType} />
+        </div>
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-built-h">
+        <h2 id="work-built-h" className="work-label m-mono">
+          Qué construyó RUN
+        </h2>
+        <Field value={work.built} />
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-features-h">
+        <h2 id="work-features-h" className="work-label m-mono">
+          Funcionalidades
+        </h2>
+        <FieldList items={work.features} />
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-flow-h">
+        <h2 id="work-flow-h" className="work-label m-mono">
+          Flujo
+        </h2>
+        <Field value={work.flow} />
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-stack-h">
+        <h2 id="work-stack-h" className="work-label m-mono">
+          Arquitectura y stack
+        </h2>
+        <dl className="work-stack">
+          <div>
+            <dt className="work-label m-mono">Arquitectura</dt>
+            <dd data-pending={isPending(work.stack?.architecture ?? PENDING)}>{work.stack?.architecture ?? PENDING}</dd>
+          </div>
+          <div>
+            <dt className="work-label m-mono">Tecnologías</dt>
+            <dd data-pending={isPending(work.stack?.technologies ?? PENDING)}>{work.stack?.technologies ?? PENDING}</dd>
+          </div>
+          <div>
+            <dt className="work-label m-mono">Integraciones</dt>
+            <dd data-pending={isPending(work.stack?.integrations ?? PENDING)}>{work.stack?.integrations ?? PENDING}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-decisions-h">
+        <h2 id="work-decisions-h" className="work-label m-mono">
+          Decisiones
+        </h2>
+        <Field value={work.decisions} />
+      </section>
+
+      <section className="m-container work-pair" aria-label="Estado y evidencia">
+        <div className="work-pair-col">
+          <h2 className="work-label m-mono">Estado</h2>
+          <Field value={work.status} />
+        </div>
+        <div className="work-pair-col">
+          <h2 className="work-label m-mono">Evidencia</h2>
+          <FieldList items={work.evidence} />
+        </div>
+      </section>
+
+      <section className="m-container work-block" aria-labelledby="work-media-h">
+        <h2 id="work-media-h" className="work-label m-mono">
+          Capturas y medios
+        </h2>
+        <div className="work-media-placeholder" data-pending="true">
+          <p className="work-text work-field" data-pending="true">
+            {work.media.images?.length ? `${work.media.images.length} medios aprobados` : `Capturas reales: ${PENDING}`}
+          </p>
+        </div>
+      </section>
+
+      {pendingFields.length > 0 && (
+        <section className="m-container work-block" aria-label="Contenido en validación">
+          <p className="work-note">
+            <strong>Contenido en validación.</strong> Campos pendientes: {pendingFields.join(", ")}.
+          </p>
+        </section>
+      )}
+
+        </>
+      ) : (
+        <>
       <section className="m-container work-pair" aria-label="Problema y solución">
         <div className="work-pair-col">
           <h2 className="work-label m-mono">Problema</h2>
@@ -112,16 +239,18 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
           <p className="work-text">{work.solution}</p>
         </div>
       </section>
+        </>
+      )}
 
       <section className="m-container work-scope" aria-labelledby="work-scope-h">
         <h2 id="work-scope-h" className="work-label m-mono">
-          Alcance y créditos
+          {isProduct ? "Créditos" : "Alcance y créditos"}
         </h2>
-        <p className="work-text">{work.scope}</p>
+        {!isProduct && <p className="work-text">{work.scope}</p>}
         <dl className="work-credits">
           <div>
             <dt className="work-label m-mono">Tipo</dt>
-            <dd>{isDemo ? DEMO_LABEL : "Caso de cliente"}</dd>
+            <dd>{typeLabel}</dd>
           </div>
           <div>
             <dt className="work-label m-mono">Disciplina</dt>
@@ -129,19 +258,21 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
           </div>
           <div>
             <dt className="work-label m-mono">Año</dt>
-            <dd>{work.year}</dd>
+            <dd data-pending={work.year === null}>{work.year ?? PENDING}</dd>
           </div>
           <div>
-            <dt className="work-label m-mono">Diseño y desarrollo</dt>
-            <dd>RUN</dd>
+            <dt className="work-label m-mono">{isProduct ? "Rol de RUN" : "Diseño y desarrollo"}</dt>
+            <dd data-pending={isProduct}>{isProduct ? PENDING : "RUN"}</dd>
           </div>
         </dl>
       </section>
 
       <section className="m-container work-cta" aria-label="Próximos pasos">
-        <GradientButton href={work.demoHref}>
-          {work.ctaDemoLabel} <AnimatedArrow />
-        </GradientButton>
+        {work.demoHref && work.ctaDemoLabel && (
+          <GradientButton href={work.demoHref}>
+            {work.ctaDemoLabel} <AnimatedArrow />
+          </GradientButton>
+        )}
         <GradientButton href={work.ctaContacto.href} variant="ghost">
           {work.ctaContacto.label} <AnimatedArrow />
         </GradientButton>
