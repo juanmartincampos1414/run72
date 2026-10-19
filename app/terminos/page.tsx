@@ -94,10 +94,13 @@ export default function TerminosPage() {
 
       <LegalSection heading="6. Entrega final">
         <p>
-          La entrega es digital e incluye: el proyecto funcional listo para operar, el
-          código fuente completo, los accesos y credenciales organizados, un documento
-          maestro con las configuraciones y una entrega preparada para su continuidad con
-          cualquier proveedor.
+          La entrega es digital e incluye exclusivamente los entregables correspondientes al producto
+          y al alcance detallados en el presupuesto. En desarrollos web puede incluir la versión
+          funcional, el código fuente, los accesos acordados y la documentación técnica aplicable. En
+          identidad y branding puede incluir los archivos editables, exportaciones y manuales definidos
+          en el alcance. En servicios de contenidos, redes o campañas se entregan las piezas, documentos
+          y materiales expresamente contratados. Las cuentas, licencias y credenciales de servicios de
+          terceros se rigen por sus propias condiciones y por lo acordado en cada contratación.
         </p>
       </LegalSection>
 

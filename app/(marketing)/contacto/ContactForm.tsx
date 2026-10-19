@@ -212,10 +212,17 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
         {errors.privacy && <p id="ct-privacy-err" className="ct-err">{errors.privacy}</p>}
       </div>
 
-      {/* honeypot */}
+      {/* honeypot: fuera de pantalla, fuera del orden de tabulación y del árbol
+          accesible (sin etiqueta visible ni leída por lectores de pantalla) */}
       <div aria-hidden="true" className="ct-hp">
-        <label htmlFor="ct-website">No completar</label>
-        <input id="ct-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        <input
+          id="ct-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
       </div>
 
       <button type="submit" className="m-btn ct-submit" disabled={state === "sending"} aria-busy={state === "sending"}>
