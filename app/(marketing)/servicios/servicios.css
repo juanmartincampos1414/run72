@@ -663,3 +663,15 @@
   .marketing .svc-demo-card,
   .marketing .svc-crumb-link { transition: none; }
 }
+
+/* Índice de servicios: intro centrada con más aire (auditoría comparativa) */
+.marketing .svc-hero--index { text-align: center; padding-bottom: 24px; }
+.marketing .svc-hero--index .svc-hero-eyebrow { justify-content: center; }
+.marketing .svc-hero--index .svc-h1 { margin-inline: auto; max-width: 18ch; }
+.marketing .svc-hero--index .svc-bajada { margin-inline: auto; max-width: 60ch; }
+.marketing .svc-hero--index + .svc-bands-section,
+.marketing .svc-bands-section { padding-top: 72px; }
+@media (min-width: 1024px) {
+  .marketing .svc-hero--index + .svc-bands-section,
+  .marketing .svc-bands-section { padding-top: 112px; }
+}
