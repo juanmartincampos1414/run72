@@ -20,6 +20,14 @@ type SpeechRecLike = {
 };
 type SpeechRecCtor = new () => SpeechRecLike;
 
+// Render mínimo de **negrita** para que los asteriscos no se muestren literales.
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((p, i) =>
+    p.startsWith("**") && p.endsWith("**") ? <strong key={i}>{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>,
+  );
+}
+
 const FIRST: Msg = {
   role: "assistant",
   content:
@@ -168,7 +176,9 @@ export function RunitLauncher() {
 
           <div ref={logRef} className="rl-log" role="log" aria-live="polite">
             {messages.map((m, i) => (
-              <div key={i} className={`rl-msg rl-${m.role}`}>{m.content}</div>
+              <div key={i} className={`rl-msg rl-${m.role}`}>
+                {m.role === "assistant" ? renderInline(m.content) : m.content}
+              </div>
             ))}
             {busy && <div className="rl-msg rl-assistant rl-typing">Pensando…</div>}
           </div>
