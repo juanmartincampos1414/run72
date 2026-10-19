@@ -10,6 +10,16 @@ import { RunMark } from "./RunMark";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+// Tipos mínimos de la Web Speech API (no estándar en lib.dom).
+type SpeechRecEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
+type SpeechRecLike = {
+  lang: string; interimResults: boolean; continuous: boolean;
+  onresult: ((e: SpeechRecEvent) => void) | null;
+  onend: (() => void) | null; onerror: (() => void) | null;
+  start: () => void; stop: () => void;
+};
+type SpeechRecCtor = new () => SpeechRecLike;
+
 const FIRST: Msg = {
   role: "assistant",
   content:
@@ -27,16 +37,24 @@ export function RunitLauncher() {
   const [messages, setMessages] = useState<Msg[]>([FIRST]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [voiceMsg, setVoiceMsg] = useState("");
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
+  const recRef = useRef<SpeechRecLike | null>(null);
 
   useEffect(() => {
     const onOpen = () => setOpen(true);
     window.addEventListener("run:open-runit", onOpen);
     return () => window.removeEventListener("run:open-runit", onOpen);
   }, []);
+
+  // Detener la escucha si se cierra el panel.
+  useEffect(() => {
+    if (!open && listening) recRef.current?.stop();
+  }, [open, listening]);
 
   useEffect(() => {
     if (!open) return;
@@ -75,6 +93,40 @@ export function RunitLauncher() {
       setMessages((m) => [...m, { role: "assistant" as const, content: "No pude responder en este momento. Podés contarnos tu proyecto por el formulario." }]);
     } finally {
       setBusy(false);
+    }
+  };
+
+  // Voz real (Web Speech API). Pide micrófono solo al pulsar; detiene/cancela;
+  // si no hay soporte o se deniega, queda la alternativa por texto.
+  const toggleMic = () => {
+    if (listening) {
+      recRef.current?.stop();
+      return;
+    }
+    const w = window as unknown as { SpeechRecognition?: SpeechRecCtor; webkitSpeechRecognition?: SpeechRecCtor };
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) {
+      setVoiceMsg("Tu navegador no soporta voz. Escribí tu mensaje.");
+      return;
+    }
+    try {
+      const rec = new SR();
+      rec.lang = "es-AR";
+      rec.interimResults = true;
+      rec.continuous = false;
+      rec.onresult = (e: SpeechRecEvent) => {
+        const t = Array.from(e.results).map((r) => r[0].transcript).join(" ");
+        setInput(t);
+      };
+      rec.onend = () => { setListening(false); setVoiceMsg(""); };
+      rec.onerror = () => { setListening(false); setVoiceMsg("No pude escuchar. Probá de nuevo o escribí."); };
+      recRef.current = rec;
+      setVoiceMsg("Escuchando… tocá el micrófono para detener.");
+      setListening(true);
+      rec.start();
+    } catch {
+      setListening(false);
+      setVoiceMsg("No pude acceder al micrófono. Escribí tu mensaje.");
     }
   };
 
@@ -143,8 +195,21 @@ export function RunitLauncher() {
               aria-label="Mensaje para Runit"
               maxLength={1500}
             />
+            <button
+              type="button"
+              className={`rl-mic ${listening ? "is-on" : ""}`}
+              aria-pressed={listening}
+              aria-label={listening ? "Detener voz" : "Hablar por voz"}
+              onClick={toggleMic}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                <rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+              </svg>
+            </button>
             <button type="submit" className="rl-send m-btn" disabled={busy || !input.trim()}>Enviar</button>
           </form>
+
+          {voiceMsg && <p className="rl-voice" role="status" aria-live="polite">{voiceMsg}</p>}
 
           {hasUserMsg && (
             <button type="button" className="rl-pass" onClick={passToForm}>
