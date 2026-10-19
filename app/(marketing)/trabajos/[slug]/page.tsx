@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -79,6 +80,8 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
   const isProduct = work.kind === "producto";
   const pendingFields = getPendingFields(work);
   const typeLabel = isDemo ? DEMO_LABEL : isProduct ? "Producto real" : "Caso de cliente";
+  const gallery = work.media.gallery ?? [];
+  const cover = gallery[0];
   const categories = work.categories.map((c) => CATEGORY_LABELS[c]).join(" · ");
 
   const nextStyle = {
@@ -110,6 +113,7 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
         <h1 className="work-title">{work.title}</h1>
         <p className="work-subtitle">{work.subtitle}</p>
         {isDemo && <p className="work-badge m-mono">{DEMO_LABEL}</p>}
+        {isProduct && work.statusLabel && <p className="work-badge m-mono">{work.statusLabel}</p>}
         {isProduct && pendingFields.length > 0 && (
           <p className="work-badge m-mono">Contenido en validación</p>
         )}
@@ -117,14 +121,51 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
 
       <div className="m-container">
         <figure className="work-cover">
-          <div className="work-poster work-poster-wide" role="img" aria-label={`Portada ilustrativa de ${work.title}`}>
-            <span className="work-poster-ui" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            {isDemo && <span className="work-poster-tag m-mono">Datos ficticios</span>}
-          </div>
+          {cover ? (
+            <div className="work-poster work-poster-wide" style={{ aspectRatio: "16 / 9" }}>
+              <Image
+                src={cover.src}
+                alt={cover.alt}
+                fill
+                priority
+                sizes="(min-width: 1200px) 1200px, 100vw"
+                style={{ objectFit: "cover", objectPosition: "top left" }}
+              />
+            </div>
+          ) : (
+            <div
+              className="work-poster work-poster-wide"
+              role="img"
+              aria-label={work.media.logo ? `Logo de ${work.title}` : `Portada ilustrativa de ${work.title}`}
+              style={work.media.logo ? { display: "grid", placeItems: "center" } : undefined}
+            >
+              {work.media.logo ? (
+                <Image
+                  src={work.media.logo}
+                  alt=""
+                  width={360}
+                  height={240}
+                  priority
+                  style={{
+                    position: "relative",
+                    width: "min(46%, 320px)",
+                    height: "auto",
+                    padding: 16,
+                    borderRadius: 20,
+                    background: "#fff",
+                  }}
+                />
+              ) : (
+                <span className="work-poster-ui" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              )}
+              {isDemo && <span className="work-poster-tag m-mono">Datos ficticios</span>}
+            </div>
+          )}
+          {cover && <figcaption className="work-note" style={{ marginTop: 12 }}>{cover.caption}</figcaption>}
         </figure>
       </div>
 
@@ -211,11 +252,44 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
         <h2 id="work-media-h" className="work-label m-mono">
           Capturas y medios
         </h2>
-        <div className="work-media-placeholder" data-pending="true">
-          <p className="work-text work-field" data-pending="true">
-            {work.media.images?.length ? `${work.media.images.length} medios aprobados` : `Capturas reales: ${PENDING}`}
-          </p>
-        </div>
+        {gallery.length > 0 ? (
+          <>
+            <ul
+              role="list"
+              style={{
+                display: "grid",
+                gap: 20,
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+              }}
+            >
+              {gallery.slice(1).map((shot) => (
+                <li key={shot.src} style={{ margin: 0 }}>
+                  <figure style={{ margin: 0, display: "grid", gap: 10 }}>
+                    <Image
+                      src={shot.src}
+                      alt={shot.alt}
+                      width={1920}
+                      height={1080}
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                      style={{ width: "100%", height: "auto", borderRadius: 16, border: "1px solid var(--m-line)" }}
+                    />
+                    <figcaption className="work-text">{shot.caption}</figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+            <p className="work-note" style={{ marginTop: 16 }}>
+              Capturas reales de la aplicación, con una organización de demostración y datos de prueba.
+            </p>
+          </>
+        ) : (
+          <div className="work-media-placeholder">
+            <p className="work-text work-field">Capturas de la aplicación en preparación.</p>
+          </div>
+        )}
       </section>
 
       {pendingFields.length > 0 && (
@@ -262,7 +336,7 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
           </div>
           <div>
             <dt className="work-label m-mono">{isProduct ? "Rol de RUN" : "Diseño y desarrollo"}</dt>
-            <dd data-pending={isProduct}>{isProduct ? PENDING : "RUN"}</dd>
+            <dd data-pending={isProduct && !work.teamRole}>{isProduct ? (work.teamRole ?? PENDING) : "RUN"}</dd>
           </div>
         </dl>
       </section>

@@ -40,7 +40,7 @@ export async function sendEmail(opts: {
   }
 }
 
-/** Email automático de inicio de proyecto (72 horas). */
+/** Email automático de inicio de proyecto (RUN Express). */
 export async function sendProjectStartedEmail(
   lead: Lead,
   startedAt: Date,
@@ -69,11 +69,11 @@ export async function sendProjectStartedEmail(
       <p style="margin:0;font-weight:600">${lead.project_label ?? "Proyecto RUN"}</p>
       <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Inicio</p>
       <p style="margin:0;font-weight:600">${when}</p>
-      <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Entrega estimada (72 h)</p>
+      <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Entrega estimada</p>
       <p style="margin:0;font-weight:600">${delivery}</p>
     </div>
     <p style="font-size:18px;font-weight:600;background:linear-gradient(110deg,#38bdf8,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent">
-      Las 72 horas de ejecución han comenzado.
+      La ejecución de tu proyecto RUN Express ha comenzado.
     </p>
     <a href="${(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.run72.app").replace(/\/$/, "")}/proyecto/${lead.id}"
        style="display:inline-block;margin-top:8px;background:#fff;color:#050505;text-decoration:none;font-weight:600;font-size:14px;padding:12px 20px;border-radius:999px">

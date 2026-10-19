@@ -8,7 +8,7 @@ import { HOME } from "@/lib/marketing/content";
 // nombre se ilumina y emerge una miniatura 16:9 dentro de la fila. En touch la
 // miniatura se muestra sin requerir hover (A44).
 export function WorkRows() {
-  const { eyebrow, rows, allLink, demosLink, demoBadge } = HOME.works;
+  const { eyebrow, rows, allLink, demosLink } = HOME.works;
   const [open, setOpen] = useState<number | null>(null);
 
   return (
@@ -29,7 +29,7 @@ export function WorkRows() {
             onBlur={() => setOpen(null)}
           >
             <div className="m-container m-work-rowinner">
-              <span className="m-work-badge m-eyebrow">{demoBadge}</span>
+              <span className="m-work-badge m-eyebrow">{row.tag}</span>
               <span className="m-work-name">{row.title}</span>
               <span className="m-work-thumb" aria-hidden="true" data-i={i}>
                 <span className="m-work-thumbinner" />

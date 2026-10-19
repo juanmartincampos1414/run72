@@ -82,15 +82,15 @@ export const HOME = {
     secondaryLink: { label: "Cómo trabajamos en detalle", href: "/como-trabajamos" },
   },
   works: {
-    eyebrow: "TRABAJOS SELECCIONADOS",
+    eyebrow: "PRODUCTOS REALES",
     rows: [
-      { title: "Sistema operativo", slug: "sistema-operativo-demo", labData: "/labs/operacion" },
-      { title: "Agente operativo", slug: "agente-operativo-demo", labData: "/labs/agente" },
-      { title: "Integración operativa", slug: "integracion-operativa-demo", labData: "/labs/integraciones" },
+      { title: "Aikestar", slug: "aikestar", tag: "Software · IA" },
+      { title: "Margin", slug: "margin", tag: "Software" },
+      { title: "Tips", slug: "tips", tag: "Software" },
     ],
     allLink: { label: "Ver todos los trabajos", href: "/trabajos" },
-    demosLink: { label: "Probar las demos", href: "/labs" },
-    demoBadge: "DEMO CONCEPTUAL",
+    demosLink: { label: "Explorar demos en Labs", href: "/labs" },
+    demoBadge: "PRODUCTO",
   },
   closing: {
     muted: "No necesitás tener la solución.",
@@ -120,7 +120,7 @@ export const FOOTER = {
       title: "Conectar",
       links: [
         { label: "Contacto", href: "/contacto" },
-        { label: "Cotizador · RUN Express", href: "/cotizar" },
+        { label: "RUN Express", href: "/express" },
         { label: "Área de clientes", href: "/hub" },
         { label: "Mapa de ejemplo", href: "/mapa/ejemplo" },
       ],

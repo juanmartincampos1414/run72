@@ -314,7 +314,7 @@ function ProposalCard({
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <Tile label="Total + IVA" value={formatARS(pricing.total)} />
         <Tile label={`Anticipo ${pricing.depositPercent}%`} value={formatARS(pricing.deposit)} highlight />
-        <Tile label="Entrega" value="72 horas" />
+        <Tile label="Entrega" value="Según alcance" />
       </div>
 
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">

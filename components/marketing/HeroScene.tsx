@@ -17,6 +17,7 @@ export function HeroScene() {
       return;
     }
     el.dataset.motion = "on";
+    el.style.setProperty("--sy", "0"); // reinicia la profundidad al montar
 
     let raf = 0;
     let tx = 0, ty = 0, cx = 0, cy = 0;

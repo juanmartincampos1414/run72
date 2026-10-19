@@ -1,0 +1,27 @@
+/* RUN Express landing — prefijo ex- */
+.marketing .ex-hero { padding-top: 140px; }
+.marketing .ex-h1 { margin-top: 10px; font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1; letter-spacing: -0.03em; font-weight: 500; color: var(--m-text); }
+.marketing .ex-lead { margin-top: 18px; max-width: 48ch; font-size: 18px; line-height: 28px; color: var(--m-muted); }
+.marketing .ex-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.marketing .ex-block { padding-block: 48px; }
+.marketing .ex-grid { display: grid; gap: 40px; }
+.marketing .ex-h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 500; letter-spacing: -0.02em; color: var(--m-text); margin-bottom: 12px; }
+.marketing .ex-h2--mt { margin-top: 32px; }
+.marketing .ex-block p { font-size: 16px; line-height: 26px; color: var(--m-muted); max-width: 60ch; }
+.marketing .ex-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.marketing .ex-list li { font-size: 16px; line-height: 24px; color: var(--m-muted); }
+.marketing .ex-note { margin-top: 18px; font-size: 14px; color: var(--m-faint); }
+.marketing .ex-link { color: var(--m-cyan); text-decoration: none; }
+.marketing .ex-link:hover { text-decoration: underline; }
+.marketing .ex-cards { display: grid; gap: 16px; margin-top: 8px; }
+.marketing .ex-card { border: 1px solid var(--m-line); border-radius: 16px; padding: 20px; background: var(--m-panel); }
+.marketing .ex-cardt { font-size: 16px; font-weight: 600; color: var(--m-text); margin-bottom: 6px; }
+.marketing .ex-closing-in { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; border-top: 1px solid var(--m-line); padding-top: 40px; }
+.marketing .ex-closing-text { font-size: clamp(1.5rem, 4vw, 2.25rem); line-height: 1.1; letter-spacing: -0.02em; color: var(--m-text); }
+@media (min-width: 768px) {
+  .marketing .ex-grid { grid-template-columns: 1fr 1fr; gap: 64px; }
+  .marketing .ex-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .marketing .ex-cards { grid-template-columns: repeat(4, 1fr); }
+}

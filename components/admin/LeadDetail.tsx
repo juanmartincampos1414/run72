@@ -124,7 +124,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
       {/* SLA */}
       {lead.production_started_at && lead.status === "en_produccion" && (
         <div className="mt-4 rounded-2xl border border-line bg-surface/40 p-4">
-          <p className="mb-2 text-xs text-faint">SLA 72 horas</p>
+          <p className="mb-2 text-xs text-faint">SLA</p>
           <SlaBar startedAt={lead.production_started_at} deadlineAt={lead.estimated_delivery_at} />
         </div>
       )}

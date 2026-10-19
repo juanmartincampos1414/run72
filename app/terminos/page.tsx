@@ -59,11 +59,11 @@ export default function TerminosPage() {
 
       <LegalSection heading="4. RUN Express: validación y plazo">
         <p>
-          Esta sección aplica solo a proyectos contratados por RUN Express. El plazo de 72 horas de
-          esa modalidad comienza una vez confirmado el anticipo y recibida toda la
-          información, materiales y accesos necesarios por parte del cliente. Las demoras en
-          la entrega de materiales o accesos por parte del cliente extienden el plazo en la
-          misma medida.
+          Esta sección aplica solo a proyectos contratados por RUN Express. Los plazos de RUN Express
+          dependen del producto seleccionado, del alcance confirmado y de la recepción completa de la
+          información, los materiales y los accesos necesarios. El plazo aplicable se informa antes del
+          inicio de la producción. Las demoras en la entrega de materiales o accesos por parte del
+          cliente extienden el plazo en la misma medida.
         </p>
         <p>
           Si luego de revisar el proyecto determinamos que no puede ejecutarse dentro del

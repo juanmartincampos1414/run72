@@ -40,11 +40,18 @@ export function QuoteEntry() {
           transition={{ duration: 0.6, ease }}
           className="mx-auto max-w-5xl text-center"
         >
-          <h1 className="text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            ¿Cómo preferís avanzar?
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-cyan">RUN Express</p>
+          <h1 className="mt-2 text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            Cotizá tu producto RUN Express
           </h1>
           <p className="mt-3 text-pretty text-muted">
-            Cotizá al instante, hablá con Runit, o coordiná una reunión. Como te quede cómodo.
+            RUN Express son productos digitales con alcance y precio definidos (webs, ecommerce,
+            identidad). Cotizá al instante, hablá con Runit o coordiná una reunión.
+          </p>
+          <p className="mx-auto mt-4 max-w-xl text-sm text-faint">
+            ¿Tu proyecto es software a medida, un agente de IA o integraciones? Eso necesita
+            diagnóstico y alcance personalizado.{" "}
+            <Link href="/contacto" className="text-brand-cyan hover:underline">Contanos qué necesitás resolver →</Link>
           </p>
 
           <div className="mt-12 grid gap-5 sm:grid-cols-3">

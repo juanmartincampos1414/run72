@@ -320,9 +320,9 @@ export function QuoteConfigurator() {
             {/* overflow-hidden: contiene el slide de entrada (framer) y evita scroll-x */}
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: dir * 28 }}
+              initial={{ opacity: 0, x: dir * 16 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, ease }}
+              transition={{ duration: 0.25, ease }}
             >
               {/* PASO 1 — Tipo de proyecto */}
               {step === 0 && (
@@ -513,7 +513,7 @@ export function QuoteConfigurator() {
 
                       <div className="mt-5 flex items-center gap-2 rounded-xl border border-brand-cyan/20 bg-brand-cyan/[0.05] px-4 py-2.5 text-sm">
                         <span className="font-medium text-fg">Tiempo de entrega:</span>
-                        <span className="text-brand-cyan">72 horas</span>
+                        <span className="text-brand-cyan">Según alcance del producto</span>
                       </div>
                     </div>
 

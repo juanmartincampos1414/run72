@@ -68,7 +68,7 @@ export function labelOf(list: Choice[], value: string | null): string | null {
  * arranca el plazo; GUARANTEE_V2 es la promesa de reembolso.
  */
 export const GUARANTEE_TIMING =
-  "El plazo de 72 horas comienza una vez confirmado el anticipo y recibida toda la información, materiales y accesos necesarios por parte del cliente.";
+  "El plazo de RUN Express depende del producto y del alcance confirmado; comienza una vez confirmado el anticipo y recibida toda la información, materiales y accesos necesarios, y se informa antes de iniciar.";
 
 export const GUARANTEE_V2 =
   "Si luego de revisar tu proyecto determinamos que no puede ejecutarse dentro del alcance de RUN, te avisamos antes de comenzar y te devolvemos el 100% del anticipo abonado.";

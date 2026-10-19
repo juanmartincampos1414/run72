@@ -73,7 +73,7 @@ export default function DashboardPage() {
           <p className="mt-1 font-display text-3xl font-semibold tabular-nums">
             {d.avgRemaining !== null ? `${d.avgRemaining}h` : "—"}
           </p>
-          <p className="mt-2 text-xs text-muted">Proyectos en desarrollo dentro del SLA 72h.</p>
+          <p className="mt-2 text-xs text-muted">Proyectos en desarrollo dentro del SLA.</p>
         </div>
         <div className="rounded-2xl border border-line bg-surface/40 p-5">
           <p className="mb-3 text-sm font-medium text-muted">Próximos a vencer</p>

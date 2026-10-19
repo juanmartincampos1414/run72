@@ -111,7 +111,7 @@ export async function PATCH(
       return NextResponse.json({ lead: data });
     }
     if (body.action === "reject_scope") {
-      const reason = (body.reason ?? "").trim() || "Alcance incompatible con 72h";
+      const reason = (body.reason ?? "").trim() || "Alcance incompatible con RUN Express";
       const { data, error } = await supabase
         .from("leads")
         .update({ status: "rechazado_alcance", rejection_reason: reason })

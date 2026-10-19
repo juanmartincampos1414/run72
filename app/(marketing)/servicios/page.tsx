@@ -60,8 +60,31 @@ export default function ServiciosPage() {
                 </PointerGlow>
               </li>
             ))}
+            <li className="svc-band svc-band--express">
+              <PointerGlow className="svc-band-glow">
+                <Link href="/express" className="svc-band-link m-arrow-host">
+                  <span className="svc-band-n m-eyebrow" aria-hidden="true">RUN Express</span>
+                  <div className="svc-band-main">
+                    <span className="svc-band-title">¿Ya sabés qué necesitás? RUN Express</span>
+                    <span className="svc-band-text">Webs, ecommerce e identidad con alcance y precio definidos, mediante un proceso simplificado y un cotizador.</span>
+                    <span className="svc-band-cta">
+                      Ver RUN Express
+                      <AnimatedArrow />
+                    </span>
+                  </div>
+                  <div className="svc-band-ex">
+                    <span className="m-eyebrow">Incluye</span>
+                    <ul className="svc-band-exlist">
+                      <li>Landing y webs corporativas</li>
+                      <li>Ecommerce de alcance cerrado</li>
+                      <li>Branding e identidad</li>
+                    </ul>
+                  </div>
+                </Link>
+              </PointerGlow>
+            </li>
           </ul>
-          <p className="svc-note">Capacidades propuestas; cada proyecto se define según el proceso y los datos de tu empresa.</p>
+          <p className="svc-note">Capacidades propuestas; cada proyecto se define según el proceso y los datos de tu empresa. RUN Express es la vía para productos estandarizados con alcance y precio cerrados.</p>
         </div>
       </section>
 

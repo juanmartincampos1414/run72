@@ -24,7 +24,7 @@ export function EditorialHero() {
       <HeroScene />
       <div className="m-container m-hero-inner">
         <p className="m-eyebrow m-hero-eyebrow">{eyebrow}</p>
-        <WordReveal as="h1" className="m-hero-title" lines={lines} />
+        <WordReveal as="h1" className="m-hero-title" lines={lines} mask={false} />
         <p className="m-hero-sub">{subtitle}</p>
         <a href={cta.href} className="m-hero-link m-arrow-host">
           {cta.label}
