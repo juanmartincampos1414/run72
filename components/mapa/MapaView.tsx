@@ -172,6 +172,8 @@ function buildGraph(data: MapData): { nodes: Node[]; edges: Edge[] } {
     // Enrutamos siempre de arriba hacia abajo para que las curvas se lean prolijas.
     const [top, bot] = i < j ? [i, j] : [j, i];
     const forward = i < j; // la flecha apunta a "hasta"
+    // Sin etiqueta sobre el lienzo (se solapaba con los títulos de área); las
+    // etiquetas se listan en la leyenda "Conexiones entre áreas" debajo.
     edges.push({
       id: `x-${i}-${j}-${ci}`,
       source: `a${top}`,
@@ -179,15 +181,9 @@ function buildGraph(data: MapData): { nodes: Node[]; edges: Edge[] } {
       target: `a${bot}`,
       targetHandle: "xt",
       type: "bezier",
-      label: c.etiqueta,
-      labelShowBg: true,
-      labelStyle: { fill: "#e5e7eb", fontSize: 10, fontWeight: 600 },
-      labelBgStyle: { fill: "#0d0d12", fillOpacity: 0.9 },
-      labelBgPadding: [6, 3] as [number, number],
-      labelBgBorderRadius: 6,
-      style: { stroke: "rgba(226,232,240,0.5)", strokeWidth: 1.4, strokeDasharray: "5 4" },
-      markerEnd: forward ? { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.7)", width: 16, height: 16 } : undefined,
-      markerStart: forward ? undefined : { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.7)", width: 16, height: 16 },
+      style: { stroke: "rgba(226,232,240,0.35)", strokeWidth: 1.2, strokeDasharray: "5 4" },
+      markerEnd: forward ? { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.55)", width: 14, height: 14 } : undefined,
+      markerStart: forward ? undefined : { type: MarkerType.ArrowClosed, color: "rgba(226,232,240,0.55)", width: 14, height: 14 },
     });
   });
 
@@ -328,6 +324,23 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
           </span>
         ))}
       </div>
+
+      {/* Conexiones entre áreas (etiquetas fuera del lienzo para que se lean) */}
+      {(data.conexiones?.length ?? 0) > 0 && (
+        <div className="mt-5">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">Conexiones entre áreas</p>
+          <ul className="flex flex-wrap gap-2">
+            {data.conexiones!.map((c, i) => (
+              <li key={i} className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/40 px-3 py-1.5 text-xs">
+                <span className="text-fg">{c.desde}</span>
+                <span className="text-brand-cyan">→</span>
+                <span className="text-fg">{c.hasta}</span>
+                <span className="text-faint">· {c.etiqueta}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <p className="mt-4 text-xs text-faint">
         Movete por el mapa: arrastrá para desplazarte y usá la rueda para zoom. Cada celda muestra la acción, la herramienta y el responsable.
