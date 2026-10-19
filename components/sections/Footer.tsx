@@ -11,7 +11,7 @@ export function Footer() {
           <div className="max-w-xs">
             <Logo />
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              Tu negocio digital completo, listo para operar en 72 horas.
+              Software a medida, agentes de IA e integraciones para tu operación.
             </p>
           </div>
 

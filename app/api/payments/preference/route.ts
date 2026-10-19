@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   try {
     const pref = await createPreference({
       accessToken: config.mp_access_token,
-      title: `Adelanto 30% — ${lead.project_label ?? "Proyecto RUN72"}`,
+      title: `Adelanto 30% — ${lead.project_label ?? "Proyecto RUN"}`,
       amount: lead.deposit_ars,
       externalReference: lead.id,
       baseUrl: baseUrlFrom(req),

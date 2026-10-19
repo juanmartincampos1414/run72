@@ -1,4 +1,4 @@
-// Radar de IA de RUN72 — config del diagnóstico (v2).
+// Radar de IA de RUN — config del diagnóstico (v2).
 // Vocabulario 100% propio (no usa los términos del radar de CESSI).
 // 6 áreas · 1 pregunta por área · rápido de completar.
 
@@ -8,7 +8,7 @@ export type Area = {
   name: string;
   /** Etiqueta corta para el gráfico. */
   short: string;
-  /** Servicio RUN72 que empuja esta área cuando está floja. */
+  /** Servicio RUN que empuja esta área cuando está floja. */
   service: string;
   /** Qué hacer para subir de nivel (próximo paso). */
   tip: string;

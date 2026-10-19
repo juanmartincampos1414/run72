@@ -62,7 +62,7 @@ export function HubShell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <Link href="/" aria-label="RUN72 — inicio">
+            <Link href="/" aria-label="RUN — inicio">
               <Logo />
             </Link>
             <span className="hidden text-sm text-faint sm:inline">· Business Hub</span>

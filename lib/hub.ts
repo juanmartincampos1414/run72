@@ -1,5 +1,5 @@
 /**
- * RUN72 Business Hub — definición del checklist maestro y scoring.
+ * RUN Business Hub — definición del checklist maestro y scoring.
  * Las áreas y los ítems son la plantilla; el ESTADO por usuario vive en la DB
  * (tabla hub_checklist). El score se computa server/client desde esos estados.
  */

@@ -22,7 +22,7 @@ const PHRASES: Record<string, string[]> = {
   proyectos: ["cargando proyectos…", "ya lo hicimos antes", "evidencia > promesas"],
   propiedad: ["todo queda a tu nombre", "0 dependencias ocultas", "las llaves son tuyas"],
   faq: ["preguntame lo que sea", "dudas? las resuelvo", "sin letra chica"],
-  cotizar: ["¿arrancamos? →", "dale, te cotizo", "72h empiezan ya"],
+  cotizar: ["¿arrancamos? →", "dale, te cotizo", "arrancamos ya"],
 };
 const SECTION_IDS = Object.keys(PHRASES);
 const pick = (a: string[]) => a[Math.floor(Math.random() * a.length)];

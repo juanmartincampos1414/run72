@@ -72,7 +72,7 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
     <div className="min-h-screen">
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
-          <Link href="/" aria-label="RUN72 — inicio">
+          <Link href="/" aria-label="RUN — inicio">
             <Logo />
           </Link>
           <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">

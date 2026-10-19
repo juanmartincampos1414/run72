@@ -84,7 +84,7 @@ export function Confirmation({
         </motion.span>
         <h1 className="mt-6 text-balance font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
           Tu proyecto está listo para{" "}
-          <span className="text-gradient">RUN72.</span>
+          <span className="text-gradient">RUN.</span>
         </h1>
         <p className="mt-3 max-w-md text-pretty text-muted">
           {name ? `${name.split(" ")[0]}, ` : ""}este es tu proyecto. Aboná el

@@ -125,7 +125,7 @@ export async function POST(req: Request) {
   }
 
   const areaList = AREAS.map((a) => `- ${a.name} (${a.service})`).join("\n");
-  const system = `Sos el estratega de IA de RUN72 (agencia que entrega en 72 horas).
+  const system = `Sos el estratega de IA de RUN (software a medida, agentes de IA e integraciones).
 Con la info de un cliente, armás su "Mapa de IA": un roadmap de adopción de IA por fases y áreas, concreto, accionable y realista para una PyME, en español rioplatense (vos).
 
 Reglas:

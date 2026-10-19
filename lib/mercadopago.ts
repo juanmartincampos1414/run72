@@ -119,7 +119,7 @@ export async function createPreference(opts: {
       },
       auto_return: "approved",
       metadata: { lead_id: opts.externalReference },
-      statement_descriptor: "RUN72",
+      statement_descriptor: "RUN",
     }),
   });
 

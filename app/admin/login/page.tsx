@@ -35,7 +35,7 @@ export default function AdminLogin() {
         </div>
         <div className="glass rounded-3xl p-7">
           <h1 className="font-display text-xl font-semibold tracking-tight">
-            Panel RUN72
+            Panel RUN
           </h1>
           <p className="mt-1 text-sm text-muted">Ingresá para administrar.</p>
 

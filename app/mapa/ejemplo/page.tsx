@@ -71,7 +71,7 @@ const EJEMPLO: MapData = {
       area: "Tu estrategia", short: "Estrategia", service: "Estrategia y hoja de ruta de IA",
       resultado: "La IA empuja el crecimiento, medido en plata.",
       celdas: [
-        { accion: "Definir 3 prioridades de IA para el año.", responsable: "Carla Ríos", herramienta: "RUN72", tipo: "analitica" },
+        { accion: "Definir 3 prioridades de IA para el año.", responsable: "Carla Ríos", herramienta: "RUN", tipo: "analitica" },
         { accion: "Medir el impacto en costos y ventas.", responsable: "Diego Ponce", herramienta: "Looker Studio", tipo: "analitica" },
         { accion: "Revisión trimestral de iniciativas.", responsable: "Carla Ríos", herramienta: "OKRs", tipo: "gobernanza" },
         { accion: "La IA guía la expansión y la apertura de locales.", responsable: "Carla Ríos", herramienta: "IA + BI", tipo: "analitica" },

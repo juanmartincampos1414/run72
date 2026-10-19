@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   try {
     const pre = await createPreapproval({
       accessToken: config.mp_access_token,
-      reason: "RUN72 Business Hub — suscripción mensual",
+      reason: "RUN Business Hub — suscripción mensual",
       amount: HUB_PRICE_ARS,
       externalReference: user.id,
       payerEmail: user.email,

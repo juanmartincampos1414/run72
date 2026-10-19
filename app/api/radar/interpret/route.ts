@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   }
 
   const scale = options.map((o, i) => `Nivel ${i + 1}: ${o}`).join("\n");
-  const system = `Sos Runit, el asistente de IA de RUN72 (agencia que entrega proyectos en 72 horas).
+  const system = `Sos Runit, el asistente de IA de RUN (software a medida, agentes de IA e integraciones).
 Estás haciendo un diagnóstico rápido y amistoso sobre cuánto usa IA el negocio de la persona.
 Hablás en español rioplatense (vos), cálido, breve y concreto. Sin tecnicismos. Sin emojis.
 Te doy un área, la pregunta y una escala de 4 niveles (de menos a más madurez).

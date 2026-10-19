@@ -56,7 +56,7 @@ export function ProjectsLaunched() {
 
                 <div className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full border border-line bg-gradient-to-r from-brand-cyan/[0.08] to-brand-violet/[0.08] px-3 py-1.5 text-xs font-medium text-fg">
                   <BoltIcon className="h-3.5 w-3.5 text-brand-cyan" />
-                  Lanzado con RUN72
+                  Lanzado con RUN
                 </div>
               </div>
             </motion.a>
@@ -72,7 +72,7 @@ export function ProjectsLaunched() {
           className="mx-auto mt-16 max-w-2xl text-balance text-center font-display text-xl font-medium leading-snug tracking-tight text-muted sm:text-2xl"
         >
           Todos comenzaron como una idea.{" "}
-          <span className="text-gradient">Ejecutados por el equipo de RUN72.</span>
+          <span className="text-gradient">Ejecutados por el equipo de RUN.</span>
         </motion.p>
       </div>
     </section>

@@ -3,7 +3,7 @@ import { LegalShell, LegalSection } from "@/components/LegalShell";
 import { SITE } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Política de Privacidad — RUN",
+  title: "Política de Privacidad",
   description: "Cómo RUN recopila, usa y protege tus datos.",
   robots: { index: true, follow: true },
 };

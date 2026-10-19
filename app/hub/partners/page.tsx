@@ -3,7 +3,7 @@ import { HubPartners } from "@/components/hub/HubPartners";
 
 export const metadata: Metadata = {
   title: "Business Hub — Partners",
-  description: "Proveedores recomendados por RUN72.",
+  description: "Proveedores recomendados por RUN.",
   robots: { index: false, follow: false },
 };
 

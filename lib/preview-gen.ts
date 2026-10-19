@@ -80,7 +80,7 @@ export async function generateLeadPreview(
     max_tokens: 14000,
     output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "low" },
     system:
-      "Sos el director de producto y diseño de RUN72. Generás una vista previa conceptual con mockups de UI en HTML autocontenido (inline CSS, sin scripts ni recursos externos salvo el logo si se provee). Diseño premium, coherente con la marca del cliente (paleta/estilo de las imágenes adjuntas). Español rioplatense.",
+      "Sos el director de producto y diseño de RUN. Generás una vista previa conceptual con mockups de UI en HTML autocontenido (inline CSS, sin scripts ni recursos externos salvo el logo si se provee). Diseño premium, coherente con la marca del cliente (paleta/estilo de las imágenes adjuntas). Español rioplatense.",
     messages: [{ role: "user", content }],
   });
 

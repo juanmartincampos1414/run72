@@ -1,4 +1,4 @@
-/** Tipos compartidos del sistema comercial RUN72. */
+/** Tipos compartidos del sistema comercial RUN. */
 
 export type ServiceType = "project" | "addon";
 

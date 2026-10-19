@@ -4,7 +4,7 @@ import type { Lead } from "./types";
 /**
  * Envío de emails vía Resend. Gated en RESEND_API_KEY: si no está configurada,
  * la función es un no-op (no rompe el flujo de pago).
- * Requiere verificar el dominio en Resend y setear RESEND_FROM (ej "RUN72 <hola@run72.app>").
+ * Requiere verificar el dominio en Resend y setear RESEND_FROM (ej "RUN <hola@run72.app>").
  */
 export async function sendEmail(opts: {
   to: string;
@@ -17,7 +17,7 @@ export async function sendEmail(opts: {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return false;
 
-  const from = opts.from ?? process.env.RESEND_FROM ?? "RUN72 <hola@run72.app>";
+  const from = opts.from ?? process.env.RESEND_FROM ?? "RUN <hola@run72.app>";
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -59,14 +59,14 @@ export async function sendProjectStartedEmail(
 
   const html = `
   <div style="font-family:system-ui,sans-serif;background:#050505;color:#f5f6f8;padding:32px;border-radius:16px;max-width:560px;margin:auto">
-    <h1 style="font-size:24px;margin:0 0 8px">Tu proyecto RUN72 ha comenzado 🚀</h1>
+    <h1 style="font-size:24px;margin:0 0 8px">Tu proyecto RUN ha comenzado 🚀</h1>
     <p style="color:#9aa0ad;line-height:1.6">
       ${lead.name ? lead.name.split(" ")[0] + ", c" : "C"}onfirmamos tu adelanto de
       <strong style="color:#f5f6f8">${formatARS(lead.deposit_ars)}</strong>.
     </p>
     <div style="background:#0d0d11;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin:16px 0">
       <p style="margin:0 0 6px;color:#9aa0ad;font-size:13px">Proyecto</p>
-      <p style="margin:0;font-weight:600">${lead.project_label ?? "Proyecto RUN72"}</p>
+      <p style="margin:0;font-weight:600">${lead.project_label ?? "Proyecto RUN"}</p>
       <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Inicio</p>
       <p style="margin:0;font-weight:600">${when}</p>
       <p style="margin:12px 0 6px;color:#9aa0ad;font-size:13px">Entrega estimada (72 h)</p>
@@ -79,12 +79,12 @@ export async function sendProjectStartedEmail(
        style="display:inline-block;margin-top:8px;background:#fff;color:#050505;text-decoration:none;font-weight:600;font-size:14px;padding:12px 20px;border-radius:999px">
       Ver la vista previa de tu proyecto →
     </a>
-    <p style="color:#6b7180;font-size:12px;margin-top:24px">RUN72 · run72.app</p>
+    <p style="color:#6b7180;font-size:12px;margin-top:24px">RUN · run72.app</p>
   </div>`;
 
   return sendEmail({
     to: lead.email,
-    subject: "Tu proyecto RUN72 ha comenzado",
+    subject: "Tu proyecto RUN ha comenzado",
     html,
   });
 }

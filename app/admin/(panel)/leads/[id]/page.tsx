@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LeadDetail } from "@/components/admin/LeadDetail";
 
 export const metadata: Metadata = {
-  title: "Detalle de lead · RUN72",
+  title: "Detalle de lead · RUN",
   robots: { index: false, follow: false },
 };
 

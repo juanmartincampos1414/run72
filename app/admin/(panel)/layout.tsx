@@ -4,7 +4,7 @@ import { getAdminUser } from "@/lib/admin/auth";
 import { AdminShell } from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
-  title: "Panel RUN72",
+  title: "Panel RUN",
   robots: { index: false, follow: false },
 };
 

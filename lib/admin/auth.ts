@@ -6,7 +6,7 @@ import { logEvent } from "@/lib/audit";
 
 /**
  * Allowlist de emails con acceso al admin. Configurable con `ADMIN_EMAILS`
- * (separados por coma). Default: el admin conocido de RUN72.
+ * (separados por coma). Default: el admin conocido de RUN.
  * Pura (sin deps de server) para poder usarse también en el middleware edge.
  */
 export function adminEmails(): string[] {

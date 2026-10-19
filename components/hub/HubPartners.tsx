@@ -41,7 +41,7 @@ export function HubPartners() {
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">Partners recomendados</h1>
         <p className="mt-1 text-sm text-muted">
-          Proveedores de confianza, seleccionados por RUN72, para lo que necesite tu negocio.
+          Proveedores de confianza, seleccionados por RUN, para lo que necesite tu negocio.
         </p>
       </div>
 

@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     await logEvent(supabase, "radar_submitted", null, { email, stage });
   }
 
-  const from = process.env.RESEND_FROM_NOTIFY || "RUN72 Radar <notificaciones@run72.app>";
+  const from = process.env.RESEND_FROM_NOTIFY || "RUN Radar <notificaciones@run72.app>";
   const admin = process.env.ADMIN_EMAILS?.split(",")[0]?.trim() || "hola@run72.app";
 
   const areaRows = areas
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     .map((s) => `<li style="margin:0 0 6px">${escapeHtml(s.name ?? "")} → <strong>${escapeHtml(s.service ?? "")}</strong></li>`)
     .join("");
 
-  // --- 1) Aviso interno a RUN72 (pide videollamada) ---
+  // --- 1) Aviso interno a RUN (pide videollamada) ---
   const adminHtml = `
   <div style="font-family:system-ui,sans-serif;background:#050505;color:#f5f6f8;padding:32px;border-radius:16px;max-width:600px;margin:auto">
     <h1 style="font-size:22px;margin:0 0 4px">Nuevo diagnóstico · pide videollamada</h1>
@@ -136,11 +136,11 @@ export async function POST(req: Request) {
       <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6">${stepRows}</ul>
     </div>
     <p style="margin:20px 0 0;font-size:14px;line-height:1.6">En breve te escribimos para coordinar una <strong>videollamada</strong>, profundizar en tu caso y armarte un presupuesto a medida. Si querés, respondé este mail con tu disponibilidad.</p>
-    <p style="color:#6b7180;font-size:12px;margin-top:18px">RUN72 · Tu proyecto listo en 72 horas · run72.app</p>
+    <p style="color:#6b7180;font-size:12px;margin-top:18px">RUN · Software a medida y agentes de IA · run72.app</p>
   </div>`;
 
   const clientText = [
-    `Tu diagnóstico de IA — RUN72`,
+    `Tu diagnóstico de IA — RUN`,
     `${name}, tu negocio está ${stage} con IA. Este es tu mapa.`,
     "",
     ...areas.map((a) => `- ${a.name}: ${NIVEL[a.level ?? 0] ?? ""}`),
@@ -149,14 +149,14 @@ export async function POST(req: Request) {
     ...steps.map((s) => `- ${s.name} → ${s.service}`),
     "",
     "En breve te escribimos para coordinar una videollamada, profundizar en tu caso y armarte un presupuesto a medida.",
-    "RUN72 · run72.app",
+    "RUN · run72.app",
   ].join("\n");
 
   await sendEmail({
     from,
     to: email,
     replyTo: admin,
-    subject: "Tu diagnóstico de IA — RUN72",
+    subject: "Tu diagnóstico de IA — RUN",
     html: clientHtml,
     text: clientText,
   });

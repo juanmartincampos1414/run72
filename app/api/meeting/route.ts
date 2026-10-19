@@ -92,7 +92,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // --- Email automático a RUN72 ---
+  // --- Email automático a RUN ---
   const to = process.env.ADMIN_EMAILS?.split(",")[0]?.trim() || "hola@run72.app";
   const row = (label: string, value: string) =>
     value
@@ -143,7 +143,7 @@ export async function POST(req: Request) {
 
   const emailed = await sendEmail({
     // Remitente distinto del destinatario: evita el "self-send" que cae en spam.
-    from: process.env.RESEND_FROM_NOTIFY || "RUN72 Cotizador <notificaciones@run72.app>",
+    from: process.env.RESEND_FROM_NOTIFY || "RUN Cotizador <notificaciones@run72.app>",
     to,
     replyTo: email,
     subject: `Solicitud de reunión — ${name}`,

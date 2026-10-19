@@ -342,7 +342,7 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack: () => 
     <div className="min-h-screen">
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
-          <Link href="/" aria-label="RUN72 — inicio">
+          <Link href="/" aria-label="RUN — inicio">
             <Logo />
           </Link>
           <button type="button" onClick={onBack} className="text-sm text-muted transition-colors hover:text-fg">

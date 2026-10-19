@@ -26,7 +26,7 @@ type Pricing = {
 };
 
 const GREETING =
-  "¡Hola! Soy el asistente de RUN72 👋 Contame en una frase qué querés construir o qué problema querés resolver, y armamos juntos tu propuesta.";
+  "¡Hola! Soy el asistente de RUN 👋 Contame en una frase qué querés construir o qué problema querés resolver, y armamos juntos tu propuesta.";
 
 export function ChatConcierge({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: GREETING }]);
@@ -226,7 +226,7 @@ export function ChatConcierge({ onBack }: { onBack: () => void }) {
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.05] text-brand-cyan">
                 <BoltIcon className="h-5 w-5" />
               </div>
-              <p className="mt-3 text-sm font-medium tracking-tight">Tu propuesta RUN72</p>
+              <p className="mt-3 text-sm font-medium tracking-tight">Tu propuesta RUN</p>
               <p className="mt-1 text-xs leading-relaxed text-faint">
                 Acá vas a ver el detalle y el precio en cuanto definamos tu proyecto.
               </p>
@@ -297,7 +297,7 @@ function ProposalCard({
     >
       <div className="flex items-center gap-2">
         <BoltIcon className="h-4 w-4 text-brand-cyan" />
-        <span className="text-sm font-medium tracking-tight">Tu propuesta RUN72</span>
+        <span className="text-sm font-medium tracking-tight">Tu propuesta RUN</span>
       </div>
 
       {pricing.lineItems.length > 0 && (
@@ -359,7 +359,7 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack: () => 
     <div className="min-h-screen">
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
-          <Link href="/" aria-label="RUN72 — inicio">
+          <Link href="/" aria-label="RUN — inicio">
             <Logo />
           </Link>
           <button onClick={onBack} className="text-sm text-muted transition-colors hover:text-fg">

@@ -1,8 +1,7 @@
-import Link from "next/link";
-import { Logo } from "./Logo";
-import { Footer } from "./sections/Footer";
+import "../app/marketing.css";
+import { MarketingShell } from "./marketing/MarketingShell";
 
-/** Layout simple para páginas legales (términos, privacidad). Presentacional. */
+/** Layout para páginas legales (términos, privacidad). Usa el shell RUN. */
 export function LegalShell({
   title,
   updated,
@@ -13,42 +12,23 @@ export function LegalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-line">
-        <div className="container-x flex items-center justify-between py-4">
-          <Link href="/" aria-label="RUN72 — inicio">
-            <Logo />
-          </Link>
-          <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
-            Volver al inicio
-          </Link>
-        </div>
-      </header>
-
-      <main className="container-x py-14 md:py-20">
+    <MarketingShell withSmooth={false}>
+      <div className="container-x pt-28 pb-24 md:pt-36">
         <div className="mx-auto max-w-2xl">
           <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
           <p className="mt-2 text-sm text-faint">Última actualización: {updated}</p>
           <div className="legal-prose mt-10 space-y-8">{children}</div>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </MarketingShell>
   );
 }
 
-/** Sección de un documento legal: título + contenido. */
-export function LegalSection({
-  heading,
-  children,
-}: {
-  heading: string;
-  children: React.ReactNode;
-}) {
+/** Sección de una página legal: encabezado + contenido. */
+export function LegalSection({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="font-display text-lg font-semibold tracking-tight text-fg">{heading}</h2>
+      <h2 className="font-display text-lg font-semibold tracking-tight">{heading}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted">{children}</div>
     </section>
   );

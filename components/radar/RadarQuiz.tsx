@@ -187,7 +187,7 @@ function Result({ result, onRestart }: { result: RadarResult | null; onRestart: 
 
       <div>
         <h3 className="font-display text-2xl font-semibold">Por dónde empezar</h3>
-        <p className="mt-1 text-muted">Tus 3 áreas más flojas y cómo las resolvemos en RUN72.</p>
+        <p className="mt-1 text-muted">Tus 3 áreas más flojas y cómo las resolvemos en RUN.</p>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {steps.map((s, i) => (
             <div key={s.code} className="flex flex-col rounded-3xl border border-line bg-surface/40 p-6">
@@ -195,7 +195,7 @@ function Result({ result, onRestart }: { result: RadarResult | null; onRestart: 
               <h4 className="font-display text-base font-semibold">{s.name}</h4>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{s.tip}</p>
               <div className="mt-4 rounded-2xl border border-brand-violet/20 bg-brand-violet/[0.06] p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-violet">Con RUN72</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-brand-violet">Con RUN</p>
                 <p className="mt-1 text-sm text-fg">{s.service}</p>
               </div>
             </div>

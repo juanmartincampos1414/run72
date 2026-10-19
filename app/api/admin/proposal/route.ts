@@ -66,11 +66,11 @@ export async function POST(req: Request) {
     .eq("active", true);
   const micros = (mic ?? []) as Microservice[];
 
-  const system = `Sos el asistente interno de propuestas de RUN72, una agencia que entrega proyectos digitales en 72 horas.
+  const system = `Sos el asistente interno de propuestas de RUN, que desarrolla software a medida, agentes de IA e integraciones.
 Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente (y a veces notas sueltas). Tu trabajo:
 1) Interpretar la necesidad REAL del cliente (no solo lo que pide literal).
 2) Elegir qué cotizar usando EXCLUSIVAMENTE los slugs/claves del catálogo de abajo. No inventes servicios ni precios: los precios los calcula el sistema.
-3) Escribir "draft": un borrador de propuesta en español rioplatense (vos), claro y humano, listo para que alguien de RUN72 lo revise y se lo mande al cliente. Estructura: qué entendimos, qué proponemos y por qué, alcance, y próximos pasos (coordinar la videollamada / arrancar). NO incluyas precios en el draft (van aparte).
+3) Escribir "draft": un borrador de propuesta en español rioplatense (vos), claro y humano, listo para que alguien de RUN lo revise y se lo mande al cliente. Estructura: qué entendimos, qué proponemos y por qué, alcance, y próximos pasos (coordinar la videollamada / arrancar). NO incluyas precios en el draft (van aparte).
 4) En "missing", listar los datos que falten para cerrar bien el presupuesto.
 Si la transcripción es ambigua, igual proponé lo más razonable y marcá los faltantes.
 

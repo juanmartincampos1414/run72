@@ -18,7 +18,7 @@ export function Credentials() {
               Experiencia <span className="text-gradient">ejecutando.</span>
             </>
           }
-          subtitle="No improvisamos. Detrás de cada entrega en 72 horas hay más de una década construyendo negocios digitales en múltiples industrias."
+          subtitle="No improvisamos. Detrás de cada entrega hay más de una década construyendo software y productos digitales en múltiples industrias."
         />
 
         {/* Dashboard-style metrics */}
@@ -43,7 +43,7 @@ export function Credentials() {
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-brand-cyan/80" />
               <span className="text-sm font-medium text-muted">
-                Track record · RUN72
+                Track record · RUN
               </span>
             </div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2.5 py-1 text-xs text-faint">

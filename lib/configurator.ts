@@ -71,7 +71,7 @@ export const GUARANTEE_TIMING =
   "El plazo de 72 horas comienza una vez confirmado el anticipo y recibida toda la información, materiales y accesos necesarios por parte del cliente.";
 
 export const GUARANTEE_V2 =
-  "Si luego de revisar tu proyecto determinamos que no puede ejecutarse dentro del alcance de RUN72, te avisamos antes de comenzar y te devolvemos el 100% del anticipo abonado.";
+  "Si luego de revisar tu proyecto determinamos que no puede ejecutarse dentro del alcance de RUN, te avisamos antes de comenzar y te devolvemos el 100% del anticipo abonado.";
 
 /** Estructura del intake mínimo (todo opcional salvo lo del Paso 2). */
 export type IntakeV2 = {
