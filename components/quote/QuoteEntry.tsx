@@ -8,15 +8,16 @@ import { QuoteConfigurator } from "./QuoteConfigurator";
 import { ChatConcierge } from "./ChatConcierge";
 import { MeetingRequest } from "./MeetingRequest";
 import { ArrowRight, BoltIcon } from "../icons";
+import type { Service, Microservice } from "@/lib/types";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 type Mode = "choose" | "form" | "chat" | "meeting";
 
-export function QuoteEntry() {
+export function QuoteEntry({ initialServices, initialMicros }: { initialServices?: Service[]; initialMicros?: Microservice[] } = {}) {
   const [mode, setMode] = useState<Mode>("choose");
 
-  if (mode === "form") return <QuoteConfigurator />;
+  if (mode === "form") return <QuoteConfigurator initialServices={initialServices} initialMicros={initialMicros} />;
   if (mode === "chat") return <ChatConcierge onBack={() => setMode("choose")} />;
   if (mode === "meeting") return <MeetingRequest onBack={() => setMode("choose")} />;
 

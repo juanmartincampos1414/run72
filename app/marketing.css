@@ -801,3 +801,52 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .marketing .m-reveal--plain .m-reveal-inner { transform: none !important; opacity: 1 !important; transition: none !important; }
 }
+
+/* Titular del hero estático (sin recorte, visible desde el primer frame) */
+.marketing .m-hero-title .m-hero-line { display: block; }
+
+/* Dropdown de navegación (Servicios → incluye RUN Express) */
+.marketing .m-nav-item { position: relative; display: inline-flex; align-items: center; }
+.marketing .m-nav-item .m-nav-link { display: inline-flex; align-items: center; gap: 4px; }
+.marketing .m-nav-caret { font-size: 9px; opacity: 0.6; }
+.marketing .m-nav-drop {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 2px;
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--m-line);
+  border-radius: 14px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+  z-index: 20;
+}
+.marketing .m-nav-dropitem {
+  font-family: var(--font-run-mono), monospace;
+  font-size: 13px;
+  color: var(--m-muted);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+.marketing .m-nav-dropitem:hover { background: rgba(255, 255, 255, 0.05); color: var(--m-text); }
+/* Antes de abrir (cuando el panel tiene hidden), no ocupa espacio */
+.marketing .m-nav-drop[hidden] { display: none; }
+
+/* Submenú en el panel móvil */
+.marketing .m-mobile-sub { display: flex; flex-direction: column; padding-left: 12px; border-left: 1px solid var(--m-line); margin: 2px 0 2px 12px; }
+.marketing .m-mobile-sublink {
+  font-family: var(--font-run-mono), monospace;
+  font-size: 14px;
+  color: var(--m-muted);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+.marketing .m-mobile-sublink:hover { background: rgba(255, 255, 255, 0.05); color: var(--m-text); }

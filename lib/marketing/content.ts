@@ -12,11 +12,19 @@ export const SITE = {
   locale: "es_AR",
 } as const;
 
-export type NavLink = { label: string; href: string };
+export type NavLink = { label: string; href: string; sub?: NavLink[] };
+
+// Submenú de Servicios (incluye RUN Express sin sobrecargar el menú principal).
+export const SERVICIOS_SUB: NavLink[] = [
+  { label: "Software a medida", href: "/servicios/software-a-medida" },
+  { label: "Agentes de IA", href: "/servicios/agentes-ia" },
+  { label: "Integraciones y automatización", href: "/servicios/automatizacion" },
+  { label: "RUN Express", href: "/express" },
+];
 
 // Header: misma secuencia y jerarquía que Nubi (3.1).
 export const NAV_LINKS: NavLink[] = [
-  { label: "Servicios", href: "/servicios" },
+  { label: "Servicios", href: "/servicios", sub: SERVICIOS_SUB },
   { label: "Soluciones", href: "/soluciones" },
   { label: "Trabajos", href: "/trabajos" },
   { label: "Blog", href: "/blog" },

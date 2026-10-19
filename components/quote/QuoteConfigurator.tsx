@@ -50,9 +50,9 @@ const INITIAL: State = {
   intake: EMPTY_INTAKE_V2,
 };
 
-export function QuoteConfigurator() {
-  const [services, setServices] = useState<Service[] | null>(null);
-  const [allMicros, setAllMicros] = useState<Microservice[]>([]);
+export function QuoteConfigurator({ initialServices, initialMicros }: { initialServices?: Service[]; initialMicros?: Microservice[] } = {}) {
+  const [services, setServices] = useState<Service[] | null>(initialServices ?? null);
+  const [allMicros, setAllMicros] = useState<Microservice[]>(initialMicros ?? []);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [state, setState] = useState<State>(INITIAL);
   const [step, setStep] = useState(0);
@@ -65,6 +65,7 @@ export function QuoteConfigurator() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    if (initialServices && initialServices.length > 0) return; // ya vino del servidor
     let alive = true;
     fetch("/api/services")
       .then(async (r) => {
@@ -331,7 +332,7 @@ export function QuoteConfigurator() {
                   subtitle="Elegí uno o varios. Lo armás en pocos minutos y ves el precio al instante."
                 >
                   <div className="grid gap-3 sm:grid-cols-2">
-                    {!services && <SkeletonCards n={8} />}
+                    {!services && <SkeletonCards n={5} />}
                     {services &&
                       PROJECT_TYPES.map((p) => {
                         const svc = serviceBySlug.get(p.slug);
@@ -347,6 +348,23 @@ export function QuoteConfigurator() {
                           />
                         );
                       })}
+                  </div>
+
+                  {/* Bloque a medida: NO seleccionable, deriva a diagnóstico */}
+                  <div className="mt-6 rounded-2xl border border-line bg-surface/30 p-5">
+                    <p className="text-sm font-medium text-fg">
+                      ¿Necesitás software a medida, un agente de IA o integraciones?
+                    </p>
+                    <p className="mt-1 text-sm text-muted">
+                      Ese tipo de proyecto (plataformas, CRM, sistemas internos, agentes, automatizaciones)
+                      requiere diagnóstico y alcance personalizado. No se cotiza acá.
+                    </p>
+                    <Link
+                      href="/contacto"
+                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110"
+                    >
+                      Contanos qué necesitás resolver
+                    </Link>
                   </div>
                 </Step>
               )}

@@ -1,30 +1,30 @@
-import { Fragment } from "react";
 import { HOME } from "@/lib/marketing/content";
-import { WordReveal } from "@/components/marketing/WordReveal";
 import { GradientText } from "@/components/marketing/GradientText";
 import { HeroScene } from "@/components/marketing/HeroScene";
 
-// Hero del Inicio (5.1). 100svh, rótulo mono, H1 por líneas, última palabra
-// con gradiente + icono RUN; bajada y enlace discreto a #servicios.
+// Hero del Inicio. El titular es ESTÁTICO: se muestra completo desde el primer
+// frame, sin depender de ninguna animación de entrada (auditoría). El
+// movimiento vive en la escena del fondo. La bajada y el enlace también estáticos.
 export function EditorialHero() {
   const { eyebrow, titleLines, gradientWord, subtitle, cta } = HOME.hero;
   const lastLine = titleLines[titleLines.length - 1];
   const before = lastLine.replace(gradientWord, "").trimEnd();
-
-  const lines = [
-    ...titleLines.slice(0, -1),
-    <Fragment key="last-line">
-      {before}{" "}
-      <GradientText>{gradientWord}</GradientText>
-    </Fragment>,
-  ];
+  const head = titleLines.slice(0, -1);
 
   return (
     <section className="m-hero" id="top">
       <HeroScene />
       <div className="m-container m-hero-inner">
         <p className="m-eyebrow m-hero-eyebrow">{eyebrow}</p>
-        <WordReveal as="h1" className="m-hero-title" lines={lines} mask={false} />
+        <h1 className="m-hero-title">
+          {head.map((line) => (
+            <span key={line} className="m-hero-line">{line}</span>
+          ))}
+          <span className="m-hero-line">
+            {before}{" "}
+            <GradientText>{gradientWord}</GradientText>
+          </span>
+        </h1>
         <p className="m-hero-sub">{subtitle}</p>
         <a href={cta.href} className="m-hero-link m-arrow-host">
           {cta.label}

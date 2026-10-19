@@ -26,15 +26,20 @@ export default function TerminosPage() {
 
       <LegalSection heading="1. Alcance del servicio">
         <p>
-          RUN desarrolla y entrega proyectos digitales (sitios web, landing pages,
-          ecommerce, plataformas, CRM, branding, redes y automatizaciones) con un modelo
-          de ejecución rápida. El alcance de cada proyecto es exactamente el que el cliente
-          selecciona en el cotizador y queda reflejado en el resumen y el presupuesto.
+          RUN Express comprende productos digitales estandarizados, como landing pages, sitios web
+          corporativos, ecommerce de alcance cerrado, branding e identidad y otros servicios
+          expresamente disponibles en el cotizador. El alcance de cada contratación es el que el
+          cliente selecciona y queda reflejado en el resumen y el presupuesto.
+        </p>
+        <p>
+          Los proyectos de software a medida, plataformas, CRM, sistemas internos, agentes de
+          inteligencia artificial e integraciones o automatizaciones que requieran diagnóstico no se
+          contratan mediante RUN Express. Su alcance, plazo, precio, propiedad intelectual, soporte y
+          condiciones se definen mediante una propuesta y un contrato específicos.
         </p>
         <p>
           Solo se incluyen los servicios, funcionalidades y microservicios efectivamente
-          seleccionados y abonados. Todo lo no detallado en el presupuesto no forma parte
-          del alcance.
+          seleccionados y abonados. Todo lo no detallado en el presupuesto no forma parte del alcance.
         </p>
       </LegalSection>
 
@@ -74,10 +79,11 @@ export default function TerminosPage() {
 
       <LegalSection heading="5. Propiedad intelectual">
         <p>
-          Al completarse el pago total, el proyecto entregado es 100% propiedad del cliente.
-          Entregamos el código fuente, los accesos y la documentación necesarios para que el
-          cliente administre el proyecto con total independencia y pueda continuarlo con
-          cualquier proveedor en el futuro.
+          Al completarse el pago total, el producto entregado es 100% propiedad del cliente.
+          Entregamos lo que corresponda a cada producto (por ejemplo, el código fuente y los accesos
+          en los desarrollos web, y los archivos editables y manuales en identidad y branding), junto
+          con la documentación necesaria para que el cliente administre el producto con independencia y
+          pueda continuarlo con cualquier proveedor en el futuro.
         </p>
         <p>
           RUN puede utilizar componentes, librerías y herramientas de terceros sujetas a

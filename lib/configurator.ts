@@ -26,15 +26,15 @@ export type ProjectTypeDef = {
 };
 
 /** Los 8 tipos visibles, en orden. */
+// RUN Express = productos digitales de alcance cerrado. Plataforma/SaaS, CRM
+// y Automatización/Integraciones NO van acá: requieren diagnóstico (se derivan
+// a Contacto desde el bloque "a medida" del cotizador).
 export const PROJECT_TYPES: ProjectTypeDef[] = [
   { slug: "sitio", label: "Web corporativa", tagline: "Sitio institucional profesional.", icon: "web", needsInfra: true },
   { slug: "landing", label: "Landing page", tagline: "Página única de alta conversión.", icon: "landing", needsInfra: true },
-  { slug: "ecommerce", label: "Ecommerce", tagline: "Tienda online lista para vender.", icon: "cart", needsInfra: true },
-  { slug: "plataforma", label: "Plataforma / SaaS", tagline: "Aplicación web a medida.", icon: "saas", needsInfra: true },
-  { slug: "crm", label: "CRM / Sistema interno", tagline: "Gestión interna y pipeline.", icon: "crm", needsInfra: true },
+  { slug: "ecommerce", label: "Ecommerce", tagline: "Tienda online de alcance cerrado.", icon: "cart", needsInfra: true },
   { slug: "branding", label: "Branding / Identidad", tagline: "Marca, logo y sistema visual.", icon: "brand", needsInfra: false },
   { slug: "redes", label: "Redes sociales", tagline: "Contenido y presencia social.", icon: "social", needsInfra: false },
-  { slug: "automatizaciones", label: "Automatización / Integraciones", tagline: "Flujos automáticos entre tus apps.", icon: "automation", needsInfra: true },
 ];
 
 export function projectTypeBySlug(slug: string): ProjectTypeDef | undefined {
