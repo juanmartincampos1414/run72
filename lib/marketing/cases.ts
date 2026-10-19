@@ -147,8 +147,8 @@ const MVP_STATUS = "MVP desarrollado · Actualmente no operativo";
 
 /**
  * Orden definitivo de Trabajos (el orden del array ES el orden público):
- *   Productos principales: 1 Aikestar, 2 J (oculto hasta identificarlo), 3 Relevo.
- *   MVPs desarrollados:    4 Margin, 5 Tips.
+ *   Productos principales: 1 Aikestar, 2 Jota, 3 Relevo.
+ *   MVPs desarrollados:    4 Margin, 5 Tips (numeración continua 01-05).
  *   Labs: demos conceptuales, aparte.
  */
 export const WORKS: Work[] = [
@@ -157,13 +157,13 @@ export const WORKS: Work[] = [
     slug: "aikestar",
     section: "principal",
     title: "Aikestar",
-    subtitle: "Gestión administrativa y financiera con IA para pymes y emprendedores.",
+    subtitle: "ERP SaaS para finanzas personales, de pareja y de pequeñas empresas.",
     categories: ["software", "ia"],
     year: 2026,
     poster: "#18ACFF",
-    statusLabel: "En desarrollo activo",
+    statusLabel: "Operativo",
     summary:
-      "Sistema de gestión administrativa y financiera con IA para pymes y emprendedores argentinos, más una plataforma de competencias, la Liga Aikestar, que premia el uso sostenido y la reducción de gastos evitables.",
+      "Plataforma de gestión financiera y administrativa impulsada por inteligencia artificial. Aikestar centraliza la información de personas, emprendedores y pequeñas empresas, automatiza la carga y conciliación de movimientos y convierte los datos operativos en información útil para decidir.",
     context:
       "Muchas pymes no entienden sus números: mezclan las finanzas personales con las del negocio, no saben cuánto ganan y una planilla de Excel ya no alcanza. Aikestar reúne gestión, finanzas y un asistente de IA en un solo lugar, y suma la Liga para fidelizar a quien usa la herramienta de forma sostenida.",
     userType:
@@ -171,11 +171,12 @@ export const WORKS: Work[] = [
     built:
       "Desarrollo de punta a punta de dos aplicaciones. La Liga se construyó desde cero: motor de cálculo, panel de administración, sitio público, API de ingesta, webhooks firmados y cron diario. En el producto principal: migración de la IA de OpenAI a Claude, pagos con Mercado Pago (suscripciones), integración con Tiendanube, CRM, órdenes de trabajo y remitos, módulo de Inversiones con cotizaciones en vivo y la sección Liga embebida.",
     features: [
-      "Transacciones, calendario, cuentas, reportes e impuestos en una sola aplicación.",
-      "Asistente de IA “Aike” y bot de WhatsApp para registrar movimientos.",
+      "Dashboard financiero, cuentas, calendario, reportes e impuestos, con conciliación bancaria y multimoneda.",
+      "Asistente de IA “Aike” y carga de movimientos por WhatsApp (texto, voz o imagen).",
       "Facturación electrónica ARCA a través de Facturitas.",
+      "Rentabilidad por proyecto, gestión de empleados, roles y permisos, y multi-organización.",
       "CRM, órdenes de trabajo y remitos, con catálogo y pedidos de Tiendanube.",
-      "Módulo de Inversiones con cotizaciones en vivo, resultado por posición y reporte en PDF.",
+      "Módulo de Inversiones con cotizaciones en vivo, resultado por posición y exportación a PDF o CSV.",
       "Liga Aikestar: Desafío de 21 días en pareja y ranking trimestral con un libro de puntos auditable.",
     ],
     flow:
@@ -191,10 +192,10 @@ export const WORKS: Work[] = [
     decisions:
       "Privacidad en la Liga: solo se reciben totales por día y categoría, y los rankings usan alias públicos. Seguridad: API keys con hash, magic links de un solo uso, bcrypt, rate limiting, CSRF y cifrado AES-GCM. La migración de OpenAI a Claude se hizo mediante un módulo traductor que aisló el cambio.",
     status:
-      "En desarrollo activo, con commits recientes hasta octubre de 2026. Según su documentación, la Liga está publicada en liga.aikestar.com; ese dato no fue verificado en vivo para esta ficha.",
+      "Operativo, con presencia pública: landing en aikestar.com, acceso en aikestar.net y la Liga en liga.aikestar.com. En desarrollo activo, con commits recientes hasta octubre de 2026.",
     evidence: [
-      "Liga publicada en liga.aikestar.com según la documentación del proyecto (no verificado en vivo).",
-      "Aplicación principal migrada a app.aikestar.com según la misma documentación.",
+      "La Liga Aikestar cuenta con una superficie pública y navegable para competencias, ganadores y consulta de puntos (liga.aikestar.com).",
+      "Sitio público en aikestar.com y acceso en aikestar.net.",
       "Capturas reales de la aplicación, con una organización de demostración.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
@@ -221,33 +222,48 @@ export const WORKS: Work[] = [
       },
     ],
   }),
-  // J (posición #2 de los principales): todavía no está identificado. Oculto (published:false)
-  // hasta contar con datos verificados; al publicarlo queda entre Aikestar y Relevo. No inventar su ficha.
-  {
-    ...product({
-      slug: "j",
-      section: "principal",
-      title: "J",
-      subtitle: "Producto de la marca propia de RUN.",
-      categories: ["ia"],
-      year: 2026,
-      poster: "#5583FF",
-      statusLabel: "Sin ficha",
-      summary: "Ficha en preparación.",
-      context: PENDING,
-      userType: PENDING,
-      built: PENDING,
-      features: [PENDING],
-      flow: PENDING,
-      stack: { architecture: PENDING, technologies: PENDING, integrations: PENDING },
-      decisions: PENDING,
-      status: PENDING,
-      evidence: [PENDING],
-      teamRole: PENDING,
-    }),
-    year: null,
-    published: false,
-  },
+  product({
+    slug: "jota",
+    section: "principal",
+    title: "Jota",
+    subtitle: "Sistema operativo de marketing con IA: tu Director de Crecimiento.",
+    categories: ["ia", "automatizacion"],
+    year: 2026,
+    poster: "#5583FF",
+    statusLabel: "Operativo",
+    summary:
+      "Sistema operativo de marketing impulsado por inteligencia artificial. Jota aprende la identidad de una marca, organiza su estrategia, produce contenidos y coordina campañas y canales desde un solo lugar, manteniendo la aprobación humana antes de ejecutar.",
+    context:
+      "Las marcas necesitan planear, producir, aprobar, publicar y medir marketing de forma coordinada, pero hoy ese trabajo queda disperso entre herramientas, equipos y canales.",
+    userType:
+      "Marcas, emprendedores, equipos y agencias, con gestión multimarca, roles y equipos.",
+    built:
+      "Desarrollo de punta a punta de la plataforma multimarca (Brand Twin): generación de contenido, imagen y video, calendario y aprobación, publicación en redes, campañas y publicidad, CRM y mensajería, webs, dominios y leads, analítica, SEO y reporting, y chat y voz con niveles de autonomía.",
+    features: [
+      "Identidad de marca y Brand Twin.",
+      "Generación de imágenes, carruseles y video (avatares, UGC y voz).",
+      "Calendario y aprobación de contenidos.",
+      "Redes, campañas y publicidad.",
+      "CRM, mensajería, webs y leads.",
+      "Analítica, SEO y reporting, con roles y gestión multimarca.",
+    ],
+    flow:
+      "1) Conecta canales (redes, publicidad, WhatsApp, web y analítica). 2) Aprende la identidad de la marca con su Brand Twin. 3) Propone y genera contenidos, anuncios y campañas. 4) Una persona revisa y aprueba antes de programar o publicar. El usuario dirige; Jota propone, organiza y ejecuta.",
+    stack: {
+      architecture:
+        "Plataforma multimarca con roles y equipos, y aprobación humana antes de ejecutar acciones.",
+      technologies:
+        "Next.js 16 (App Router), TypeScript, Tailwind, Supabase (Postgres y Auth) y SDK de Anthropic; LiveKit para voz y tiempo real; exceljs y jspdf para exportación; motion.",
+      integrations:
+        "Supabase, Anthropic y LiveKit; además de los canales que se conectan (redes, publicidad, WhatsApp, web y analítica) según la configuración de cada marca. Las conexiones con cada canal dependen de esa configuración.",
+    },
+    decisions:
+      "Aprobación humana antes de ejecutar (human-in-the-loop); gestión multimarca con roles; niveles de autonomía configurables.",
+    status: "Operativo; con sitio público, planes, registro y acceso en jcaigency.com.",
+    evidence: ["jcaigency.com"],
+    teamRole: OWN_PRODUCT_ROLE,
+    ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=agentes" },
+  }),
 
   product({
     slug: "relevo",
@@ -257,7 +273,24 @@ export const WORKS: Work[] = [
     categories: ["software", "ia"],
     year: 2026,
     poster: "#5583FF",
-    statusLabel: "Operativo · live",
+    statusLabel: "OPERATIVO · EN USO",
+    gallery: [
+      {
+        src: "/work/relevo/mision.jpg",
+        alt: "Vista Misión de Relevo: resumen de la misión en una mirada (dónde estamos, qué buscamos, avances, qué bloquea, qué viene) sobre un espacio de trabajo demostrativo.",
+        caption: "Vista Misión: el resumen de la misión en una mirada. Datos demostrativos.",
+      },
+      {
+        src: "/work/relevo/agenda.jpg",
+        alt: "Vista Hoy de Relevo con la agenda del día, filtros por estado y una barra para consultar la agenda, sobre datos demostrativos.",
+        caption: "Vista Hoy: agenda del día con filtros y consulta. Datos demostrativos.",
+      },
+      {
+        src: "/work/relevo/oportunidades.jpg",
+        alt: "Vista Oportunidades de Relevo mostrando el estado del pipeline sobre un espacio de trabajo demostrativo.",
+        caption: "Vista Oportunidades: estado del pipeline. Datos demostrativos.",
+      },
+    ],
     summary:
       "Sistema operativo de inteligencia para equipos de originación e investigación: reúne empresas, personas, oportunidades y fuentes en un modelo único, con trazabilidad completa y un resumen diario de qué requiere atención.",
     context:
@@ -265,7 +298,7 @@ export const WORKS: Work[] = [
     userType:
       "Equipos de originación e investigación, con roles de owner, admin (con aprobación) y visor de solo lectura, y soporte multi-workspace.",
     built:
-      "Desarrollo de punta a punta: tenencia multi-workspace con registro de auditoría append-only, lectura e ingesta del CRM maestro, modelo canónico de relaciones e IA.",
+      "Desarrollo de punta a punta: arquitectura multi-workspace con registro de auditoría append-only, lectura e ingesta del CRM maestro, modelo canónico de relaciones e IA.",
     features: [
       "Lectura determinística y de solo lectura del CRM maestro.",
       "Sincronización incremental.",
@@ -278,7 +311,7 @@ export const WORKS: Work[] = [
       "Sincroniza el CRM maestro en solo lectura, arma el modelo canónico de relaciones, detecta pendientes, contradicciones y campos críticos, y entrega el Morning Brief y las vistas de trabajo.",
     stack: {
       architecture:
-        "Tenencia multi-workspace con capacidades por rol y un registro de auditoría append-only.",
+        "Arquitectura multi-workspace con capacidades por rol y un registro de auditoría append-only.",
       technologies:
         "Next.js 16 (App Router), TypeScript, Tailwind 4, shadcn/ui, Supabase (Postgres, Auth y RLS) y zod; SDK de Anthropic; leaflet (mapas) y exceljs.",
       integrations: "Supabase, Anthropic y lectura (solo lectura) del CRM maestro.",
@@ -481,7 +514,7 @@ export function getProducts(): Work[] {
   return getPublishedWorks().filter((w) => w.kind === "producto");
 }
 
-/** Productos principales (operativos), en orden: Aikestar, J (cuando se publique), Relevo. */
+/** Productos principales (operativos), en orden: Aikestar, Jota, Relevo. */
 export function getPrincipalProducts(): Work[] {
   return getProducts().filter((w) => w.section === "principal");
 }
@@ -533,7 +566,7 @@ export function isWorkCategory(value: string | null | undefined): value is WorkC
 
 /**
  * Posición circular dentro del grupo del trabajo: los productos reales siguen
- * el orden Aikestar → (J) → Relevo → Margin → Tips; las demos de Labs, el suyo.
+ * el orden Aikestar → Jota → Relevo → Margin → Tips; las demos de Labs, el suyo.
  */
 export function getWorkSequence(
   slug: string,

@@ -301,7 +301,7 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
         )}
         {(isMvp || gallery.length === 0) && (
           <div className="work-media-placeholder" style={gallery.length > 0 ? { marginTop: 24 } : undefined}>
-            <h3 className="work-label m-mono">Evidencia del producto</h3>
+            {gallery.length > 0 && <h3 className="work-label m-mono">Evidencia del producto</h3>}
             <p className="work-text">{isMvp ? MVP_EVIDENCE_COPY : OPERATIONAL_EVIDENCE_COPY}</p>
           </div>
         )}

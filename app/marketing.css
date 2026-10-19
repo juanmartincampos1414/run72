@@ -850,3 +850,9 @@ html.lenis, html.lenis body { height: auto; }
   border-radius: 10px;
 }
 .marketing .m-mobile-sublink:hover { background: rgba(255, 255, 255, 0.05); color: var(--m-text); }
+
+/* Filas de trabajos: texto (meta + nombre + descripción) + miniatura */
+.marketing .m-work-text { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.marketing .m-work-meta { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.marketing .m-work-state { font-family: var(--font-run-mono), monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #0a0a0a; background: var(--m-gold); padding: 2px 8px; border-radius: 999px; }
+.marketing .m-work-desc { font-size: 15px; line-height: 22px; color: var(--m-muted); max-width: 44ch; }

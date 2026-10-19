@@ -41,7 +41,8 @@ function countText(n: number, filterLabel: string): string {
   return `Mostrando ${n} ${noun}${filterLabel ? ` en ${filterLabel}` : ""}`;
 }
 
-export function WorksBrowser({ works }: { works: Work[] }) {
+/** `order`: slugs en orden global, para una numeración continua entre secciones (estable ante filtros). */
+export function WorksBrowser({ works, order }: { works: Work[]; order?: string[] }) {
   const [filter, setFilter] = useState<Filter>("todos");
 
   // El filtro persiste por query (?categoria=) y sessionStorage.
@@ -111,7 +112,7 @@ export function WorksBrowser({ works }: { works: Work[] }) {
                 <span className="work-card-body">
                   <span className="work-row-top">
                     <span className="work-card-meta m-mono">
-                      {String(i + 1).padStart(2, "0")} · {w.categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}
+                      {String((order ? order.indexOf(w.slug) : -1) >= 0 ? order!.indexOf(w.slug) + 1 : i + 1).padStart(2, "0")} · {w.categories.map((c) => CATEGORY_LABELS[c]).join(" · ")}
                     </span>
                     {hasPendingFields(w) && <span className="work-badge m-mono">Contenido en validación</span>}
                   </span>

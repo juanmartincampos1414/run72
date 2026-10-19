@@ -91,10 +91,10 @@ export const HOME = {
   },
   works: {
     eyebrow: "PRODUCTOS PRINCIPALES",
-    // Orden: Aikestar, J, Relevo. J se suma en el puesto 2 cuando se confirme.
     rows: [
-      { title: "Aikestar", slug: "aikestar", tag: "Software · IA" },
-      { title: "Relevo", slug: "relevo", tag: "Software · IA" },
+      { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA." },
+      { title: "Jota", slug: "jota", tag: "IA · Marketing", state: "Operativo", desc: "Sistema operativo de marketing con IA." },
+      { title: "Relevo", slug: "relevo", tag: "Software · IA", state: "Operativo", desc: "Inteligencia para originar e investigar oportunidades." },
     ],
     allLink: { label: "Ver todos los trabajos", href: "/trabajos" },
     demosLink: { label: "Explorar demos en Labs", href: "/labs" },

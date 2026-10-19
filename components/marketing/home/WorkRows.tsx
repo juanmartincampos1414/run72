@@ -29,8 +29,14 @@ export function WorkRows() {
             onBlur={() => setOpen(null)}
           >
             <div className="m-container m-work-rowinner">
-              <span className="m-work-badge m-eyebrow">{row.tag}</span>
-              <span className="m-work-name">{row.title}</span>
+              <span className="m-work-text">
+                <span className="m-work-meta">
+                  <span className="m-work-badge m-eyebrow">{row.tag}</span>
+                  {row.state && <span className="m-work-state">{row.state}</span>}
+                </span>
+                <span className="m-work-name">{row.title}</span>
+                {row.desc && <span className="m-work-desc">{row.desc}</span>}
+              </span>
               <span className="m-work-thumb" aria-hidden="true" data-i={i}>
                 <span className="m-work-thumbinner" />
               </span>

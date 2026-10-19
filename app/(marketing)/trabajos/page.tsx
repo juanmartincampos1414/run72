@@ -26,6 +26,8 @@ export default function TrabajosPage() {
   const mvps = getMvpProducts();
   const demos = getDemos();
   const total = principals.length + mvps.length;
+  // Numeración continua 01..N a través de ambas secciones.
+  const order = [...principals, ...mvps].map((w) => w.slug);
 
   return (
     <div className="work-page">
@@ -55,7 +57,7 @@ export default function TrabajosPage() {
           <h3 id="work-principal-h" className="work-section-title work-section-title-sm">
             Productos principales
           </h3>
-          <WorksBrowser works={principals} />
+          <WorksBrowser works={principals} order={order} />
         </section>
       )}
 
@@ -64,7 +66,7 @@ export default function TrabajosPage() {
           <h3 id="work-mvp-h" className="work-section-title work-section-title-sm">
             MVPs desarrollados
           </h3>
-          <WorksBrowser works={mvps} />
+          <WorksBrowser works={mvps} order={order} />
         </section>
       )}
 
