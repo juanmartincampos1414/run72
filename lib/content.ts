@@ -6,7 +6,8 @@
 export const SITE = {
   name: "RUN",
   tagline: "Tu operación, lista por alcance.",
-  email: "hola@run72.app",
+  // Centralizado en env para migrar a una casilla de marca RUN sin tocar código.
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hola@run72.app",
   linkedin: "https://www.linkedin.com/company/run72",
 } as const;
 

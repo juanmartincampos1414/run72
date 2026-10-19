@@ -57,7 +57,7 @@ const jsonLd = {
   name: "RUN",
   description: DESCRIPTION,
   url: SITE_URL,
-  email: "hola@run72.app",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hola@run72.app",
   makesOffer: [
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Software a medida" } },
     { "@type": "Offer", itemOffered: { "@type": "Service", name: "Agentes de inteligencia artificial" } },

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { NAV_LINKS, NAV_CTA } from "@/lib/marketing/content";
+import { track } from "@/lib/marketing/analytics";
 import { Wordmark } from "./Wordmark";
 
 export function MarketingHeader() {
@@ -69,7 +70,7 @@ export function MarketingHeader() {
         </nav>
 
         <div className="m-header-cta">
-          <Link href={NAV_CTA.href} className="m-btn m-btn--compact">
+          <Link href={NAV_CTA.href} className="m-btn m-btn--compact" onClick={() => track("cta_contact_click", { location: "header" })}>
             {NAV_CTA.label}
           </Link>
         </div>
@@ -118,7 +119,7 @@ export function MarketingHeader() {
               )}
             </div>
           ))}
-          <Link href={NAV_CTA.href} className="m-btn m-mobile-ctabtn" onClick={() => setOpen(false)}>
+          <Link href={NAV_CTA.href} className="m-btn m-mobile-ctabtn" onClick={() => { track("cta_contact_click", { location: "mobile_nav" }); setOpen(false); }}>
             {NAV_CTA.label}
           </Link>
         </nav>

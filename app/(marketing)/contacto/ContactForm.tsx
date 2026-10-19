@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import { SITE } from "@/lib/marketing/content";
 import { track } from "@/lib/marketing/analytics";
 import { fbTrack } from "@/lib/meta-pixel";
+import { getAttribution } from "@/lib/marketing/attribution";
 
 type Interest = "software" | "agentes" | "automatizacion" | "orientacion";
 type Budget = "unsure" | "3000_7500" | "7500_15000" | "15000_30000" | "over_30000";
+type Timeline = "asap" | "month" | "1_3m" | "later" | "exploring";
 
 const INTERESTS: { value: Interest; label: string }[] = [
   { value: "software", label: "Software a medida" },
@@ -22,10 +24,18 @@ const BUDGETS: { value: Budget; label: string }[] = [
   { value: "15000_30000", label: "USD 15.000–30.000" },
   { value: "over_30000", label: "Más de USD 30.000" },
 ];
+const TIMELINES: { value: Timeline; label: string }[] = [
+  { value: "asap", label: "Lo antes posible" },
+  { value: "month", label: "Este mes" },
+  { value: "1_3m", label: "En 1–3 meses" },
+  { value: "later", label: "Más adelante" },
+  { value: "exploring", label: "Estoy explorando" },
+];
 
 export function ContactForm({ initialInterest }: { initialInterest?: Interest }) {
   const [interest, setInterest] = useState<Interest | "">(initialInterest ?? "");
   const [budget, setBudget] = useState<Budget | "">("");
+  const [timeline, setTimeline] = useState<Timeline | "">("");
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [netError, setNetError] = useState(false);
@@ -55,6 +65,7 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
     if (!startedRef.current) {
       startedRef.current = true;
       track("inquiry_started", { route: "/contacto" });
+      track("contact_form_start", { route: "/contacto" });
     }
   };
 
@@ -64,18 +75,23 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
     setErrors({});
     setNetError(false);
     const fd = new FormData(e.currentTarget);
+    const attribution = getAttribution();
     const payload = {
       name: String(fd.get("name") ?? ""),
       email: String(fd.get("email") ?? ""),
       company: String(fd.get("company") ?? ""),
+      phone: String(fd.get("phone") ?? ""),
       interest,
       problem: String(fd.get("problem") ?? ""),
       systems: String(fd.get("systems") ?? ""),
       budget,
+      timeline,
       privacy: fd.get("privacy") === "on",
       website: String(fd.get("website") ?? ""),
       idempotencyKey: keyRef.current,
       sourcePath: typeof window !== "undefined" ? window.location.pathname : "/contacto",
+      // Atribución first-touch (no se muestra en campos visibles, no va a analítica).
+      attribution,
     };
 
     try {
@@ -100,7 +116,10 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
       // Éxito confirmado por el servidor.
       setResult({ id: data.inquiryId, email: payload.email });
       setState("sent");
+      // Eventos comerciales: solo tras confirmación del servidor, sin PII.
       track("inquiry_submitted", { route: "/contacto", solutionId: interest || undefined });
+      track("contact_form_submit", { route: "/contacto", solutionId: interest || undefined });
+      track("lead_created", { route: "/contacto", solutionId: interest || undefined });
       fbTrack("Lead", { content_name: "Contacto a medida", content_category: interest || "orientacion" });
       // rotar clave tras éxito
       keyRef.current = crypto.randomUUID();
@@ -157,9 +176,17 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
         </div>
       </div>
 
-      <div className="ct-field">
-        <label htmlFor="ct-company">Empresa <span className="ct-opt">(opcional)</span></label>
-        <input id="ct-company" name="company" type="text" autoComplete="organization" maxLength={160} />
+      <div className="ct-row2">
+        <div className="ct-field">
+          <label htmlFor="ct-company">Empresa <span className="ct-opt">(opcional)</span></label>
+          <input id="ct-company" name="company" type="text" autoComplete="organization" maxLength={160} />
+        </div>
+        <div className="ct-field">
+          <label htmlFor="ct-phone">Teléfono / WhatsApp <span className="ct-opt">(opcional)</span></label>
+          <input id="ct-phone" name="phone" type="tel" autoComplete="tel" maxLength={40}
+            aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "ct-phone-err" : undefined} />
+          {errors.phone && <p id="ct-phone-err" className="ct-err">{errors.phone}</p>}
+        </div>
       </div>
 
       <fieldset className="ct-fieldset" aria-describedby={errors.interest ? "ct-interest-err" : undefined}>
@@ -197,6 +224,19 @@ export function ContactForm({ initialInterest }: { initialInterest?: Interest })
             <label key={o.value} className={`ct-chip ${budget === o.value ? "is-on" : ""}`}>
               <input type="radio" name="budget" value={o.value} checked={budget === o.value}
                 onChange={() => setBudget(o.value)} />
+              {o.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="ct-fieldset">
+        <legend>¿Cuándo necesitás comenzar? <span className="ct-opt">(opcional)</span></legend>
+        <div className="ct-chips">
+          {TIMELINES.map((o) => (
+            <label key={o.value} className={`ct-chip ${timeline === o.value ? "is-on" : ""}`}>
+              <input type="radio" name="timeline" value={o.value} checked={timeline === o.value}
+                onChange={() => setTimeline(o.value)} />
               {o.label}
             </label>
           ))}

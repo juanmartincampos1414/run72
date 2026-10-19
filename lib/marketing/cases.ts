@@ -4,8 +4,13 @@
 
 export type WorkKind = "producto" | "demo" | "client";
 export type WorkCategory = "software" | "ia" | "automatizacion";
-/** Sección de un producto real: principal (operativo) o MVP desarrollado. */
-export type WorkSection = "principal" | "mvp";
+/**
+ * Sección de un producto real:
+ *   principal: producto operativo (Aikestar, Jota).
+ *   mvp-uso:   MVP funcional en uso privado (Relevo).
+ *   mvp:       MVP desarrollado, actualmente no operativo (Margin, Tips).
+ */
+export type WorkSection = "principal" | "mvp-uso" | "mvp";
 
 export const DEMO_LABEL = "Demo conceptual · Datos ficticios";
 
@@ -60,7 +65,7 @@ export type Work = {
   evidence?: string[];
   publicationPermission?: boolean;
   teamRole?: string;
-  /** Solo productos: "principal" (operativo) o "mvp" (desarrollado, no operativo). */
+  /** Solo productos: "principal" (operativo), "mvp-uso" (MVP en uso privado) o "mvp" (desarrollado, no operativo). */
   section?: WorkSection;
   /** Ficha de producto (kind=producto). Solo datos verificados; un dato desconocido se omite o es PENDING. */
   context?: string;
@@ -99,7 +104,8 @@ type ProductInput = {
   stack: WorkStack;
   decisions: string;
   status: string;
-  evidence: string[];
+  /** Evidencia pública verificable (URLs). Vacío/omitido si el producto no tiene presencia pública. */
+  evidence?: string[];
   teamRole: string;
   logo?: string;
   gallery?: WorkShot[];
@@ -135,7 +141,7 @@ function product(p: ProductInput): Work {
     decisions: p.decisions,
     status: p.status,
     statusLabel: p.statusLabel,
-    evidence: p.evidence,
+    evidence: p.evidence ?? [],
     teamRole: p.teamRole,
   };
 }
@@ -147,12 +153,13 @@ const MVP_STATUS = "MVP desarrollado · Actualmente no operativo";
 
 /**
  * Orden definitivo de Trabajos (el orden del array ES el orden público):
- *   Productos principales: 1 Aikestar, 2 Jota, 3 Relevo.
- *   MVPs desarrollados:    4 Margin, 5 Tips (numeración continua 01-05).
+ *   Productos operativos:                 1 Aikestar, 2 Jota.
+ *   MVP funcional en uso privado:         3 Relevo.
+ *   MVPs desarrollados, no operativos:    4 Margin, 5 Tips (numeración continua 01-05).
  *   Labs: demos conceptuales, aparte.
  */
 export const WORKS: Work[] = [
-  // ---- Productos principales (operativos) ----
+  // ---- Productos operativos ----
   product({
     slug: "aikestar",
     section: "principal",
@@ -267,23 +274,19 @@ export const WORKS: Work[] = [
 
   product({
     slug: "relevo",
-    section: "principal",
+    section: "mvp-uso",
     title: "Relevo",
-    subtitle: "Sistema operativo de inteligencia para originar e investigar oportunidades.",
+    subtitle:
+      "Sistema privado para organizar la originación e investigación de oportunidades, en uso en un entorno controlado.",
     categories: ["software", "ia"],
     year: 2026,
     poster: "#5583FF",
-    statusLabel: "OPERATIVO · EN USO",
+    statusLabel: "MVP FUNCIONAL · EN USO PRIVADO",
     gallery: [
       {
         src: "/work/relevo/mision.jpg",
         alt: "Vista Misión de Relevo: resumen de la misión en una mirada (dónde estamos, qué buscamos, avances, qué bloquea, qué viene) sobre un espacio de trabajo demostrativo.",
         caption: "Vista Misión: el resumen de la misión en una mirada. Datos demostrativos.",
-      },
-      {
-        src: "/work/relevo/agenda.jpg",
-        alt: "Vista Hoy de Relevo con la agenda del día, filtros por estado y una barra para consultar la agenda, sobre datos demostrativos.",
-        caption: "Vista Hoy: agenda del día con filtros y consulta. Datos demostrativos.",
       },
       {
         src: "/work/relevo/oportunidades.jpg",
@@ -292,7 +295,7 @@ export const WORKS: Work[] = [
       },
     ],
     summary:
-      "Sistema operativo de inteligencia para equipos de originación e investigación: reúne empresas, personas, oportunidades y fuentes en un modelo único, con trazabilidad completa y un resumen diario de qué requiere atención.",
+      "Sistema privado de inteligencia para equipos de originación e investigación: reúne empresas, personas, oportunidades y fuentes en un modelo único, con trazabilidad completa y un resumen diario de qué requiere atención.",
     context:
       "Reunir y mantener al día la inteligencia de una misión de originación (empresas, personas, oportunidades y fuentes) sin perder trazabilidad ni depender de planillas dispersas.",
     userType:
@@ -318,8 +321,9 @@ export const WORKS: Work[] = [
     },
     decisions:
       "Lectura de solo lectura y determinística del CRM, que nunca escribe en la fuente. Sincronización incremental. Registro de auditoría append-only. Multi-workspace con capacidades por rol.",
-    status: "Operativo en relevo.site; en uso real.",
-    evidence: ["relevo.site"],
+    status:
+      "MVP funcional en uso privado. La aplicación no cuenta actualmente con una landing comercial pública.",
+    evidence: [],
     teamRole: OWN_PRODUCT_ROLE,
     ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=software" },
   }),
@@ -514,12 +518,17 @@ export function getProducts(): Work[] {
   return getPublishedWorks().filter((w) => w.kind === "producto");
 }
 
-/** Productos principales (operativos), en orden: Aikestar, Jota, Relevo. */
+/** Productos operativos, en orden: Aikestar, Jota. */
 export function getPrincipalProducts(): Work[] {
   return getProducts().filter((w) => w.section === "principal");
 }
 
-/** MVPs desarrollados, en orden: Margin, Tips. */
+/** MVP funcional en uso privado: Relevo. */
+export function getPrivateMvpProducts(): Work[] {
+  return getProducts().filter((w) => w.section === "mvp-uso");
+}
+
+/** MVPs desarrollados, actualmente no operativos, en orden: Margin, Tips. */
 export function getMvpProducts(): Work[] {
   return getProducts().filter((w) => w.section === "mvp");
 }
@@ -542,7 +551,8 @@ export function getPendingFields(work: Work): string[] {
     ["Integraciones", isPending(work.stack?.integrations)],
     ["Decisiones", isPending(work.decisions)],
     ["Estado", isPending(work.status)],
-    ["Evidencia", !work.evidence?.length || work.evidence.some(isPending)],
+    // La evidencia pública es opcional (p. ej. un MVP en uso privado sin landing); solo se marca si quedó pendiente.
+    ["Evidencia", Boolean(work.evidence?.some(isPending))],
     ["Año", work.year === null],
   ];
   return checks.filter(([, pending]) => pending).map(([label]) => label);
@@ -564,6 +574,11 @@ export function isWorkCategory(value: string | null | undefined): value is WorkC
   return value === "software" || value === "ia" || value === "automatizacion";
 }
 
+/** Los 5 productos reales en orden público: operativos, MVP en uso privado, MVPs desarrollados. */
+export function allProductsInOrder(): Work[] {
+  return [...getPrincipalProducts(), ...getPrivateMvpProducts(), ...getMvpProducts()];
+}
+
 /**
  * Posición circular dentro del grupo del trabajo: los productos reales siguen
  * el orden Aikestar → Jota → Relevo → Margin → Tips; las demos de Labs, el suyo.
@@ -573,7 +588,7 @@ export function getWorkSequence(
 ): { index: number; total: number; next: Work; prev: Work } | undefined {
   const current = getPublishedWorks().find((w) => w.slug === slug);
   if (!current) return undefined;
-  const list = current.kind === "demo" ? getDemos() : [...getPrincipalProducts(), ...getMvpProducts()];
+  const list = current.kind === "demo" ? getDemos() : allProductsInOrder();
   const i = list.findIndex((w) => w.slug === slug);
   if (i === -1) return undefined;
   return {

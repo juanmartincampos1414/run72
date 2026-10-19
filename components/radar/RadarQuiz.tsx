@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { RunitFigure } from "@/components/runit/RunitFigure";
 import { fbTrack } from "@/lib/meta-pixel";
+import { getAttribution } from "@/lib/marketing/attribution";
 import {
   QUESTIONS,
   STAGES,
@@ -80,11 +81,13 @@ function LeadForm({ result }: { result: RadarResult }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [privacy, setPrivacy] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!privacy) { setError("Necesitamos tu conformidad con la política de privacidad."); setState("error"); return; }
     setState("sending"); setError("");
     try {
       const res = await fetch("/api/radar", {
@@ -96,6 +99,9 @@ function LeadForm({ result }: { result: RadarResult }) {
           stageLevel: result.stageLevel,
           areas: result.areas.map((a) => ({ name: a.name, level: a.level })),
           steps: result.steps.map((s) => ({ name: s.name, service: s.service })),
+          // Acción explícita del usuario + conformidad → puede alimentar el pipeline.
+          privacy,
+          attribution: getAttribution(),
         }),
       });
       const data = await res.json();
@@ -130,6 +136,11 @@ function LeadForm({ result }: { result: RadarResult }) {
         <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="WhatsApp (opcional)"
           className="rounded-xl border border-line bg-ink px-4 py-3 text-sm outline-none focus:border-brand-violet" />
       </div>
+      <label className="mt-4 flex items-start gap-2.5 text-sm text-muted">
+        <input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-brand-violet" />
+        <span>Leí y acepto la <a href="/privacidad" target="_blank" rel="noopener" className="text-fg underline">política de privacidad</a>. No me suscribe a comunicaciones de marketing.</span>
+      </label>
       {error && <p className="mt-3 text-sm text-rose-400">{error}</p>}
       <button type="submit" disabled={state === "sending"}
         className="mt-5 w-full rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3.5 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-60">

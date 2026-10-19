@@ -5,7 +5,10 @@ export const SITE = {
   name: "RUN",
   legalName: "RUN",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.run72.app",
-  email: "hola@run72.app",
+  // Identidad de correo público de RUN. Centralizada en env para migrar a una
+  // casilla de marca sin tocar código. Mientras no exista casilla propia de
+  // RUN, hola@run72.app queda como alias/forward temporal (bloqueante de prod).
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hola@run72.app",
   titleDefault: "RUN · Software a medida y agentes de IA",
   description:
     "Desarrollamos software a medida, agentes de inteligencia artificial e integraciones para mejorar la operación de tu empresa. Contanos qué necesitás resolver.",
@@ -90,11 +93,11 @@ export const HOME = {
     secondaryLink: { label: "Cómo trabajamos en detalle", href: "/como-trabajamos" },
   },
   works: {
-    eyebrow: "PRODUCTOS PRINCIPALES",
+    eyebrow: "TRABAJOS SELECCIONADOS",
     rows: [
       { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA." },
       { title: "Jota", slug: "jota", tag: "IA · Marketing", state: "Operativo", desc: "Sistema operativo de marketing con IA." },
-      { title: "Relevo", slug: "relevo", tag: "Software · IA", state: "Operativo", desc: "Inteligencia para originar e investigar oportunidades." },
+      { title: "Relevo", slug: "relevo", tag: "Software · IA", state: "MVP funcional · en uso privado", desc: "Inteligencia para originar e investigar oportunidades." },
     ],
     allLink: { label: "Ver todos los trabajos", href: "/trabajos" },
     demosLink: { label: "Explorar demos en Labs", href: "/labs" },

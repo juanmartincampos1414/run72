@@ -11,7 +11,15 @@ export type AnalyticsEvent =
   | "demo_open"
   | "demo_complete"
   | "inquiry_started"
-  | "inquiry_submitted";
+  | "inquiry_submitted"
+  // Eventos comerciales (14 / Part D). Se emiten solo tras el éxito del paso
+  // correspondiente y nunca transportan PII (nombre, email, texto libre).
+  | "cta_contact_click"
+  | "contact_form_start"
+  | "contact_form_submit"
+  | "quote_start"
+  | "quote_complete"
+  | "lead_created";
 
 type AllowedProps = Partial<Record<"route" | "solutionId" | "demoId" | "location", string>>;
 

@@ -4,6 +4,7 @@ import { MarketingHeader } from "./MarketingHeader";
 import { MarketingFooter } from "./MarketingFooter";
 import { RunitLauncher } from "./RunitLauncher";
 import { SmoothScroll } from "./SmoothScroll";
+import { AttributionTracker } from "./AttributionTracker";
 
 // Shell visual de RUN (marketing). Aplica el namespace .marketing, las
 // variables de fuente propias y monta header/footer. Lo usan tanto las rutas
@@ -25,6 +26,7 @@ export function MarketingShell({
   return (
     <div className={`marketing ${marketingFontVars}`}>
       {withSmooth && <SmoothScroll />}
+      <AttributionTracker />
       <MarketingHeader />
       <main id="main-content">{children}</main>
       {withFooter && <MarketingFooter />}

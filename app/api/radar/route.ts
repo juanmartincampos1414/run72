@@ -20,9 +20,25 @@ type Body = {
   stageLevel?: number;
   areas?: Area[];
   steps?: Step[];
+  privacy?: boolean;
+  attribution?: Record<string, unknown>;
 };
 
 const NIVEL = ["", "En el arranque", "Agarrando ritmo", "En velocidad", "A la cabeza"];
+const PRIVACY_VERSION = "2026-10-18";
+
+function deriveChannel(a: Record<string, string>, host: string | null): string {
+  const src = (a.utm_source || "").toLowerCase();
+  const med = (a.utm_medium || "").toLowerCase();
+  const ref = (a.referrer || "").toLowerCase();
+  if (a.gclid || src.includes("google")) return med.includes("cpc") || med.includes("paid") || a.gclid ? "google_ads" : "google";
+  if (a.fbclid || src.includes("facebook") || src.includes("meta") || src.includes("instagram")) return "meta_ads";
+  if (src.includes("linkedin")) return "linkedin";
+  if (med.includes("cpc") || med.includes("paid") || med.includes("ads")) return "paid";
+  if (ref && (!host || !ref.includes(host))) return "referral";
+  if (!ref && !src) return "direct";
+  return "organic";
+}
 
 export async function POST(req: Request) {
   let body: Body;
@@ -64,6 +80,48 @@ export async function POST(req: Request) {
       saved = false;
     }
     await logEvent(supabase, "radar_submitted", null, { email, stage });
+
+    // --- Alimentar el pipeline unificado SOLO con consentimiento explícito ---
+    // (Runit Scan ya es una acción explícita; sumamos la conformidad de privacidad.)
+    if (body.privacy === true) {
+      const attr: Record<string, string> = {};
+      const attrIn = (body.attribution && typeof body.attribution === "object" ? body.attribution : {}) as Record<string, unknown>;
+      for (const k of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "fbclid", "referrer", "landing_page"]) {
+        const v = attrIn[k];
+        if (typeof v === "string" && v.trim()) attr[k] = v.trim().slice(0, 300);
+      }
+      const channel = deriveChannel(attr, req.headers.get("host"));
+      const problem = [
+        `Autodiagnóstico Runit Scan — etapa: ${stage || "s/d"}.`,
+        areas.length ? "Áreas: " + areas.map((a) => `${a.name} (${NIVEL[a.level ?? 0] ?? ""})`).join(", ") : "",
+        steps.length ? "Próximos pasos sugeridos: " + steps.map((s) => `${s.name} → ${s.service}`).join("; ") : "",
+      ].filter(Boolean).join("\n");
+      try {
+        await supabase.from("project_inquiries").insert({
+          idempotency_key: crypto.randomUUID(),
+          name,
+          email,
+          phone: whatsapp || null,
+          interest: "orientacion",
+          problem: problem.slice(0, 3000),
+          privacy_version: PRIVACY_VERSION,
+          privacy_accepted_at: new Date().toISOString(),
+          source: "runit_scan",
+          entry_path: "/runit-scan",
+          landing_page: attr.landing_page || null,
+          referrer: attr.referrer || null,
+          utm_source: attr.utm_source || null,
+          utm_medium: attr.utm_medium || null,
+          utm_campaign: attr.utm_campaign || null,
+          utm_content: attr.utm_content || null,
+          utm_term: attr.utm_term || null,
+          channel,
+          priority: "media",
+        });
+      } catch {
+        /* el radar_submission ya quedó guardado; el espejo no bloquea */
+      }
+    }
   }
 
   const from = process.env.RESEND_FROM_NOTIFY || "RUN Radar <notificaciones@run72.app>";

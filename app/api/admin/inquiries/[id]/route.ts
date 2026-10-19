@@ -7,6 +7,7 @@ import { sendEmail } from "@/lib/email";
 export const dynamic = "force-dynamic";
 
 const STATUSES = ["nuevo", "revisando", "contactado", "cerrado"] as const;
+const PRIORITIES = ["alta", "media", "baja", "spam"] as const;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function escapeHtml(s: string): string {
@@ -29,7 +30,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   const { data, error } = await getSupabaseAdmin()
     .from("project_inquiries")
     .select(
-      "id, name, email, company, interest, problem, systems, budget, status, source_path, privacy_version, privacy_accepted_at, created_at, notified_at",
+      "id, name, email, company, phone, interest, problem, systems, budget, timeline, status, priority, source, channel, entry_path, landing_page, referrer, utm_source, utm_medium, utm_campaign, utm_content, utm_term, source_path, privacy_version, privacy_accepted_at, consent_marketing_at, notes, last_contact_at, created_at, notified_at",
     )
     .eq("id", id)
     .maybeSingle();
@@ -69,8 +70,8 @@ export async function PATCH(req: Request, { params }: Ctx) {
     if (error) return NextResponse.json({ error: "No se pudo cargar la consulta." }, { status: 500 });
     if (!q) return NextResponse.json({ error: "Consulta no encontrada." }, { status: 404 });
 
-    const to = process.env.ADMIN_EMAILS?.split(",")[0]?.trim() || "hola@run72.app";
-    const from = process.env.RESEND_FROM_NOTIFY || "RUN <notificaciones@run72.app>";
+    const to = process.env.LEADS_NOTIFICATION_EMAIL || process.env.ADMIN_EMAILS?.split(",")[0]?.trim() || "hola@run72.app";
+    const from = process.env.CONTACT_FROM_EMAIL || process.env.RESEND_FROM_NOTIFY || "RUN <notificaciones@run72.app>";
     const sent = await sendEmail({
       to,
       from,
@@ -106,28 +107,49 @@ ${q.systems ? `<p><strong>Herramientas:</strong> ${escapeHtml(q.systems)}</p>` :
     return NextResponse.json({ ok: true, notified_at: notifiedAt });
   }
 
-  // --- Cambio de estado ---
+  // --- Actualización de campos del pipeline (estado, prioridad, notas) ---
+  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  let changedStatus: string | null = null;
+
   if (typeof body.status === "string") {
-    const status = body.status;
-    if (!(STATUSES as readonly string[]).includes(status)) {
+    if (!(STATUSES as readonly string[]).includes(body.status)) {
       return NextResponse.json({ error: "Estado inválido." }, { status: 400 });
     }
-    const { data, error } = await supabase
-      .from("project_inquiries")
-      .update({ status })
-      .eq("id", id)
-      .select("id")
-      .maybeSingle();
-    if (error) return NextResponse.json({ error: "No se pudo actualizar el estado." }, { status: 500 });
-    if (!data) return NextResponse.json({ error: "Consulta no encontrada." }, { status: 404 });
-
-    await logEvent(supabase, "inquiry_status_changed", null, {
-      inquiry_id: id,
-      status,
-      by: auth.user.email ?? null,
-    });
-    return NextResponse.json({ ok: true });
+    patch.status = body.status;
+    changedStatus = body.status;
+    // Al marcar contactado/cerrado, registrar último contacto.
+    if (body.status === "contactado" || body.status === "cerrado") {
+      patch.last_contact_at = new Date().toISOString();
+    }
+  }
+  if (typeof body.priority === "string") {
+    if (!(PRIORITIES as readonly string[]).includes(body.priority)) {
+      return NextResponse.json({ error: "Prioridad inválida." }, { status: 400 });
+    }
+    patch.priority = body.priority;
+  }
+  if (typeof body.notes === "string") {
+    patch.notes = body.notes.slice(0, 4000) || null;
   }
 
-  return NextResponse.json({ error: "Acción inválida." }, { status: 400 });
+  if (Object.keys(patch).length === 1) {
+    return NextResponse.json({ error: "Acción inválida." }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from("project_inquiries")
+    .update(patch)
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error) return NextResponse.json({ error: "No se pudo actualizar la consulta." }, { status: 500 });
+  if (!data) return NextResponse.json({ error: "Consulta no encontrada." }, { status: 404 });
+
+  await logEvent(supabase, "inquiry_updated", null, {
+    inquiry_id: id,
+    status: changedStatus,
+    priority: typeof body.priority === "string" ? body.priority : null,
+    by: auth.user.email ?? null,
+  });
+  return NextResponse.json({ ok: true });
 }

@@ -26,6 +26,9 @@ const MVP_EVIDENCE_COPY =
   "MVP documentado a partir de su código, arquitectura y recorridos funcionales. Actualmente no dispone de un entorno público demostrativo.";
 const OPERATIONAL_EVIDENCE_COPY =
   "Producto operativo documentado a partir de su código, arquitectura y recorridos. Capturas con datos reales no se publican por privacidad.";
+/** Productos sin evidencia pública (sin URL): se verifican desde el repositorio y su entorno local. */
+const PRIVATE_EVIDENCE_COPY =
+  "Aplicación funcional verificada desde el repositorio y su entorno local. Las capturas muestran la interfaz real con una organización demostrativa y datos anonimizados.";
 
 export function generateStaticParams(): Params[] {
   return getWorkSlugs().map((slug) => ({ slug }));
@@ -86,7 +89,10 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
   const isProduct = work.kind === "producto";
   const pendingFields = getPendingFields(work);
   const isMvp = work.section === "mvp";
-  const typeLabel = isDemo ? DEMO_LABEL : isProduct ? (isMvp ? "MVP desarrollado" : "Producto principal") : "Caso de cliente";
+  const hasPublicEvidence = Boolean(work.evidence?.length);
+  const productTypeLabel =
+    work.section === "mvp-uso" ? "MVP funcional en uso privado" : isMvp ? "MVP desarrollado" : "Producto operativo";
+  const typeLabel = isDemo ? DEMO_LABEL : isProduct ? productTypeLabel : "Caso de cliente";
   const gallery = work.media.gallery ?? [];
   const cover = gallery[0];
   const categories = work.categories.map((c) => CATEGORY_LABELS[c]).join(" · ");
@@ -255,16 +261,19 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
           <h2 className="work-label m-mono">Estado</h2>
           <Field value={work.status} />
         </div>
-        <div className="work-pair-col">
-          <h2 className="work-label m-mono">Evidencia</h2>
-          <FieldList items={work.evidence} />
-        </div>
+        {hasPublicEvidence && (
+          <div className="work-pair-col">
+            <h2 className="work-label m-mono">Evidencia</h2>
+            <FieldList items={work.evidence} />
+          </div>
+        )}
       </section>
 
       <section className="m-container work-block" aria-labelledby="work-media-h">
         <h2 id="work-media-h" className="work-label m-mono">
-          {gallery.length > 0 ? "Capturas y medios" : "Evidencia del producto"}
+          {gallery.length > 0 && hasPublicEvidence ? "Capturas y medios" : "Evidencia del producto"}
         </h2>
+        {gallery.length > 0 && !hasPublicEvidence && <p className="work-text">{PRIVATE_EVIDENCE_COPY}</p>}
         {gallery.length > 0 && (
           <>
             <ul
@@ -294,12 +303,15 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
                 </li>
               ))}
             </ul>
-            <p className="work-note" style={{ marginTop: 16 }}>
-              Capturas reales de la aplicación, con una organización de demostración y datos de prueba.
-            </p>
+            {hasPublicEvidence && (
+              <p className="work-note" style={{ marginTop: 16 }}>
+                Capturas reales de la aplicación, con una organización de demostración y datos de prueba.
+              </p>
+            )}
           </>
         )}
-        {(isMvp || gallery.length === 0) && (
+        {gallery.length === 0 && !hasPublicEvidence && <p className="work-text">{PRIVATE_EVIDENCE_COPY}</p>}
+        {hasPublicEvidence && (isMvp || gallery.length === 0) && (
           <div className="work-media-placeholder" style={gallery.length > 0 ? { marginTop: 24 } : undefined}>
             {gallery.length > 0 && <h3 className="work-label m-mono">Evidencia del producto</h3>}
             <p className="work-text">{isMvp ? MVP_EVIDENCE_COPY : OPERATIONAL_EVIDENCE_COPY}</p>

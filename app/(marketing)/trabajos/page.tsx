@@ -9,6 +9,7 @@ import {
   getDemos,
   getMvpProducts,
   getPrincipalProducts,
+  getPrivateMvpProducts,
   workPath,
 } from "@/lib/marketing/cases";
 import { WorksBrowser } from "./WorksBrowser";
@@ -23,11 +24,12 @@ export const metadata: Metadata = {
 
 export default function TrabajosPage() {
   const principals = getPrincipalProducts();
+  const inUse = getPrivateMvpProducts();
   const mvps = getMvpProducts();
   const demos = getDemos();
-  const total = principals.length + mvps.length;
-  // Numeración continua 01..N a través de ambas secciones.
-  const order = [...principals, ...mvps].map((w) => w.slug);
+  const total = principals.length + inUse.length + mvps.length;
+  // Numeración continua 01..N a través de los tres grupos.
+  const order = [...principals, ...inUse, ...mvps].map((w) => w.slug);
 
   return (
     <div className="work-page">
@@ -47,7 +49,7 @@ export default function TrabajosPage() {
         </h2>
         <p className="work-count m-mono">
           {total} {total === 1 ? "producto real" : "productos reales"} · {principals.length}{" "}
-          {principals.length === 1 ? "principal" : "principales"} · {mvps.length}{" "}
+          {principals.length === 1 ? "operativo" : "operativos"} · {inUse.length} MVP en uso · {mvps.length}{" "}
           {mvps.length === 1 ? "MVP desarrollado" : "MVPs desarrollados"}
         </p>
       </section>
@@ -55,16 +57,25 @@ export default function TrabajosPage() {
       {principals.length > 0 && (
         <section className="m-container work-index-list" aria-labelledby="work-principal-h">
           <h3 id="work-principal-h" className="work-section-title work-section-title-sm">
-            Productos principales
+            Productos operativos
           </h3>
           <WorksBrowser works={principals} order={order} />
+        </section>
+      )}
+
+      {inUse.length > 0 && (
+        <section className="m-container work-index-list" aria-labelledby="work-mvp-uso-h">
+          <h3 id="work-mvp-uso-h" className="work-section-title work-section-title-sm">
+            MVP funcional en uso privado
+          </h3>
+          <WorksBrowser works={inUse} order={order} />
         </section>
       )}
 
       {mvps.length > 0 && (
         <section className="m-container work-index-list" aria-labelledby="work-mvp-h">
           <h3 id="work-mvp-h" className="work-section-title work-section-title-sm">
-            MVPs desarrollados
+            MVPs desarrollados · actualmente no operativos
           </h3>
           <WorksBrowser works={mvps} order={order} />
         </section>
