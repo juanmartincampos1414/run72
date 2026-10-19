@@ -90,11 +90,11 @@ export const HOME = {
     secondaryLink: { label: "Cómo trabajamos en detalle", href: "/como-trabajamos" },
   },
   works: {
-    eyebrow: "PRODUCTOS REALES",
+    eyebrow: "PRODUCTOS PRINCIPALES",
+    // Orden: Aikestar, J, Relevo. J se suma en el puesto 2 cuando se confirme.
     rows: [
       { title: "Aikestar", slug: "aikestar", tag: "Software · IA" },
-      { title: "Margin", slug: "margin", tag: "Software" },
-      { title: "Tips", slug: "tips", tag: "Software" },
+      { title: "Relevo", slug: "relevo", tag: "Software · IA" },
     ],
     allLink: { label: "Ver todos los trabajos", href: "/trabajos" },
     demosLink: { label: "Explorar demos en Labs", href: "/labs" },

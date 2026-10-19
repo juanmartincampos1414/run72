@@ -3,7 +3,14 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import { GradientText } from "@/components/marketing/GradientText";
-import { CATEGORY_LABELS, DEMO_LABEL, getDemos, getProducts, workPath } from "@/lib/marketing/cases";
+import {
+  CATEGORY_LABELS,
+  DEMO_LABEL,
+  getDemos,
+  getMvpProducts,
+  getPrincipalProducts,
+  workPath,
+} from "@/lib/marketing/cases";
 import { WorksBrowser } from "./WorksBrowser";
 import "./trabajos.css";
 
@@ -15,8 +22,10 @@ export const metadata: Metadata = {
 };
 
 export default function TrabajosPage() {
-  const products = getProducts();
+  const principals = getPrincipalProducts();
+  const mvps = getMvpProducts();
   const demos = getDemos();
+  const total = principals.length + mvps.length;
 
   return (
     <div className="work-page">
@@ -34,8 +43,30 @@ export default function TrabajosPage() {
         <h2 id="work-products-h" className="work-section-title">
           Software y productos reales
         </h2>
-        <WorksBrowser works={products} />
+        <p className="work-count m-mono">
+          {total} {total === 1 ? "producto real" : "productos reales"} · {principals.length}{" "}
+          {principals.length === 1 ? "principal" : "principales"} · {mvps.length}{" "}
+          {mvps.length === 1 ? "MVP desarrollado" : "MVPs desarrollados"}
+        </p>
       </section>
+
+      {principals.length > 0 && (
+        <section className="m-container work-index-list" aria-labelledby="work-principal-h">
+          <h3 id="work-principal-h" className="work-section-title work-section-title-sm">
+            Productos principales
+          </h3>
+          <WorksBrowser works={principals} />
+        </section>
+      )}
+
+      {mvps.length > 0 && (
+        <section className="m-container work-index-list" aria-labelledby="work-mvp-h">
+          <h3 id="work-mvp-h" className="work-section-title work-section-title-sm">
+            MVPs desarrollados
+          </h3>
+          <WorksBrowser works={mvps} />
+        </section>
+      )}
 
       <section className="m-container work-labs" aria-labelledby="work-labs-h">
         <div className="work-labs-head">

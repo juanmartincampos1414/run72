@@ -22,6 +22,11 @@ import "../trabajos.css";
 
 type Params = { slug: string };
 
+const MVP_EVIDENCE_COPY =
+  "MVP documentado a partir de su código, arquitectura y recorridos funcionales. Actualmente no dispone de un entorno público demostrativo.";
+const OPERATIONAL_EVIDENCE_COPY =
+  "Producto operativo documentado a partir de su código, arquitectura y recorridos. Capturas con datos reales no se publican por privacidad.";
+
 export function generateStaticParams(): Params[] {
   return getWorkSlugs().map((slug) => ({ slug }));
 }
@@ -74,15 +79,23 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
   const seq = getWorkSequence(slug);
   if (!work || !seq) notFound();
 
-  const { next, index, total } = seq;
+  const { next, prev, index, total } = seq;
   const nextIndex = (index % total) + 1;
+  const prevIndex = ((index - 2 + total) % total) + 1;
   const isDemo = work.kind === "demo";
   const isProduct = work.kind === "producto";
   const pendingFields = getPendingFields(work);
-  const typeLabel = isDemo ? DEMO_LABEL : isProduct ? "Producto real" : "Caso de cliente";
+  const isMvp = work.section === "mvp";
+  const typeLabel = isDemo ? DEMO_LABEL : isProduct ? (isMvp ? "MVP desarrollado" : "Producto principal") : "Caso de cliente";
   const gallery = work.media.gallery ?? [];
   const cover = gallery[0];
   const categories = work.categories.map((c) => CATEGORY_LABELS[c]).join(" · ");
+
+  const prevStyle = {
+    "--work-next-chars": prev.title.length,
+    "--work-next-word": longestWord(prev.title),
+    "--work-accent": prev.media.poster,
+  } as CSSProperties;
 
   const nextStyle = {
     "--work-next-chars": next.title.length,
@@ -250,9 +263,9 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
 
       <section className="m-container work-block" aria-labelledby="work-media-h">
         <h2 id="work-media-h" className="work-label m-mono">
-          Capturas y medios
+          {gallery.length > 0 ? "Capturas y medios" : "Evidencia del producto"}
         </h2>
-        {gallery.length > 0 ? (
+        {gallery.length > 0 && (
           <>
             <ul
               role="list"
@@ -285,9 +298,11 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
               Capturas reales de la aplicación, con una organización de demostración y datos de prueba.
             </p>
           </>
-        ) : (
-          <div className="work-media-placeholder">
-            <p className="work-text work-field">Capturas de la aplicación en preparación.</p>
+        )}
+        {(isMvp || gallery.length === 0) && (
+          <div className="work-media-placeholder" style={gallery.length > 0 ? { marginTop: 24 } : undefined}>
+            <h3 className="work-label m-mono">Evidencia del producto</h3>
+            <p className="work-text">{isMvp ? MVP_EVIDENCE_COPY : OPERATIONAL_EVIDENCE_COPY}</p>
           </div>
         )}
       </section>
@@ -350,6 +365,27 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
         <GradientButton href={work.ctaContacto.href} variant="ghost">
           {work.ctaContacto.label} <AnimatedArrow />
         </GradientButton>
+      </section>
+
+      <section className="work-next-wrap" aria-label="Trabajo anterior">
+        <div className="m-container">
+          <Link
+            href={workPath(prev)}
+            className="work-next"
+            style={prevStyle}
+            aria-label={`Trabajo anterior: ${prev.title}, ${prevIndex} de ${total}`}
+          >
+            <span className="work-next-top">
+              <span className="work-label m-mono">Trabajo anterior</span>
+              <span className="work-next-counter m-mono" aria-hidden="true">
+                {formatCounter(prevIndex, total)}
+              </span>
+            </span>
+            <span className="work-next-name" aria-hidden="true">
+              {prev.title}
+            </span>
+          </Link>
+        </div>
       </section>
 
       <section className="work-next-wrap" aria-label="Siguiente trabajo">

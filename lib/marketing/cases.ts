@@ -4,6 +4,8 @@
 
 export type WorkKind = "producto" | "demo" | "client";
 export type WorkCategory = "software" | "ia" | "automatizacion";
+/** Sección de un producto real: principal (operativo) o MVP desarrollado. */
+export type WorkSection = "principal" | "mvp";
 
 export const DEMO_LABEL = "Demo conceptual · Datos ficticios";
 
@@ -29,7 +31,7 @@ export type WorkMedia = {
   images?: string[];
   /** Productos: logo real del producto (/public). */
   logo?: string;
-  /** Productos: capturas reales de la aplicación. Si no hay, la ficha dice que están en preparación. */
+  /** Productos: capturas reales y seguras de la aplicación. Si no hay, la ficha muestra el bloque "Evidencia del producto". */
   gallery?: WorkShot[];
 };
 
@@ -58,6 +60,8 @@ export type Work = {
   evidence?: string[];
   publicationPermission?: boolean;
   teamRole?: string;
+  /** Solo productos: "principal" (operativo) o "mvp" (desarrollado, no operativo). */
+  section?: WorkSection;
   /** Ficha de producto (kind=producto). Solo datos verificados; un dato desconocido se omite o es PENDING. */
   context?: string;
   userType?: string;
@@ -79,6 +83,7 @@ export type WorkStack = {
 
 type ProductInput = {
   slug: string;
+  section: WorkSection;
   title: string;
   subtitle: string;
   categories: WorkCategory[];
@@ -98,6 +103,7 @@ type ProductInput = {
   teamRole: string;
   logo?: string;
   gallery?: WorkShot[];
+  ctaContacto?: WorkLink;
 };
 
 /** Ficha de producto real: solo datos verificados en el repositorio. */
@@ -107,13 +113,14 @@ function product(p: ProductInput): Work {
     title: p.title,
     subtitle: p.subtitle,
     kind: "producto",
+    section: p.section,
     categories: p.categories,
     year: p.year,
     summary: p.summary,
     problem: p.context,
     solution: p.built,
     scope: p.status,
-    ctaContacto: {
+    ctaContacto: p.ctaContacto ?? {
       label: "Hablar de un proyecto como este",
       href: `/contacto?interes=${p.categories.includes("ia") ? "agentes" : "software"}`,
     },
@@ -135,10 +142,20 @@ function product(p: ProductInput): Work {
 
 const OWN_PRODUCT_ROLE = "Producto propio · diseño y desarrollo";
 
+/** Estado de los MVP desarrollados que hoy no tienen un entorno operativo. */
+const MVP_STATUS = "MVP desarrollado · Actualmente no operativo";
+
+/**
+ * Orden definitivo de Trabajos (el orden del array ES el orden público):
+ *   Productos principales: 1 Aikestar, 2 J (oculto hasta identificarlo), 3 Relevo.
+ *   MVPs desarrollados:    4 Margin, 5 Tips.
+ *   Labs: demos conceptuales, aparte.
+ */
 export const WORKS: Work[] = [
-  // ---- Productos propios de RUN: fichas con datos verificados en cada repositorio ----
+  // ---- Productos principales (operativos) ----
   product({
     slug: "aikestar",
+    section: "principal",
     title: "Aikestar",
     subtitle: "Gestión administrativa y financiera con IA para pymes y emprendedores.",
     categories: ["software", "ia"],
@@ -204,14 +221,86 @@ export const WORKS: Work[] = [
       },
     ],
   }),
+  // J (posición #2 de los principales): todavía no está identificado. Oculto (published:false)
+  // hasta contar con datos verificados; al publicarlo queda entre Aikestar y Relevo. No inventar su ficha.
+  {
+    ...product({
+      slug: "j",
+      section: "principal",
+      title: "J",
+      subtitle: "Producto de la marca propia de RUN.",
+      categories: ["ia"],
+      year: 2026,
+      poster: "#5583FF",
+      statusLabel: "Sin ficha",
+      summary: "Ficha en preparación.",
+      context: PENDING,
+      userType: PENDING,
+      built: PENDING,
+      features: [PENDING],
+      flow: PENDING,
+      stack: { architecture: PENDING, technologies: PENDING, integrations: PENDING },
+      decisions: PENDING,
+      status: PENDING,
+      evidence: [PENDING],
+      teamRole: PENDING,
+    }),
+    year: null,
+    published: false,
+  },
+
+  product({
+    slug: "relevo",
+    section: "principal",
+    title: "Relevo",
+    subtitle: "Sistema operativo de inteligencia para originar e investigar oportunidades.",
+    categories: ["software", "ia"],
+    year: 2026,
+    poster: "#5583FF",
+    statusLabel: "Operativo · live",
+    summary:
+      "Sistema operativo de inteligencia para equipos de originación e investigación: reúne empresas, personas, oportunidades y fuentes en un modelo único, con trazabilidad completa y un resumen diario de qué requiere atención.",
+    context:
+      "Reunir y mantener al día la inteligencia de una misión de originación (empresas, personas, oportunidades y fuentes) sin perder trazabilidad ni depender de planillas dispersas.",
+    userType:
+      "Equipos de originación e investigación, con roles de owner, admin (con aprobación) y visor de solo lectura, y soporte multi-workspace.",
+    built:
+      "Desarrollo de punta a punta: tenencia multi-workspace con registro de auditoría append-only, lectura e ingesta del CRM maestro, modelo canónico de relaciones e IA.",
+    features: [
+      "Lectura determinística y de solo lectura del CRM maestro.",
+      "Sincronización incremental.",
+      "Modelo canónico de relaciones: empresas, personas, activos, oportunidades, entrevistas, actividades y fuentes.",
+      "Historial y trazabilidad con un registro de auditoría append-only.",
+      "Seguimiento de pendientes, fechas, contradicciones y campos críticos.",
+      "Morning Brief y vistas de trabajo: Hoy, Misión, Brain y Ficha.",
+    ],
+    flow:
+      "Sincroniza el CRM maestro en solo lectura, arma el modelo canónico de relaciones, detecta pendientes, contradicciones y campos críticos, y entrega el Morning Brief y las vistas de trabajo.",
+    stack: {
+      architecture:
+        "Tenencia multi-workspace con capacidades por rol y un registro de auditoría append-only.",
+      technologies:
+        "Next.js 16 (App Router), TypeScript, Tailwind 4, shadcn/ui, Supabase (Postgres, Auth y RLS) y zod; SDK de Anthropic; leaflet (mapas) y exceljs.",
+      integrations: "Supabase, Anthropic y lectura (solo lectura) del CRM maestro.",
+    },
+    decisions:
+      "Lectura de solo lectura y determinística del CRM, que nunca escribe en la fuente. Sincronización incremental. Registro de auditoría append-only. Multi-workspace con capacidades por rol.",
+    status: "Operativo en relevo.site; en uso real.",
+    evidence: ["relevo.site"],
+    teamRole: OWN_PRODUCT_ROLE,
+    ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=software" },
+  }),
+
+  // ---- MVPs desarrollados: construidos y documentados, hoy no operativos ----
   product({
     slug: "margin",
+    section: "mvp",
     title: "Margin",
     subtitle: "Inteligencia económica para restaurantes y hospitality.",
     categories: ["software", "ia"],
     year: 2026,
     poster: "#8960FF",
-    statusLabel: "MVP en desarrollo activo",
+    statusLabel: MVP_STATUS,
     summary:
       "Plataforma de inteligencia económica para hospitality: convierte facturas, menús, recetas y cierres operativos en una lectura de márgenes y costos. No es un ERP, un POS ni un sistema contable.",
     context:
@@ -238,23 +327,23 @@ export const WORKS: Work[] = [
     },
     decisions:
       "El historial de precios es append-only con borrado lógico. El restaurante se resuelve desde la sesión, nunca desde el cliente. Toda salida de OCR o IA pasa por revisión humana. Quedan fuera de alcance por decisión: inventario, órdenes de compra y contabilidad.",
-    status:
-      "MVP funcional en desarrollo activo, con brechas conocidas. Según su propia auditoría interna, todavía no está listo para clientes pagos. Sin despliegue público verificado.",
+    status: MVP_STATUS,
     evidence: [
       "Repositorio privado, con un único autor.",
-      "Auditoría interna del producto que documenta sus brechas y que todavía no está listo para clientes pagos.",
+      "Auditoría interna del producto que documenta sus brechas: no está listo para clientes pagos. Sin despliegue público verificado.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/margin/logo.png",
   }),
   product({
     slug: "tips",
+    section: "mvp",
     title: "Tips",
     subtitle: "Reconocimiento al staff de hospitality con bandas NFC.",
     categories: ["software", "automatizacion"],
     year: 2026,
     poster: "#FFD873",
-    statusLabel: "En piloto / MVP",
+    statusLabel: MVP_STATUS,
     summary:
       "Plataforma de reconocimiento para hospitality. Cada banda NFC pertenece a una persona del staff, no a una mesa, y convierte la buena atención en propinas, reseñas y clientes que vuelven.",
     context:
@@ -281,41 +370,14 @@ export const WORKS: Work[] = [
     },
     decisions:
       "La banda pertenece a una persona, no a una mesa. Los datos nunca se borran: se archivan por estado. Los pagos son agnósticos de pasarela y con idempotencia: el dinero solo se confirma por webhook. Las credenciales se guardan solo por referencia.",
-    status:
-      "MVP en piloto, probado en un entorno de laboratorio propio. Sin clientes pagos verificados y sin URL pública verificada.",
+    status: MVP_STATUS,
     evidence: [
       "Repositorio privado, con un único autor.",
-      "Entorno de laboratorio propio para el piloto; sin clientes pagos verificados.",
+      "Probado en un entorno de laboratorio propio; sin clientes pagos ni URL pública verificados.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/tips/logo.png",
   }),
-  // J: sin información verificada todavía; la ficha queda oculta hasta tenerla.
-  {
-    ...product({
-      slug: "j",
-      title: "J",
-      subtitle: "Producto de la marca propia de RUN.",
-      categories: ["ia"],
-      year: 2026,
-      poster: "#5583FF",
-      statusLabel: "Sin ficha",
-      summary: "Ficha en preparación.",
-      context: PENDING,
-      userType: PENDING,
-      built: PENDING,
-      features: [PENDING],
-      flow: PENDING,
-      stack: { architecture: PENDING, technologies: PENDING, integrations: PENDING },
-      decisions: PENDING,
-      status: PENDING,
-      evidence: [PENDING],
-      teamRole: PENDING,
-    }),
-    year: null,
-    published: false,
-  },
-
   // ---- Labs: demos conceptuales con datos ficticios ----
   {
     slug: "sistema-operativo-demo",
@@ -419,6 +481,16 @@ export function getProducts(): Work[] {
   return getPublishedWorks().filter((w) => w.kind === "producto");
 }
 
+/** Productos principales (operativos), en orden: Aikestar, J (cuando se publique), Relevo. */
+export function getPrincipalProducts(): Work[] {
+  return getProducts().filter((w) => w.section === "principal");
+}
+
+/** MVPs desarrollados, en orden: Margin, Tips. */
+export function getMvpProducts(): Work[] {
+  return getProducts().filter((w) => w.section === "mvp");
+}
+
 export function getDemos(): Work[] {
   return getPublishedWorks().filter((w) => w.kind === "demo");
 }
@@ -459,12 +531,24 @@ export function isWorkCategory(value: string | null | undefined): value is WorkC
   return value === "software" || value === "ia" || value === "automatizacion";
 }
 
-/** Posición circular entre trabajos publicados (contador 01/03 → 03/03). */
-export function getWorkSequence(slug: string): { index: number; total: number; next: Work } | undefined {
-  const list = getPublishedWorks();
+/**
+ * Posición circular dentro del grupo del trabajo: los productos reales siguen
+ * el orden Aikestar → (J) → Relevo → Margin → Tips; las demos de Labs, el suyo.
+ */
+export function getWorkSequence(
+  slug: string,
+): { index: number; total: number; next: Work; prev: Work } | undefined {
+  const current = getPublishedWorks().find((w) => w.slug === slug);
+  if (!current) return undefined;
+  const list = current.kind === "demo" ? getDemos() : [...getPrincipalProducts(), ...getMvpProducts()];
   const i = list.findIndex((w) => w.slug === slug);
   if (i === -1) return undefined;
-  return { index: i + 1, total: list.length, next: list[(i + 1) % list.length] };
+  return {
+    index: i + 1,
+    total: list.length,
+    next: list[(i + 1) % list.length],
+    prev: list[(i - 1 + list.length) % list.length],
+  };
 }
 
 export function formatCounter(n: number, total: number): string {
