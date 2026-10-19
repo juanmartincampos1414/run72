@@ -809,6 +809,17 @@ html.lenis, html.lenis body { height: auto; }
 .marketing .m-nav-item { position: relative; display: inline-flex; align-items: center; }
 .marketing .m-nav-item .m-nav-link { display: inline-flex; align-items: center; gap: 4px; }
 .marketing .m-nav-caret { font-size: 9px; opacity: 0.6; }
+/* Puente invisible que cubre el espacio de 10px entre el enlace y el dropdown,
+   para que el cursor no salga del área hover del .m-nav-item al bajar al panel.
+   Corrige el cierre prematuro sin depender de un delay de JS. */
+.marketing .m-nav-item:has(.m-nav-drop)::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -12px;
+  right: -12px;
+  height: 12px;
+}
 .marketing .m-nav-drop {
   position: absolute;
   top: calc(100% + 10px);

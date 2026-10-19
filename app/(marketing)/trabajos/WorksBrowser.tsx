@@ -6,6 +6,7 @@ import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import {
   CATEGORY_LABELS,
   PENDING,
+  getEvidenceSummary,
   hasPendingFields,
   isPending,
   isWorkCategory,
@@ -129,7 +130,7 @@ export function WorksBrowser({ works, order }: { works: Work[]; order?: string[]
                     </div>
                     <div>
                       <dt className="work-label m-mono">Evidencia</dt>
-                      <dd data-pending={isPending(w.evidence?.[0])}>{w.evidence?.[0] ?? PENDING}</dd>
+                      <dd data-pending={isPending(getEvidenceSummary(w))}>{getEvidenceSummary(w)}</dd>
                     </div>
                   </dl>
                   <span className="work-card-link m-mono">

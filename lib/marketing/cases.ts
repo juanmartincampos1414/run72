@@ -21,6 +21,14 @@ export function isPending(value: string | null | undefined): boolean {
   return typeof value === "string" && value.includes(PENDING);
 }
 
+/** Evidencia de un producto sin landing pública (MVP en uso privado): se verifica
+ *  desde el repositorio y su entorno local. Copia larga para la ficha. */
+export const PRIVATE_EVIDENCE_COPY =
+  "Aplicación funcional verificada desde el repositorio y su entorno local. Las capturas muestran la interfaz real con una organización demostrativa y datos anonimizados.";
+/** Versión breve para la tarjeta de /trabajos (misma fuente, sin divergencias). */
+export const PRIVATE_EVIDENCE_SUMMARY =
+  "Aplicación funcional verificada desde el repositorio y su entorno local, con interfaz real y datos demostrativos anonimizados.";
+
 export const CATEGORY_LABELS: Record<WorkCategory, string> = {
   software: "Software",
   ia: "IA",
@@ -560,6 +568,15 @@ export function getPendingFields(work: Work): string[] {
 
 export function hasPendingFields(work: Work): boolean {
   return getPendingFields(work).length > 0;
+}
+
+/** Evidencia a mostrar en la tarjeta de /trabajos. Unifica tarjeta y ficha:
+ *  evidencia pública si existe; si no la hay pero sí capturas (MVP en uso
+ *  privado), la verificación por repositorio/entorno; PENDING solo si falta. */
+export function getEvidenceSummary(work: Work): string {
+  if (work.evidence?.length) return work.evidence[0];
+  if (work.media?.gallery?.length) return PRIVATE_EVIDENCE_SUMMARY;
+  return PENDING;
 }
 
 export function getWork(slug: string): Work | undefined {

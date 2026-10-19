@@ -10,6 +10,7 @@ import {
   CATEGORY_LABELS,
   DEMO_LABEL,
   PENDING,
+  PRIVATE_EVIDENCE_COPY,
   formatCounter,
   getPendingFields,
   getWork,
@@ -26,9 +27,7 @@ const MVP_EVIDENCE_COPY =
   "MVP documentado a partir de su código, arquitectura y recorridos funcionales. Actualmente no dispone de un entorno público demostrativo.";
 const OPERATIONAL_EVIDENCE_COPY =
   "Producto operativo documentado a partir de su código, arquitectura y recorridos. Capturas con datos reales no se publican por privacidad.";
-/** Productos sin evidencia pública (sin URL): se verifican desde el repositorio y su entorno local. */
-const PRIVATE_EVIDENCE_COPY =
-  "Aplicación funcional verificada desde el repositorio y su entorno local. Las capturas muestran la interfaz real con una organización demostrativa y datos anonimizados.";
+/** PRIVATE_EVIDENCE_COPY se importa de cases.ts para unificar tarjeta y ficha. */
 
 export function generateStaticParams(): Params[] {
   return getWorkSlugs().map((slug) => ({ slug }));

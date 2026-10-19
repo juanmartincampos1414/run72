@@ -13,8 +13,50 @@ export function MarketingHeader() {
   const [menu, setMenu] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  // Evita que al devolver el foco al enlace tras Escape, el onFocus reabra el menú.
+  const suppressOpenRef = useRef(false);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+
+  // Navegación por teclado del dropdown de escritorio (A06): ArrowDown/Up recorren
+  // las opciones, Escape cierra y devuelve el foco al enlace. Tab/Shift+Tab fluyen
+  // de forma natural (onBlur del contenedor cierra al salir).
+  const onMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, href: string) => {
+    const container = e.currentTarget;
+    const items = Array.from(container.querySelectorAll<HTMLElement>(".m-nav-dropitem"));
+    const link = container.querySelector<HTMLElement>(".m-nav-link");
+    const idx = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (menu !== href) {
+        setMenu(href);
+        requestAnimationFrame(() => items[0]?.focus());
+      } else {
+        items[Math.min(idx + 1, items.length - 1)]?.focus();
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (menu === href && idx > 0) items[idx - 1]?.focus();
+      else {
+        setMenu(null);
+        link?.focus();
+      }
+    } else if (e.key === "Escape") {
+      if (menu === href) {
+        e.preventDefault();
+        setMenu(null);
+        suppressOpenRef.current = true;
+        link?.focus();
+        requestAnimationFrame(() => { suppressOpenRef.current = false; });
+      }
+    } else if (e.key === "Home" && menu === href) {
+      e.preventDefault();
+      items[0]?.focus();
+    } else if (e.key === "End" && menu === href) {
+      e.preventDefault();
+      items[items.length - 1]?.focus();
+    }
+  };
 
   // Cerrar con Escape y restaurar foco (A06).
   useEffect(() => {
@@ -46,8 +88,9 @@ export function MarketingHeader() {
                 className="m-nav-item"
                 onMouseEnter={() => setMenu(l.href)}
                 onMouseLeave={() => setMenu(null)}
-                onFocus={() => setMenu(l.href)}
+                onFocus={() => { if (!suppressOpenRef.current) setMenu(l.href); }}
                 onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setMenu(null); }}
+                onKeyDown={(e) => onMenuKeyDown(e, l.href)}
               >
                 <Link href={l.href} className="m-nav-link" aria-current={isActive(l.href) ? "page" : undefined} aria-expanded={menu === l.href} aria-haspopup="true">
                   {l.label}
