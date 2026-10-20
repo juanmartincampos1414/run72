@@ -1,0 +1,184 @@
+/* ------------------------------------------------------------------ *
+ * RUN · Propuesta de hero (escena 3D). Aislado: solo se usa en /hero.
+ * Paleta cálida tipo ORYZO (walnut / cream / ember), pieza propia de RUN.
+ * ------------------------------------------------------------------ */
+.hv2-root {
+  --hv2-canvas: #120a05;
+  --hv2-cream: #ffedd7;
+  --hv2-cream-dim: #c8b49c;
+  --hv2-ember: #ff6a2a;
+  --hv2-border: rgba(255, 237, 215, 0.16);
+  background: var(--hv2-canvas);
+  color: var(--hv2-cream);
+  font-family: var(--font-run-display), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hv2 {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* Lienzo 3D full-bleed */
+.hv2-canvas { position: absolute; inset: 0; z-index: 0; }
+.hv2-canvas canvas { width: 100% !important; height: 100% !important; display: block; }
+
+/* Marca de agua gigante: tipografía integrada en la escena */
+.hv2-watermark {
+  position: absolute;
+  z-index: 1;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-size: clamp(9rem, 34vw, 32rem);
+  line-height: 0.8;
+  color: var(--hv2-cream);
+  opacity: 0.045;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Viñeta cálida para legibilidad del texto (oscurece bordes y base) */
+.hv2-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 85% at 50% 38%, transparent 40%, rgba(18, 10, 5, 0.55) 100%),
+    linear-gradient(180deg, rgba(18, 10, 5, 0.45) 0%, transparent 22%, transparent 48%, rgba(18, 10, 5, 0.82) 100%);
+}
+
+/* Barra superior */
+.hv2-bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 3vw, 32px) clamp(20px, 5vw, 56px);
+}
+.hv2-logo { font-weight: 500; font-size: 20px; letter-spacing: 0.02em; }
+.hv2-barcta {
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hv2-cream);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.hv2-barcta:hover { opacity: 1; }
+.hv2-barcta span { color: var(--hv2-ember); }
+
+/* Bloque de contenido (titular + CTA), anclado abajo */
+.hv2-inner {
+  position: relative;
+  z-index: 5;
+  margin-top: auto;
+  padding: 0 clamp(20px, 5vw, 56px) clamp(16px, 3vw, 28px);
+  max-width: 900px;
+}
+.hv2-eyebrow {
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: clamp(10px, 1.1vw, 12.5px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hv2-cream-dim);
+  margin: 0 0 18px;
+}
+.hv2-title {
+  font-weight: 450;
+  font-size: clamp(2.8rem, 8.5vw, 6.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  margin: 0;
+  color: var(--hv2-cream);
+  text-wrap: balance;
+}
+.hv2-title-em { color: var(--hv2-cream); position: relative; }
+.hv2-title-em::after {
+  content: "";
+  display: inline-block;
+  width: 0.42em;
+  height: 0.085em;
+  margin-left: 0.22em;
+  vertical-align: 0.2em;
+  background: var(--hv2-ember);
+  border-radius: 2px;
+}
+.hv2-sub {
+  margin: 22px 0 0;
+  max-width: 48ch;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  color: var(--hv2-cream-dim);
+}
+
+/* CTAs */
+.hv2-ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 30px; }
+.hv2-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 26px;
+  border-radius: 8px;
+  background: var(--hv2-cream);
+  color: #1a0f07;
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+.hv2-cta:hover { background: #fff; transform: translateY(-1px); }
+.hv2-cta-ghost {
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hv2-cream);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.hv2-cta-ghost:hover { opacity: 1; }
+.hv2-cta-ghost span { color: var(--hv2-ember); }
+
+/* Pie de hero */
+.hv2-foot {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(20px, 5vw, 56px) clamp(18px, 3vw, 28px);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--hv2-cream-dim);
+}
+.hv2-tag { color: var(--hv2-ember); opacity: 0.9; }
+.hv2-scroll { position: relative; opacity: 0.7; }
+
+/* Foco accesible */
+.hv2 a:focus-visible { outline: 2px solid var(--hv2-cream); outline-offset: 3px; border-radius: 4px; }
+
+@media (max-width: 760px) {
+  .hv2-watermark { top: 38%; opacity: 0.05; }
+  .hv2-inner { max-width: 100%; }
+  .hv2-sub { max-width: 100%; }
+  .hv2-ctas { gap: 12px; }
+  .hv2-cta { width: 100%; justify-content: center; }
+  .hv2-foot { font-size: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv2-cta { transition: none; }
+}
