@@ -95,18 +95,28 @@ export const HOME = {
   works: {
     eyebrow: "TRABAJOS SELECCIONADOS",
     rows: [
-      { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA." },
-      { title: "Jota", slug: "jota", tag: "IA · Marketing", state: "Operativo", desc: "Sistema operativo de marketing con IA." },
-      { title: "Relevo", slug: "relevo", tag: "Software · IA", state: "MVP funcional · en uso privado", desc: "Inteligencia para originar e investigar oportunidades." },
+      { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA.", img: "/work/aikestar/dashboard.jpg", alt: "Panel de Aikestar: salud financiera y cuentas operativas." },
+      { title: "Jota", slug: "jota", tag: "IA · Marketing", state: "Operativo", desc: "Sistema operativo de marketing con IA.", img: "/work/jota/landing.jpg", alt: "Landing pública de Jota (jcaigency.com)." },
+      { title: "Fixy", slug: "fixy", tag: "Software · Plataforma", state: "MVP funcional · web pública", desc: "Conecta clientes con profesionales y centraliza servicios para hogares y empresas.", img: "/work/fixy/landing.jpg", alt: "Landing pública de Fixy." },
     ],
     allLink: { label: "Ver todos los trabajos", href: "/trabajos" },
     demosLink: { label: "Explorar demos en Labs", href: "/labs" },
     demoBadge: "PRODUCTO",
   },
+  // Experiencia acumulada del equipo en su etapa anterior (no es antigüedad de la
+  // marca RUN ni describe esos proyectos como desarrollos de software/IA).
+  experience: {
+    title: "Experiencia detrás de RUN",
+    stats: [
+      { value: "+10", label: "Años de trayectoria" },
+      { value: "+300", label: "Proyectos realizados" },
+      { value: "12", label: "Industrias atendidas" },
+    ],
+  },
   closing: {
     muted: "No necesitás tener la solución.",
     strong: "Contanos qué querés resolver.",
-    cta: { label: "Contanos qué necesitás resolver", href: "/contacto" },
+    cta: { label: "Hablemos de tu proyecto", href: "/contacto" },
   },
 } as const;
 

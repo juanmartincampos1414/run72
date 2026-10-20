@@ -6,11 +6,13 @@ export type WorkKind = "producto" | "demo" | "client";
 export type WorkCategory = "software" | "ia" | "automatizacion";
 /**
  * Sección de un producto real:
- *   principal: producto operativo (Aikestar, Jota).
- *   mvp-uso:   MVP funcional en uso privado (Relevo).
- *   mvp:       MVP desarrollado, actualmente no operativo (Margin, Tips).
+ *   principal:    producto operativo (Aikestar, Jota).
+ *   mvp-publico:  MVP funcional con web pública (Fixy): flujo público operativo,
+ *                 integraciones comerciales aún no activadas.
+ *   mvp-uso:      MVP funcional en uso privado (Relevo).
+ *   mvp:          MVP desarrollado, actualmente no operativo (Margin, Tips).
  */
-export type WorkSection = "principal" | "mvp-uso" | "mvp";
+export type WorkSection = "principal" | "mvp-publico" | "mvp-uso" | "mvp";
 
 export const DEMO_LABEL = "Demo conceptual · Datos ficticios";
 
@@ -162,8 +164,9 @@ const MVP_STATUS = "MVP desarrollado · Actualmente no operativo";
 /**
  * Orden definitivo de Trabajos (el orden del array ES el orden público):
  *   Productos operativos:                 1 Aikestar, 2 Jota.
- *   MVP funcional en uso privado:         3 Relevo.
- *   MVPs desarrollados, no operativos:    4 Margin, 5 Tips (numeración continua 01-05).
+ *   MVP funcional · web pública:          3 Fixy.
+ *   MVP funcional en uso privado:         4 Relevo.
+ *   MVPs desarrollados, no operativos:    5 Margin, 6 Tips (numeración continua 01-06).
  *   Labs: demos conceptuales, aparte.
  */
 export const WORKS: Work[] = [
@@ -280,6 +283,68 @@ export const WORKS: Work[] = [
     ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=agentes" },
   }),
 
+  // ---- MVP funcional · producto público ----
+  product({
+    slug: "fixy",
+    section: "mvp-publico",
+    title: "Fixy",
+    subtitle:
+      "Plataforma de servicios: conecta clientes con profesionales y centraliza la gestión de servicios para hogares y empresas.",
+    categories: ["software", "ia"],
+    year: 2026,
+    poster: "#FF8A3D",
+    statusLabel: "MVP FUNCIONAL · WEB PÚBLICA",
+    summary:
+      "Plataforma que conecta hogares, oficinas y pequeñas empresas con profesionales independientes y empresas de servicios para reparación, instalación y mantenimiento; reúne pedido, presupuestos, contratación, coordinación, pago, seguimiento, reclamos, reseñas e historial por propiedad. MVP para Argentina (ARS, CABA/GBA).",
+    context:
+      "Un pedido de servicio para el hogar o la empresa suele dispersarse en llamados, presupuestos sueltos y falta de trazabilidad; Fixy lo centraliza en un flujo único.",
+    userType:
+      "Clientes (hogares, oficinas, pymes), profesionales y empresas de servicios, y operación de plataforma; con soporte multi-sede (organizaciones) y roles.",
+    built:
+      "Aplicación Next.js full-stack propia: ~21 módulos de dominio en src/server/modules, 40 migraciones SQL versionadas, documentación de producto, arquitectura, estados y pagos, reglas de arquitectura con Semgrep y un envoltorio móvil con Capacitor. Autoría propia.",
+    features: [
+      "Solicitud conversacional sin cuenta (implementada).",
+      "Triage de categoría con reglas locales; IA de Claude opcional y desactivada por defecto.",
+      "Matching determinista cliente↔profesional por categoría, zona y reseñas.",
+      "Presupuestos comparables (pedirlos es gratis).",
+      "Coordinación y agenda con código de visita (parcial: una franja por día).",
+      "Multi-sede: organizaciones y propiedades como sedes.",
+      "Autenticación y roles propios.",
+      "Mensajería con enmascarado de contactos, evidencias privadas firmadas, reclamos y disputas, y reseñas.",
+      "Pagos y liquidaciones: simulados por defecto (gateway mock); Mercado Pago está implementado pero NO activado. WhatsApp y email reales desactivados por defecto.",
+    ],
+    flow:
+      "El cliente pide por un asistente conversacional (sin cuenta), Fixy arma el matching e invita hasta 4 profesionales, se comparan presupuestos, se coordina la visita con código y queda el historial por propiedad.",
+    stack: {
+      architecture:
+        "Next.js 16 (App Router, server actions) + PostgreSQL 16 con migraciones versionadas; storage privado y DB en Supabase; multi-sede por organizaciones.",
+      technologies:
+        "Next.js 16.4, React 19.2, TypeScript, Tailwind 4, PostgreSQL (postgres), Supabase, SDK de Anthropic (opcional), zod, three/react-three-fiber; móvil con Capacitor.",
+      integrations:
+        "Supabase (storage/DB), Mercado Pago (implementado, no activado), WhatsApp Cloud API (modo simulado), Anthropic (opcional) — ninguna integración comercial verificada en operación.",
+    },
+    decisions:
+      "Pagos y notificaciones detrás de adaptadores (mock por defecto) para desarrollar sin credenciales; IA server-only y opcional, solo clasifica (no diagnostica ni cotiza); auth propia con migración a Supabase Auth pendiente.",
+    status:
+      "MVP funcional en desarrollo activo, con web pública (fixy.solutions) y flujo de solicitud público operativo. Las integraciones comerciales (pagos, liquidaciones, WhatsApp, email) están implementadas en modo simulado o desactivadas: no hay operación comercial ni métricas verificables.",
+    evidence: ["fixy.solutions"],
+    teamRole: OWN_PRODUCT_ROLE,
+    gallery: [
+      {
+        src: "/work/fixy/landing.jpg",
+        alt: "Landing pública de Fixy",
+        caption: "Landing pública de Fixy.",
+      },
+      {
+        src: "/work/fixy/solicitar.jpg",
+        alt: "Flujo público de solicitud de Fixy (asistente paso a paso)",
+        caption: "Flujo de solicitud público, sin cuenta.",
+      },
+    ],
+    ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=software" },
+  }),
+
+  // ---- MVP funcional en uso privado ----
   product({
     slug: "relevo",
     section: "mvp-uso",
@@ -531,6 +596,11 @@ export function getPrincipalProducts(): Work[] {
   return getProducts().filter((w) => w.section === "principal");
 }
 
+/** MVP funcional con web pública: Fixy. */
+export function getPublicMvpProducts(): Work[] {
+  return getProducts().filter((w) => w.section === "mvp-publico");
+}
+
 /** MVP funcional en uso privado: Relevo. */
 export function getPrivateMvpProducts(): Work[] {
   return getProducts().filter((w) => w.section === "mvp-uso");
@@ -591,14 +661,19 @@ export function isWorkCategory(value: string | null | undefined): value is WorkC
   return value === "software" || value === "ia" || value === "automatizacion";
 }
 
-/** Los 5 productos reales en orden público: operativos, MVP en uso privado, MVPs desarrollados. */
+/** Los 6 productos reales en orden público: operativos, MVP con web pública, MVP en uso privado, MVPs desarrollados. */
 export function allProductsInOrder(): Work[] {
-  return [...getPrincipalProducts(), ...getPrivateMvpProducts(), ...getMvpProducts()];
+  return [
+    ...getPrincipalProducts(),
+    ...getPublicMvpProducts(),
+    ...getPrivateMvpProducts(),
+    ...getMvpProducts(),
+  ];
 }
 
 /**
  * Posición circular dentro del grupo del trabajo: los productos reales siguen
- * el orden Aikestar → Jota → Relevo → Margin → Tips; las demos de Labs, el suyo.
+ * el orden Aikestar → Jota → Fixy → Relevo → Margin → Tips; las demos de Labs, el suyo.
  */
 export function getWorkSequence(
   slug: string,

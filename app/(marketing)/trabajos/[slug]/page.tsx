@@ -90,7 +90,13 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
   const isMvp = work.section === "mvp";
   const hasPublicEvidence = Boolean(work.evidence?.length);
   const productTypeLabel =
-    work.section === "mvp-uso" ? "MVP funcional en uso privado" : isMvp ? "MVP desarrollado" : "Producto operativo";
+    work.section === "mvp-publico"
+      ? "MVP funcional · web pública"
+      : work.section === "mvp-uso"
+        ? "MVP funcional en uso privado"
+        : isMvp
+          ? "MVP desarrollado"
+          : "Producto operativo";
   const typeLabel = isDemo ? DEMO_LABEL : isProduct ? productTypeLabel : "Caso de cliente";
   const gallery = work.media.gallery ?? [];
   const cover = gallery[0];

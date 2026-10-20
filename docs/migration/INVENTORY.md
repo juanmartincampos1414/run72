@@ -24,10 +24,10 @@ esta ronda) · ⚠️ pendiente/bloqueante.
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `/` | Home: hero, principio, capacidades, proceso, trabajos, cierre | ✅ (estructura/henos previos) |
+| `/` | Home integrada (Fase 2+): hero 3D + lenguaje cálido; proceso compacto (tabs), trabajos con miniaturas reales, franja "Experiencia detrás de RUN", cierre sin repetición | ✅ (verificado en vivo) |
 | `/servicios` · `/servicios/[especialidad]` | Software a medida / Agentes IA / Automatización | 🔎 |
 | `/soluciones` · `/soluciones/[vertical]` | Agentes por industria (restaurantes/hoteles/real estate) | 🔎 |
-| `/trabajos` · `/trabajos/[slug]` | Portfolio: 01 Aikestar, 02 Jota (operativos), 03 Relevo (MVP en uso privado), 04 Margin, 05 Tips (MVPs no operativos). HOST fuera. | ✅ |
+| `/trabajos` · `/trabajos/[slug]` | Portfolio (6, numeración 01–06): 01 Aikestar, 02 Jota (operativos), 03 **Fixy** (MVP funcional · web pública), 04 Relevo (MVP en uso privado), 05 Margin, 06 Tips (MVPs no operativos). HOST fuera. Ficha Fixy verificada contra el repo (pagos/WhatsApp/email simulados o desactivados). | ✅ |
 | `/como-trabajamos` | Proceso en detalle | 🔎 |
 | `/blog` · `/blog/[slug]` | Blog | 🔎 |
 | `/labs` · `/labs/{agente,integraciones,operacion}` | Demos conceptuales (datos ficticios) | 🔎 |

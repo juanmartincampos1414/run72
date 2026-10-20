@@ -7,6 +7,7 @@ import { Principles } from "@/components/marketing/home/Principles";
 import { CapabilitiesGrid } from "@/components/marketing/home/CapabilitiesGrid";
 import { StickyProcess } from "@/components/marketing/home/StickyProcess";
 import { WorkRows } from "@/components/marketing/home/WorkRows";
+import { ExperienceBand } from "@/components/marketing/home/ExperienceBand";
 import { ClosingCTA } from "@/components/marketing/home/ClosingCTA";
 
 // Home de RUN (Fase 2): hero 3D aprobado + secciones en el lenguaje editorial
@@ -21,6 +22,7 @@ export default function Home() {
       <CapabilitiesGrid />
       <StickyProcess />
       <WorkRows />
+      <ExperienceBand />
       <ClosingCTA />
     </MarketingShell>
   );

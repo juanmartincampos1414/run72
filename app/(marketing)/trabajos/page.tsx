@@ -10,6 +10,7 @@ import {
   getMvpProducts,
   getPrincipalProducts,
   getPrivateMvpProducts,
+  getPublicMvpProducts,
   workPath,
 } from "@/lib/marketing/cases";
 import { WorksBrowser } from "./WorksBrowser";
@@ -24,12 +25,13 @@ export const metadata: Metadata = {
 
 export default function TrabajosPage() {
   const principals = getPrincipalProducts();
+  const publicMvps = getPublicMvpProducts();
   const inUse = getPrivateMvpProducts();
   const mvps = getMvpProducts();
   const demos = getDemos();
-  const total = principals.length + inUse.length + mvps.length;
-  // Numeración continua 01..N a través de los tres grupos.
-  const order = [...principals, ...inUse, ...mvps].map((w) => w.slug);
+  const total = principals.length + publicMvps.length + inUse.length + mvps.length;
+  // Numeración continua 01..N a través de los cuatro grupos.
+  const order = [...principals, ...publicMvps, ...inUse, ...mvps].map((w) => w.slug);
 
   return (
     <div className="work-page">
@@ -49,7 +51,9 @@ export default function TrabajosPage() {
         </h2>
         <p className="work-count m-mono">
           {total} {total === 1 ? "producto real" : "productos reales"} · {principals.length}{" "}
-          {principals.length === 1 ? "operativo" : "operativos"} · {inUse.length} MVP en uso · {mvps.length}{" "}
+          {principals.length === 1 ? "operativo" : "operativos"} · {publicMvps.length}{" "}
+          {publicMvps.length === 1 ? "MVP con web pública" : "MVPs con web pública"} · {inUse.length}{" "}
+          {inUse.length === 1 ? "MVP en uso privado" : "MVPs en uso privado"} · {mvps.length}{" "}
           {mvps.length === 1 ? "MVP desarrollado" : "MVPs desarrollados"}
         </p>
       </section>
@@ -60,6 +64,15 @@ export default function TrabajosPage() {
             Productos operativos
           </h3>
           <WorksBrowser works={principals} order={order} />
+        </section>
+      )}
+
+      {publicMvps.length > 0 && (
+        <section className="m-container work-index-list" aria-labelledby="work-mvp-publico-h">
+          <h3 id="work-mvp-publico-h" className="work-section-title work-section-title-sm">
+            MVP funcional · producto público
+          </h3>
+          <WorksBrowser works={publicMvps} order={order} />
         </section>
       )}
 

@@ -1,123 +1,67 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { HOME } from "@/lib/marketing/content";
 import Link from "next/link";
 
-// Proceso (5.4 + 4.4). Escritorio: escena sticky 100dvh sobre envolvente
-// 500dvh con 4 pasos y botones. Móvil / reduced-motion: lista estática
-// completa con scroll nativo.
+// Proceso (5.4). Compacto y accesible: índice de etapas seleccionable por click o
+// teclado (sin obligar a recorrer con scroll). Una etapa dominante a la vez.
+// Conserva las 4 etapas, sus entregables y el enlace a "Cómo trabajamos en detalle".
 export function StickyProcess() {
   const { eyebrow, title, steps, secondaryLink } = HOME.process;
-  const wrapRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const [p, setP] = useState(0);
-  const [interactive, setInteractive] = useState(false);
+  const railRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const desktop = window.matchMedia("(min-width: 1024px)");
-    const update = () => setInteractive(desktop.matches && !reduce.matches);
-    update();
-    reduce.addEventListener("change", update);
-    desktop.addEventListener("change", update);
-    return () => {
-      reduce.removeEventListener("change", update);
-      desktop.removeEventListener("change", update);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!interactive) return;
-    const el = wrapRef.current;
-    if (!el) return;
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const rect = el.getBoundingClientRect();
-        const recorrido = el.offsetHeight - window.innerHeight;
-        const scrolled = -rect.top;
-        const prog = Math.min(1, Math.max(0, recorrido > 0 ? scrolled / recorrido : 0));
-        setP(prog);
-        setActive(Math.min(steps.length - 1, Math.floor(prog * steps.length)));
-      });
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [interactive, steps.length]);
-
-  const goTo = (i: number) => {
-    const el = wrapRef.current;
-    if (!el || !interactive) return;
-    const recorrido = el.offsetHeight - window.innerHeight;
-    const center = (i + 0.5) / steps.length; // .125, .375, .625, .875
-    const top = el.offsetTop + recorrido * center;
-    window.scrollTo({ top, behavior: "smooth" });
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let n = active;
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") n = (active + 1) % steps.length;
+    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") n = (active - 1 + steps.length) % steps.length;
+    else if (e.key === "Home") n = 0;
+    else if (e.key === "End") n = steps.length - 1;
+    else return;
+    e.preventDefault();
+    setActive(n);
+    railRef.current?.querySelectorAll<HTMLElement>('[role="tab"]')[n]?.focus();
   };
 
+  const s = steps[active];
+
   return (
-    <section className="m-section m-process" id="proceso" aria-labelledby="process-title">
+    <section className="m-section proc" id="proceso" aria-labelledby="process-title">
       <div className="m-container">
         <p className="m-eyebrow">{eyebrow}</p>
-        <h2 id="process-title" className="m-process-title">{title}</h2>
-      </div>
+        <h2 id="process-title" className="proc-title">{title}</h2>
 
-      {/* Envolvente: alta solo en modo interactivo (desktop) */}
-      <div ref={wrapRef} className={`m-process-wrap ${interactive ? "is-interactive" : ""}`}>
-        <div className="m-process-scene">
-          <div className="m-container m-process-cols">
-            <div className="m-process-rail" role="tablist" aria-label="Pasos del proceso">
-              <span className="m-process-track" aria-hidden="true">
-                <span className="m-process-fill" style={interactive ? { transform: `scaleY(${p})` } : undefined} />
-              </span>
-              {steps.map((s, i) => (
-                <button
-                  key={s.n}
-                  type="button"
-                  role="tab"
-                  aria-selected={active === i}
-                  className={`m-process-tab ${active === i ? "is-active" : ""}`}
-                  onClick={() => goTo(i)}
-                >
-                  <span className="m-mono m-process-tabn">{s.n}</span>
-                  <span className="m-process-tabtitle">{s.title}</span>
-                </button>
-              ))}
-            </div>
+        <div className="proc-grid">
+          <div className="proc-rail" role="tablist" aria-label="Pasos del proceso" ref={railRef} onKeyDown={onKeyDown}>
+            {steps.map((st, i) => (
+              <button
+                key={st.n}
+                type="button"
+                role="tab"
+                id={`proc-tab-${i}`}
+                aria-selected={active === i}
+                aria-controls="proc-panel"
+                tabIndex={active === i ? 0 : -1}
+                className={`proc-tab ${active === i ? "is-active" : ""}`}
+                onClick={() => setActive(i)}
+              >
+                <span className="m-mono proc-tabn">{st.n}</span>
+                <span className="proc-tabtitle">{st.title}</span>
+              </button>
+            ))}
+          </div>
 
-            <div className="m-process-panels">
-              {steps.map((s, i) => (
-                <article
-                  key={s.n}
-                  className={`m-process-panel ${interactive ? (active === i ? "is-active" : "is-dim") : "is-static"}`}
-                  aria-hidden={interactive ? active !== i : undefined}
-                >
-                  <span className="m-mono m-process-paneln">{s.n}</span>
-                  <h3 className="m-process-paneltitle">{s.title}</h3>
-                  <p className="m-process-paneltext">{s.text}</p>
-                  <p className="m-process-deliverable m-mono">Entregable · {s.deliverable}</p>
-                </article>
-              ))}
-            </div>
+          <div className="proc-panel" id="proc-panel" role="tabpanel" aria-labelledby={`proc-tab-${active}`}>
+            <span className="m-mono proc-paneln">{s.n}</span>
+            <h3 className="proc-paneltitle">{s.title}</h3>
+            <p className="proc-paneltext">{s.text}</p>
+            <p className="m-mono proc-deliverable">Entregable · {s.deliverable}</p>
           </div>
         </div>
-      </div>
 
-      <div className="m-container" id="propiedad">
-        <Link href={secondaryLink.href} className="m-process-secondary m-mono m-arrow-host">
-          {secondaryLink.label}
-          <span className="m-arrow" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            <svg viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </span>
+        <Link href={secondaryLink.href} className="proc-secondary m-mono" id="propiedad">
+          {secondaryLink.label} <span aria-hidden="true">→</span>
         </Link>
       </div>
     </section>
