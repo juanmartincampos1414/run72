@@ -179,7 +179,8 @@ export function HeroCoreScene({ onError }: { onError?: () => void }) {
 
       const loop = () => {
         if (disposed || !visible) return;
-        raf = requestAnimationFrame(loop);
+        // reduced-motion: una sola pasada (ensamblado y quieto), sin bucle continuo.
+        if (!reduce) raf = requestAnimationFrame(loop);
         const t = clock.getElapsedTime();
         const intro = reduce ? 1 : Math.min(1, t / INTRO);
         const e = easeOut(intro);

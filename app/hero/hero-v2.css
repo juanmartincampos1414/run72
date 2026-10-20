@@ -14,17 +14,25 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* Contenedor con recorrido de scroll: aporta la transición de cámara que revela
-   otra cara del objeto. El escenario queda sticky y el texto siempre visible. */
-.hv2-scroll { position: relative; height: 185vh; }
+/* Contenedor del hero. Solo en modo "motion" (WebGL animado) aporta un recorrido
+   de scroll que transforma la cámara y revela otra cara del objeto; el escenario
+   queda sticky y el texto siempre visible. En respaldo estático o reduced-motion
+   no hay transición de cámara, así que no se agrega recorrido (100svh). */
+.hv2-scroll { position: relative; height: 100svh; }
+.hv2-scroll[data-scroll="on"] { height: 185vh; }
 .hv2 {
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  position: relative;
+  min-height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   isolation: isolate;
+}
+.hv2-scroll[data-scroll="on"] .hv2 {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 0;
 }
 
 /* Lienzo 3D full-bleed */
