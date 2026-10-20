@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HeroCoreScene } from "./HeroCoreScene";
+import { HeroCanvas } from "./HeroCanvas";
 
 // Propuesta nueva de hero para RUN (inspiración ORYZO, pieza propia).
 // Composición recompuesta: escena 3D full-bleed con el núcleo conectado como
@@ -7,8 +7,9 @@ import { HeroCoreScene } from "./HeroCoreScene";
 // y un CTA de contacto legible. El mensaje deja claro qué hace RUN.
 export function HeroV2() {
   return (
+    <div className="hv2-scroll">
     <section className="hv2">
-      <HeroCoreScene />
+      <HeroCanvas />
       <div className="hv2-grain" aria-hidden="true" />
       <span className="hv2-watermark" aria-hidden="true">RUN</span>
       <div className="hv2-vignette" aria-hidden="true" />
@@ -40,8 +41,9 @@ export function HeroV2() {
 
       <div className="hv2-foot" aria-hidden="true">
         <span className="hv2-tag">RUN·01 — SISTEMA CONECTADO</span>
-        <span className="hv2-scroll">SCROLL</span>
+        <span className="hv2-scrollhint">SCROLL</span>
       </div>
     </section>
+    </div>
   );
 }

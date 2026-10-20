@@ -14,9 +14,13 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Contenedor con recorrido de scroll: aporta la transición de cámara que revela
+   otra cara del objeto. El escenario queda sticky y el texto siempre visible. */
+.hv2-scroll { position: relative; height: 185vh; }
 .hv2 {
-  position: relative;
-  min-height: 100svh;
+  position: sticky;
+  top: 0;
+  height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -26,6 +30,19 @@
 /* Lienzo 3D full-bleed */
 .hv2-canvas { position: absolute; inset: 0; z-index: 0; }
 .hv2-canvas canvas { width: 100% !important; height: 100% !important; display: block; }
+
+/* Respaldo estático (sin WebGL): mismo encuadre que el objeto 3D */
+.hv2-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none;
+}
+.hv2-fallback svg { width: clamp(320px, 42vw, 600px); height: auto; margin-top: clamp(36px, 8vh, 110px); }
+@media (max-width: 760px) { .hv2-fallback svg { width: 72vw; margin-top: 11vh; } }
 
 /* Marca de agua gigante: tipografía integrada en la escena */
 .hv2-watermark {
@@ -52,8 +69,9 @@
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(120% 85% at 50% 38%, transparent 40%, rgba(18, 10, 5, 0.55) 100%),
-    linear-gradient(180deg, rgba(18, 10, 5, 0.45) 0%, transparent 22%, transparent 48%, rgba(18, 10, 5, 0.82) 100%);
+    radial-gradient(130% 90% at 62% 32%, transparent 38%, rgba(18, 10, 5, 0.5) 100%),
+    linear-gradient(180deg, rgba(18, 10, 5, 0.4) 0%, transparent 20%, transparent 42%, rgba(18, 10, 5, 0.9) 100%),
+    linear-gradient(90deg, rgba(18, 10, 5, 0.5) 0%, transparent 44%);
 }
 
 /* Barra superior */
@@ -165,7 +183,7 @@
   color: var(--hv2-cream-dim);
 }
 .hv2-tag { color: var(--hv2-ember); opacity: 0.9; }
-.hv2-scroll { position: relative; opacity: 0.7; }
+.hv2-scrollhint { position: relative; opacity: 0.7; }
 
 /* Foco accesible */
 .hv2 a:focus-visible { outline: 2px solid var(--hv2-cream); outline-offset: 3px; border-radius: 4px; }
