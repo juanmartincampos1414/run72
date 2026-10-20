@@ -11,7 +11,7 @@ import type * as T3 from "three";
 // transición de cámara por scroll que revela otra cara del mismo objeto. Con
 // prefers-reduced-motion queda ensamblado y quieto. Si WebGL falla, avisa (onError)
 // para que el contenedor muestre el respaldo estático.
-export function HeroCoreScene({ onError }: { onError?: () => void }) {
+export function HeroCoreScene({ onError, scrollDriven = true }: { onError?: () => void; scrollDriven?: boolean }) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -156,7 +156,7 @@ export function HeroCoreScene({ onError }: { onError?: () => void }) {
         // El contenedor sticky aporta ~0.9vh de recorrido; mapea a 0..1.
         scrollP = Math.max(0, Math.min(1, window.scrollY / (vh * 0.85)));
       };
-      if (!reduce) window.addEventListener("scroll", onScroll, { passive: true });
+      if (!reduce && scrollDriven) window.addEventListener("scroll", onScroll, { passive: true });
 
       const onResize = () => {
         camera.aspect = w() / h();
@@ -257,7 +257,7 @@ export function HeroCoreScene({ onError }: { onError?: () => void }) {
       disposed = true;
       cleanups.forEach((c) => c());
     };
-  }, [onError]);
+  }, [onError, scrollDriven]);
 
   return <div ref={mountRef} className="hv2-canvas" aria-hidden="true" />;
 }

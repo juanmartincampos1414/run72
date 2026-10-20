@@ -39,18 +39,8 @@
 .hv2-canvas { position: absolute; inset: 0; z-index: 0; }
 .hv2-canvas canvas { width: 100% !important; height: 100% !important; display: block; }
 
-/* Respaldo estático (sin WebGL): mismo encuadre que el objeto 3D */
-.hv2-fallback {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  pointer-events: none;
-}
-.hv2-fallback svg { width: clamp(320px, 42vw, 600px); height: auto; margin-top: clamp(36px, 8vh, 110px); }
-@media (max-width: 760px) { .hv2-fallback svg { width: 72vw; margin-top: 11vh; } }
+/* Respaldo estático (sin WebGL): render real de la escena como imagen de fondo */
+.hv2-fallback { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
 
 /* Marca de agua gigante: tipografía integrada en la escena */
 .hv2-watermark {
