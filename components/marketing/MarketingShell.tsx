@@ -17,14 +17,17 @@ export function MarketingShell({
   withFooter = true,
   withSmooth = true,
   withRunit = true,
+  theme,
 }: {
   children: ReactNode;
   withFooter?: boolean;
   withSmooth?: boolean;
   withRunit?: boolean;
+  /** "warm": lenguaje editorial cálido (hero aprobado). Solo donde se integra. */
+  theme?: "warm";
 }) {
   return (
-    <div className={`marketing ${marketingFontVars}`}>
+    <div className={`marketing ${theme === "warm" ? "run-warm" : ""} ${marketingFontVars}`}>
       {withSmooth && <SmoothScroll />}
       <AttributionTracker />
       <MarketingHeader />

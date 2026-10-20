@@ -1,0 +1,121 @@
+/* ------------------------------------------------------------------ *
+ * RUN · Lenguaje editorial cálido — integración en la Home (Fase 2).
+ * Scope: .marketing.run-warm (lo aplica MarketingShell theme="warm").
+ * Reutiliza las clases del hero (hv2-*) definiendo sus variables acá, y
+ * remapea los tokens de marketing a la paleta cálida aprobada en /hero.
+ * No afecta a otras páginas (solo la Home monta el tema).
+ * ------------------------------------------------------------------ */
+.marketing.run-warm {
+  /* Variables del hero (para reutilizar sus clases en la Home) */
+  --hv2-canvas: #120a05;
+  --hv2-cream: #ffedd7;
+  --hv2-cream-dim: #c8b49c;
+  --hv2-ember: #ff6a2a;
+  --hv2-border: rgba(255, 237, 215, 0.16);
+
+  /* Remapeo de tokens de marketing → paleta cálida (walnut / cream / ember) */
+  --m-bg: #120a05;
+  --m-deep: #0c0703;
+  --m-surface: #1b1109;
+  --m-panel: #1b1109;
+  --m-text: #ffedd7;
+  --m-muted: #c8b49c;
+  --m-faint: #9a8b79;
+  --m-gray: #9a8b79;
+  --m-category: #9a8b79;
+  --m-line: rgba(255, 237, 215, 0.12);
+  --m-line-active: rgba(255, 237, 215, 0.3);
+  --m-input: #201813;
+  --m-input-text: #ffedd7;
+  --m-input-label: #c8b49c;
+  --m-input-border: rgba(255, 237, 215, 0.22);
+  --m-input-help: #9a8b79;
+
+  background: #120a05;
+  color: #ffedd7;
+}
+
+/* ===== Home hero: una sola pantalla, sin barra propia, sin recorrido 185vh ===== */
+.run-warm .home-hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+.run-warm .home-hero .home-hero-inner { padding-bottom: clamp(44px, 8vh, 96px); }
+/* la marca de agua un poco más alta para no chocar con el titular */
+.run-warm .home-hero .hv2-watermark { top: 42%; }
+
+/* ===== Header editorial cálido (conserva nav + dropdown corregido) ===== */
+.run-warm .m-header-wrap { top: 0; padding-inline: 0; }
+.run-warm .m-header {
+  max-width: 1280px;
+  border: 0;
+  border-bottom: 1px solid var(--m-line);
+  border-radius: 0;
+  background: color-mix(in srgb, #120a05 70%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding-inline: 24px;
+}
+@media (min-width: 768px) { .run-warm .m-header { height: 72px; padding-inline: 32px; } }
+.run-warm .m-nav-link {
+  font-family: var(--font-run-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--m-text);
+  opacity: 0.72;
+}
+.run-warm .m-nav-link:hover,
+.run-warm .m-nav-link[aria-current="page"] { opacity: 1; }
+.run-warm .m-nav-drop { background: color-mix(in srgb, #1b1109 97%, transparent); border-color: var(--m-line); border-radius: 10px; }
+.run-warm .m-nav-dropitem { color: var(--m-muted); }
+.run-warm .m-nav-dropitem:hover { background: rgba(255, 237, 215, 0.06); color: var(--m-text); }
+
+/* ===== Botones: crema sólido, sin gradiente ni glow ===== */
+.run-warm .m-btn, .run-warm .m-btn--compact {
+  background: var(--hv2-cream);
+  color: #1a0f07;
+  border-radius: 8px;
+  box-shadow: none;
+  font-family: var(--font-run-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+}
+.run-warm .m-btn::before { display: none; }
+.run-warm .m-btn:hover { background: #fff; box-shadow: none; transform: translateY(-1px); }
+.run-warm .m-btn--compact { height: 40px; }
+.run-warm .m-btn-ghost {
+  border-radius: 8px;
+  border-color: var(--m-line);
+  color: var(--m-text);
+  font-family: var(--font-run-display), ui-sans-serif, system-ui, sans-serif;
+}
+.run-warm .m-btn-ghost:hover { border-color: var(--m-line-active); background: rgba(255, 237, 215, 0.04); }
+
+/* ===== Acentos: eyebrow, estado, barra de proceso, texto con gradiente ===== */
+.run-warm .m-eyebrow { color: var(--m-faint); }
+.run-warm .m-gradient-text { background: none; -webkit-text-fill-color: currentColor; color: var(--hv2-cream); animation: none; }
+.run-warm .m-work-state {
+  background: transparent;
+  color: var(--hv2-ember);
+  border: 1px solid color-mix(in srgb, var(--hv2-ember) 45%, transparent);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.run-warm .m-process-fill { background: var(--hv2-ember); }
+.run-warm .m-process-tab { border-radius: 8px; }
+.run-warm .m-process-tab[aria-selected="true"] { border-color: color-mix(in srgb, var(--hv2-ember) 50%, transparent); color: var(--m-text); }
+.run-warm .m-principle-accent { color: var(--hv2-ember); }
+.run-warm .m-closing-mark { color: var(--hv2-ember); }
+
+/* CTA primario del hero: texto oscuro sobre crema (gana a `.marketing a`) */
+.run-warm .home-hero .hv2-cta { color: #1a0f07; background: var(--hv2-cream); }
+.run-warm .home-hero .hv2-cta:hover { background: #fff; }
+
+/* Foco visible crema */
+.run-warm a:focus-visible,
+.run-warm button:focus-visible,
+.run-warm input:focus-visible,
+.run-warm textarea:focus-visible { outline: 2px solid var(--hv2-cream); outline-offset: 2px; }
