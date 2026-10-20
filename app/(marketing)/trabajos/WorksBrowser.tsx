@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import {
@@ -104,11 +105,21 @@ export function WorksBrowser({ works, order }: { works: Work[]; order?: string[]
                 style={{ "--work-accent": w.media.poster } as CSSProperties}
               >
                 <span className="work-poster" aria-hidden="true">
-                  <span className="work-poster-ui">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
+                  {w.media.gallery?.[0] ? (
+                    <Image
+                      src={w.media.gallery[0].src}
+                      alt=""
+                      fill
+                      sizes="(min-width: 768px) 42vw, 100vw"
+                      className="work-poster-img"
+                    />
+                  ) : (
+                    <span className="work-poster-ui">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                  )}
                 </span>
                 <span className="work-card-body">
                   <span className="work-row-top">

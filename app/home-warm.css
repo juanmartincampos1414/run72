@@ -190,3 +190,45 @@
 @media (max-width: 640px) {
   .run-warm .m-work-thumb { width: clamp(96px, 34vw, 150px); }
 }
+
+/* ============================================================
+ * FASE 3 — Páginas internas (Servicios/Soluciones, Trabajos/fichas, Contacto)
+ * Todo bajo .run-warm. El remap de tokens ya recolorea; acá van los refinamientos
+ * de composición/superficies/forms para que no sea "solo color".
+ * ============================================================ */
+
+/* ----- Contacto: formulario cálido, campos consistentes (incl. Teléfono) ----- */
+.run-warm .ct-chip { border-radius: 8px; border-color: var(--m-line); background: var(--m-surface); }
+.run-warm .ct-chip.is-on {
+  border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent);
+  background: color-mix(in srgb, var(--hv2-ember) 12%, var(--m-surface));
+  color: var(--m-text);
+}
+.run-warm .ct-field input,
+.run-warm .ct-field textarea,
+.run-warm .ct-form input[type="text"],
+.run-warm .ct-form input[type="email"],
+.run-warm .ct-form input[type="tel"],
+.run-warm .ct-form textarea {
+  border-radius: 8px;
+  background: var(--m-input);
+  border-color: var(--m-input-border);
+}
+.run-warm .ct-field input:focus,
+.run-warm .ct-field textarea:focus,
+.run-warm .ct-form input:focus,
+.run-warm .ct-form textarea:focus { border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent); }
+.run-warm .ct-h1 { letter-spacing: -0.03em; }
+.run-warm .ct-alt a { color: var(--hv2-ember); }
+
+/* ----- Fichas de trabajos: estado ember, imágenes y hairlines cálidos ----- */
+.run-warm .work-badge { color: var(--hv2-ember); }
+.run-warm .work-close:hover { border-color: var(--m-line-active); }
+.run-warm [data-pending="true"] { color: var(--m-faint); }
+
+/* ----- Soluciones / Servicios: acentos cálidos en superficies e índices ----- */
+.run-warm .m-cap-band { background: transparent; }
+
+/* ----- Trabajos (índice): portada real en la tarjeta (sin el mock azul) ----- */
+.run-warm .work-poster { position: relative; overflow: hidden; }
+.run-warm .work-poster-img { object-fit: cover; }

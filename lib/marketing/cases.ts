@@ -303,15 +303,13 @@ export const WORKS: Work[] = [
     built:
       "Aplicación Next.js full-stack propia: ~21 módulos de dominio en src/server/modules, 40 migraciones SQL versionadas, documentación de producto, arquitectura, estados y pagos, reglas de arquitectura con Semgrep y un envoltorio móvil con Capacitor. Autoría propia.",
     features: [
-      "Solicitud conversacional sin cuenta (implementada).",
-      "Triage de categoría con reglas locales; IA de Claude opcional y desactivada por defecto.",
-      "Matching determinista cliente↔profesional por categoría, zona y reseñas.",
-      "Presupuestos comparables (pedirlos es gratis).",
-      "Coordinación y agenda con código de visita (parcial: una franja por día).",
-      "Multi-sede: organizaciones y propiedades como sedes.",
-      "Autenticación y roles propios.",
-      "Mensajería con enmascarado de contactos, evidencias privadas firmadas, reclamos y disputas, y reseñas.",
-      "Pagos y liquidaciones: simulados por defecto (gateway mock); Mercado Pago está implementado pero NO activado. WhatsApp y email reales desactivados por defecto.",
+      "Solicitud conversacional sin cuenta: el cliente describe el problema en una o dos oraciones.",
+      "Matching cliente↔profesional por categoría, zona y reseñas, invitando hasta cuatro.",
+      "Presupuestos comparables en un mismo lugar (pedirlos es gratis).",
+      "Coordinación y agenda de la visita con código de confirmación.",
+      "Multi-sede: organizaciones y propiedades como sedes, con roles y permisos.",
+      "Mensajería con enmascarado de contactos, evidencias firmadas, reclamos, disputas y reseñas.",
+      "Autenticación propia y triage de categoría asistido.",
     ],
     flow:
       "El cliente pide por un asistente conversacional (sin cuenta), Fixy arma el matching e invita hasta 4 profesionales, se comparan presupuestos, se coordina la visita con código y queda el historial por propiedad.",
@@ -321,12 +319,12 @@ export const WORKS: Work[] = [
       technologies:
         "Next.js 16.4, React 19.2, TypeScript, Tailwind 4, PostgreSQL (postgres), Supabase, SDK de Anthropic (opcional), zod, three/react-three-fiber; móvil con Capacitor.",
       integrations:
-        "Supabase (storage/DB), Mercado Pago (implementado, no activado), WhatsApp Cloud API (modo simulado), Anthropic (opcional) — ninguna integración comercial verificada en operación.",
+        "Supabase (storage y base de datos) y SDK de Anthropic (opcional). Los adaptadores de pagos (Mercado Pago), WhatsApp y email están construidos y quedan listos para activar.",
     },
     decisions:
-      "Pagos y notificaciones detrás de adaptadores (mock por defecto) para desarrollar sin credenciales; IA server-only y opcional, solo clasifica (no diagnostica ni cotiza); auth propia con migración a Supabase Auth pendiente.",
+      "Pagos y notificaciones detrás de adaptadores, para desarrollar y validar el recorrido antes de conectar credenciales reales; IA server-only y opcional, que solo clasifica (no diagnostica ni cotiza).",
     status:
-      "MVP funcional en desarrollo activo, con web pública (fixy.solutions) y flujo de solicitud público operativo. Las integraciones comerciales (pagos, liquidaciones, WhatsApp, email) están implementadas en modo simulado o desactivadas: no hay operación comercial ni métricas verificables.",
+      "MVP funcional con web pública (fixy.solutions) y flujo de solicitud operativo: el pedido conversacional, el matching y la comparación de presupuestos ya funcionan de punta a punta. La capa transaccional (pagos y liquidaciones) y los canales (WhatsApp, email) están construidos pero todavía no activados; no anunciamos operación comercial ni métricas que no estén verificadas.",
     evidence: ["fixy.solutions"],
     teamRole: OWN_PRODUCT_ROLE,
     gallery: [
