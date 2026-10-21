@@ -13,7 +13,7 @@ import {
   getPublicMvpProducts,
   workPath,
 } from "@/lib/marketing/cases";
-import { WorksBrowser } from "./WorksBrowser";
+import { WorksIndex, type WorkGroup } from "./WorksIndex";
 import "./trabajos.css";
 
 export const metadata: Metadata = {
@@ -32,6 +32,13 @@ export default function TrabajosPage() {
   const total = principals.length + publicMvps.length + inUse.length + mvps.length;
   // Numeración continua 01..N a través de los cuatro grupos.
   const order = [...principals, ...publicMvps, ...inUse, ...mvps].map((w) => w.slug);
+  // Grupos de madurez bajo un único filtro general (WorksIndex).
+  const groups: WorkGroup[] = [
+    { id: "principal", title: "Productos operativos", works: principals },
+    { id: "mvp-publico", title: "MVP funcional · producto público", works: publicMvps },
+    { id: "mvp-uso", title: "MVP funcional en uso privado", works: inUse },
+    { id: "mvp", title: "MVPs desarrollados · actualmente no operativos", works: mvps },
+  ].filter((g) => g.works.length > 0);
 
   return (
     <div className="work-page">
@@ -58,41 +65,7 @@ export default function TrabajosPage() {
         </p>
       </section>
 
-      {principals.length > 0 && (
-        <section className="m-container work-index-list" aria-labelledby="work-principal-h">
-          <h3 id="work-principal-h" className="work-section-title work-section-title-sm">
-            Productos operativos
-          </h3>
-          <WorksBrowser works={principals} order={order} />
-        </section>
-      )}
-
-      {publicMvps.length > 0 && (
-        <section className="m-container work-index-list" aria-labelledby="work-mvp-publico-h">
-          <h3 id="work-mvp-publico-h" className="work-section-title work-section-title-sm">
-            MVP funcional · producto público
-          </h3>
-          <WorksBrowser works={publicMvps} order={order} />
-        </section>
-      )}
-
-      {inUse.length > 0 && (
-        <section className="m-container work-index-list" aria-labelledby="work-mvp-uso-h">
-          <h3 id="work-mvp-uso-h" className="work-section-title work-section-title-sm">
-            MVP funcional en uso privado
-          </h3>
-          <WorksBrowser works={inUse} order={order} />
-        </section>
-      )}
-
-      {mvps.length > 0 && (
-        <section className="m-container work-index-list" aria-labelledby="work-mvp-h">
-          <h3 id="work-mvp-h" className="work-section-title work-section-title-sm">
-            MVPs desarrollados · actualmente no operativos
-          </h3>
-          <WorksBrowser works={mvps} order={order} />
-        </section>
-      )}
+      <WorksIndex groups={groups} order={order} />
 
       <section className="m-container work-labs" aria-labelledby="work-labs-h">
         <div className="work-labs-head">

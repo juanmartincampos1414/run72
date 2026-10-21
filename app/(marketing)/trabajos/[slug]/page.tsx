@@ -310,7 +310,7 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
             </ul>
             {hasPublicEvidence && (
               <p className="work-note" style={{ marginTop: 16 }}>
-                Capturas reales de la aplicación, con una organización de demostración y datos de prueba.
+                {work.galleryNote ?? "Capturas reales de la aplicación, con una organización de demostración y datos de prueba."}
               </p>
             )}
           </>

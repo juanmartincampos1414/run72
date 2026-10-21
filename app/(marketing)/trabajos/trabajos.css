@@ -102,6 +102,9 @@
   line-height: 18px;
   color: var(--m-gray);
 }
+/* Un solo bloque de control (filtro general + conteo) para todo el índice. */
+.marketing .work-index-controls { margin-top: 8px; }
+.marketing .work-index-controls .work-count { margin: 16px 0 8px; }
 
 .marketing .work-grid {
   display: grid;

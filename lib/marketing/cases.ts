@@ -88,6 +88,8 @@ export type Work = {
   status?: string;
   /** Etiqueta corta de madurez (p. ej. "MVP en desarrollo activo"). */
   statusLabel?: string;
+  /** Nota al pie de la galería; si se omite, se usa el texto por defecto. */
+  galleryNote?: string;
 };
 
 export type WorkStack = {
@@ -119,6 +121,7 @@ type ProductInput = {
   teamRole: string;
   logo?: string;
   gallery?: WorkShot[];
+  galleryNote?: string;
   ctaContacto?: WorkLink;
 };
 
@@ -151,6 +154,7 @@ function product(p: ProductInput): Work {
     decisions: p.decisions,
     status: p.status,
     statusLabel: p.statusLabel,
+    galleryNote: p.galleryNote,
     evidence: p.evidence ?? [],
     teamRole: p.teamRole,
   };
@@ -280,6 +284,14 @@ export const WORKS: Work[] = [
     status: "Operativo; con sitio público, planes, registro y acceso en jcaigency.com.",
     evidence: ["jcaigency.com"],
     teamRole: OWN_PRODUCT_ROLE,
+    gallery: [
+      {
+        src: "/work/jota/landing.jpg",
+        alt: "Landing pública de Jota en jcaigency.com: «Tu marketing lo pienso yo, con tu marca adentro», con el asistente Jota y los canales que coordina.",
+        caption: "Landing pública de Jota (jcaigency.com).",
+      },
+    ],
+    galleryNote: "Captura de la landing pública de Jota (jcaigency.com).",
     ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=agentes" },
   }),
 
@@ -339,6 +351,7 @@ export const WORKS: Work[] = [
         caption: "Flujo de solicitud público, sin cuenta.",
       },
     ],
+    galleryNote: "Capturas de la landing y del flujo público de solicitud de Fixy.",
     ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=software" },
   }),
 
@@ -442,6 +455,14 @@ export const WORKS: Work[] = [
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/margin/logo.png",
+    gallery: [
+      {
+        src: "/work/margin/producto.jpg",
+        alt: "Diseño del tablero de margen por plato de Margin (prototipo): KPIs de precio, costo y margen bruto/neto, composición de costo, qué afectó el margen y recomendaciones para «Milanesa Napolitana».",
+        caption: "Diseño del tablero de margen por plato (prototipo).",
+      },
+    ],
+    galleryNote: "Imagen de diseño del producto (prototipo), no una aplicación en operación.",
   }),
   product({
     slug: "tips",
