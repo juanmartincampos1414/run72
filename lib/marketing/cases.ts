@@ -295,13 +295,13 @@ export const WORKS: Work[] = [
     poster: "#FF8A3D",
     statusLabel: "MVP FUNCIONAL · WEB PÚBLICA",
     summary:
-      "Plataforma que conecta hogares, oficinas y pequeñas empresas con profesionales independientes y empresas de servicios para reparación, instalación y mantenimiento; reúne pedido, presupuestos, contratación, coordinación, pago, seguimiento, reclamos, reseñas e historial por propiedad. MVP para Argentina (ARS, CABA/GBA).",
+      "Plataforma que conecta hogares, oficinas y pequeñas empresas con profesionales independientes y empresas de servicios para reparación, instalación y mantenimiento; reúne pedido, presupuestos, contratación, coordinación, seguimiento, reseñas e historial por propiedad. MVP para Argentina (CABA/GBA).",
     context:
       "Un pedido de servicio para el hogar o la empresa suele dispersarse en llamados, presupuestos sueltos y falta de trazabilidad; Fixy lo centraliza en un flujo único.",
     userType:
       "Clientes (hogares, oficinas, pymes), profesionales y empresas de servicios, y operación de plataforma; con soporte multi-sede (organizaciones) y roles.",
     built:
-      "Aplicación Next.js full-stack propia: ~21 módulos de dominio en src/server/modules, 40 migraciones SQL versionadas, documentación de producto, arquitectura, estados y pagos, reglas de arquitectura con Semgrep y un envoltorio móvil con Capacitor. Autoría propia.",
+      "Aplicación web full-stack de autoría propia: pedido, matching, presupuestos comparables, coordinación de la visita, multi-sede con roles, mensajería con contactos enmascarados, reseñas e historial por propiedad, con su documentación de producto y un envoltorio móvil.",
     features: [
       "Solicitud conversacional sin cuenta: el cliente describe el problema en una o dos oraciones.",
       "Matching cliente↔profesional por categoría, zona y reseñas, invitando hasta cuatro.",
@@ -319,12 +319,12 @@ export const WORKS: Work[] = [
       technologies:
         "Next.js 16.4, React 19.2, TypeScript, Tailwind 4, PostgreSQL (postgres), Supabase, SDK de Anthropic (opcional), zod, three/react-three-fiber; móvil con Capacitor.",
       integrations:
-        "Supabase (storage y base de datos) y SDK de Anthropic (opcional). Los adaptadores de pagos (Mercado Pago), WhatsApp y email están construidos y quedan listos para activar.",
+        "Supabase (base de datos y almacenamiento privado) y SDK de Anthropic (opcional, solo para clasificar el pedido).",
     },
     decisions:
-      "Pagos y notificaciones detrás de adaptadores, para desarrollar y validar el recorrido antes de conectar credenciales reales; IA server-only y opcional, que solo clasifica (no diagnostica ni cotiza).",
+      "IA server-only y opcional: solo clasifica el pedido, no diagnostica ni cotiza. Autenticación propia y contactos enmascarados para proteger a ambas partes durante la coordinación.",
     status:
-      "MVP funcional con web pública (fixy.solutions) y flujo de solicitud operativo: el pedido conversacional, el matching y la comparación de presupuestos ya funcionan de punta a punta. La capa transaccional (pagos y liquidaciones) y los canales (WhatsApp, email) están construidos pero todavía no activados; no anunciamos operación comercial ni métricas que no estén verificadas.",
+      "MVP funcional con web pública (fixy.solutions): el pedido conversacional, el matching y la comparación de presupuestos funcionan de punta a punta. La operación transaccional (pagos y liquidaciones) y los canales de mensajería (WhatsApp, email) forman parte del desarrollo y no se incluyen en este recorrido público.",
     evidence: ["fixy.solutions"],
     teamRole: OWN_PRODUCT_ROLE,
     gallery: [

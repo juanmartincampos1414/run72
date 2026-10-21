@@ -183,6 +183,13 @@
   line-height: 28px;
   color: var(--m-muted);
 }
+.marketing .work-card-state {
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--m-category);
+}
 .marketing .work-card-link {
   display: inline-flex;
   align-items: center;

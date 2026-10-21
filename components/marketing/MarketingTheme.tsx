@@ -3,11 +3,21 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-// Activa el lenguaje editorial cálido (.run-warm) en las rutas ya migradas
-// (Fase 2: Home se maneja aparte; Fase 3: Servicios, Soluciones, Trabajos +
-// fichas, Contacto). El resto del sitio (Blog, Labs, Express, Cómo trabajamos)
-// conserva su tema anterior hasta su fase. Centralizado en el layout (marketing).
-const WARM_ROUTES = [/^\/servicios(\/|$)/, /^\/soluciones(\/|$)/, /^\/trabajos(\/|$)/, /^\/contacto(\/|$)/];
+// Activa el lenguaje editorial cálido (.run-warm) en las rutas ya migradas.
+// Fase 2: Home (aparte). Fase 3 · grupo 1: Servicios, Soluciones, Trabajos +
+// fichas, Contacto. Grupo 2: Express (landing), Blog, Labs, Cómo trabajamos.
+// Pendiente: el cotizador y demás herramientas usan otro sistema de tokens
+// (brand-*) y se migran en un pase propio, cuidando su usabilidad.
+const WARM_ROUTES = [
+  /^\/servicios(\/|$)/,
+  /^\/soluciones(\/|$)/,
+  /^\/trabajos(\/|$)/,
+  /^\/contacto(\/|$)/,
+  /^\/express(\/|$)/,
+  /^\/blog(\/|$)/,
+  /^\/labs(\/|$)/,
+  /^\/como-trabajamos(\/|$)/,
+];
 
 export function MarketingTheme() {
   const pathname = usePathname();

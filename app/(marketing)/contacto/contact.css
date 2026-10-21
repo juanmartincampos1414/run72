@@ -23,6 +23,7 @@
 .marketing .ct-opt { color: var(--m-input-help); }
 .marketing .ct-form input[type="text"],
 .marketing .ct-form input[type="email"],
+.marketing .ct-form input[type="tel"],
 .marketing .ct-form textarea {
   width: 100%;
   border-radius: 6px;

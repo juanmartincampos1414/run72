@@ -6,10 +6,8 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import {
   CATEGORY_LABELS,
-  PENDING,
-  getEvidenceSummary,
+  DEMO_LABEL,
   hasPendingFields,
-  isPending,
   isWorkCategory,
   type Work,
   type WorkCategory,
@@ -129,21 +127,10 @@ export function WorksBrowser({ works, order }: { works: Work[]; order?: string[]
                     {hasPendingFields(w) && <span className="work-badge m-mono">Contenido en validación</span>}
                   </span>
                   <span className="work-card-title">{w.title}</span>
-                  <span className="work-card-summary">{w.summary}</span>
-                  <dl className="work-row-facts">
-                    <div>
-                      <dt className="work-label m-mono">Usuario</dt>
-                      <dd data-pending={isPending(w.userType)}>{w.userType ?? PENDING}</dd>
-                    </div>
-                    <div>
-                      <dt className="work-label m-mono">Estado</dt>
-                      <dd data-pending={isPending(w.status)}>{w.status ?? PENDING}</dd>
-                    </div>
-                    <div>
-                      <dt className="work-label m-mono">Evidencia</dt>
-                      <dd data-pending={isPending(getEvidenceSummary(w))}>{getEvidenceSummary(w)}</dd>
-                    </div>
-                  </dl>
+                  <span className="work-card-summary">{w.subtitle}</span>
+                  <span className="work-card-state m-mono">
+                    {w.kind === "demo" ? DEMO_LABEL : w.statusLabel ?? ""}
+                  </span>
                   <span className="work-card-link m-mono">
                     Ver ficha <AnimatedArrow />
                   </span>

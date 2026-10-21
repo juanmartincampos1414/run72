@@ -31,6 +31,14 @@
   --m-input-border: rgba(255, 237, 215, 0.22);
   --m-input-help: #9a8b79;
 
+  /* Acentos del sistema anterior → cálidos (ember/ámbar/cream). Cualquier
+     regla que use estos tokens se recolorea sola; los gradientes con hex
+     fijo se corrigen abajo. El dorado ya es cálido: se conserva. */
+  --m-cyan: #ffb27a;
+  --m-blue: #ff8a4c;
+  --m-violet: #ff6a2a;
+  --m-gold: #ffd29a;
+
   background: #120a05;
   color: #ffedd7;
 }
@@ -197,38 +205,83 @@
  * de composición/superficies/forms para que no sea "solo color".
  * ============================================================ */
 
-/* ----- Contacto: formulario cálido, campos consistentes (incl. Teléfono) ----- */
-.run-warm .ct-chip { border-radius: 8px; border-color: var(--m-line); background: var(--m-surface); }
-.run-warm .ct-chip.is-on {
+/* ----- Contacto: formulario cálido, campos consistentes (incl. Teléfono) -----
+ * contact.css (CSS de página) se carga DESPUÉS de este archivo (CSS de layout),
+ * así que a igual especificidad ganaba el tema frío. Se usa .marketing.run-warm
+ * (una clase más) para ganar siempre, sin depender del orden de carga. */
+.marketing.run-warm .ct-chip { border-radius: 8px; border-color: var(--m-line); background: var(--m-surface); color: var(--m-muted); }
+.marketing.run-warm .ct-chip:hover { border-color: var(--m-line-active); background: color-mix(in srgb, var(--hv2-ember) 6%, var(--m-surface)); }
+.marketing.run-warm .ct-chip.is-on {
   border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent);
   background: color-mix(in srgb, var(--hv2-ember) 12%, var(--m-surface));
   color: var(--m-text);
 }
-.run-warm .ct-field input,
-.run-warm .ct-field textarea,
-.run-warm .ct-form input[type="text"],
-.run-warm .ct-form input[type="email"],
-.run-warm .ct-form input[type="tel"],
-.run-warm .ct-form textarea {
+.marketing.run-warm .ct-form input[type="text"],
+.marketing.run-warm .ct-form input[type="email"],
+.marketing.run-warm .ct-form input[type="tel"],
+.marketing.run-warm .ct-form textarea {
   border-radius: 8px;
   background: var(--m-input);
   border-color: var(--m-input-border);
 }
-.run-warm .ct-field input:focus,
-.run-warm .ct-field textarea:focus,
-.run-warm .ct-form input:focus,
-.run-warm .ct-form textarea:focus { border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent); }
-.run-warm .ct-h1 { letter-spacing: -0.03em; }
-.run-warm .ct-alt a { color: var(--hv2-ember); }
+.marketing.run-warm .ct-form input:focus-visible,
+.marketing.run-warm .ct-form textarea:focus-visible {
+  border-color: color-mix(in srgb, var(--hv2-ember) 70%, transparent);
+  background: color-mix(in srgb, var(--hv2-ember) 7%, var(--m-input));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hv2-ember) 28%, transparent);
+}
+/* Radios y checkbox: acento cálido (no violeta del sistema anterior) */
+.marketing.run-warm .ct-chip input,
+.marketing.run-warm .ct-check input { accent-color: var(--hv2-ember); }
+.marketing.run-warm .ct-h1 { letter-spacing: -0.03em; }
+.marketing.run-warm .ct-alt a { color: var(--hv2-ember); }
+
+/* NOTA DE CASCADA: los CSS de página (servicios/soluciones/trabajos/blog/labs)
+ * se cargan DESPUÉS de este archivo (CSS de layout). A igual especificidad
+ * ganaba el tema frío, así que todo lo que pisa una regla de página usa
+ * .marketing.run-warm (una clase más) para ganar sin depender del orden. */
 
 /* ----- Fichas de trabajos: estado ember, imágenes y hairlines cálidos ----- */
-.run-warm .work-badge { color: var(--hv2-ember); }
-.run-warm .work-close:hover { border-color: var(--m-line-active); }
-.run-warm [data-pending="true"] { color: var(--m-faint); }
+.marketing.run-warm .work-badge { color: var(--hv2-ember); }
+.marketing.run-warm .work-close:hover { border-color: var(--m-line-active); }
+.marketing.run-warm [data-pending="true"] { color: var(--m-faint); }
 
 /* ----- Soluciones / Servicios: acentos cálidos en superficies e índices ----- */
-.run-warm .m-cap-band { background: transparent; }
+.marketing.run-warm .m-cap-band { background: transparent; }
+
+/* Halos de encabezado: eran violeta/azul con hex fijo (no tokens). Los
+   recoloreamos a ámbar/ember tenue para unificar con el sistema cálido. */
+.marketing.run-warm .svc-hero-bg,
+.marketing.run-warm .sol-hero-bg {
+  background:
+    linear-gradient(180deg, rgba(18, 10, 5, 0) 40%, #120a05 100%),
+    radial-gradient(110% 80% at 50% 0%, rgba(255, 106, 42, 0.16) 0%, rgba(255, 178, 122, 0.06) 40%, rgba(18, 10, 5, 0) 75%);
+}
+/* Filete superior y panel ilustrativo (mock propio de RUN, no captura real) */
+.marketing.run-warm .svc-topline { background: linear-gradient(90deg, var(--hv2-ember), #ff8a4c 40%, #ffb27a 72%, var(--m-gold)); }
+.marketing.run-warm .svc-visual {
+  background:
+    radial-gradient(90% 120% at 12% 0%, rgba(255, 178, 122, 0.18) 0%, rgba(255, 178, 122, 0) 55%),
+    radial-gradient(80% 100% at 100% 100%, rgba(255, 106, 42, 0.22) 0%, rgba(255, 106, 42, 0) 60%),
+    radial-gradient(60% 60% at 90% 0%, rgba(255, 210, 154, 0.1) 0%, rgba(255, 210, 154, 0) 60%),
+    var(--m-deep);
+}
+.marketing.run-warm .svc-ui-side .svc-ui-logo { background: linear-gradient(90deg, var(--hv2-ember), #ffb27a); }
+.marketing.run-warm .svc-ui-top b { background: linear-gradient(135deg, #ff8a4c, var(--hv2-ember)); }
 
 /* ----- Trabajos (índice): portada real en la tarjeta (sin el mock azul) ----- */
-.run-warm .work-poster { position: relative; overflow: hidden; }
-.run-warm .work-poster-img { object-fit: cover; }
+.marketing.run-warm .work-poster { position: relative; overflow: hidden; }
+.marketing.run-warm .work-poster-img { object-fit: cover; }
+
+/* ============================================================
+ * FASE 3 — grupo 2 (Express, Blog, Labs, Cómo trabajamos)
+ * El remap de tokens cálidos ya recolorea casi todo; acá van los
+ * pocos gradientes/superficies con hex frío fijo que quedaban.
+ * ============================================================ */
+/* Blog: tarjeta destacada con halo cálido (era violeta) */
+.marketing.run-warm .blog-card--featured { background: radial-gradient(120% 220% at 4% 50%, rgba(255, 106, 42, 0.1), transparent 85%), var(--m-panel); }
+.marketing.run-warm .blog-card--featured:hover { background: radial-gradient(120% 220% at 4% 50%, rgba(255, 106, 42, 0.18), transparent 85%), var(--m-panel); }
+/* Labs: estado, chip "info" y fila seleccionada en tono cálido */
+.marketing.run-warm .lab-status { border-left-color: var(--hv2-ember); background: rgba(255, 106, 42, 0.07); }
+.marketing.run-warm .lab-chip[data-tone="info"] { border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent); }
+.marketing.run-warm .lab-table tr[data-selected="true"] { background: rgba(255, 106, 42, 0.1); }

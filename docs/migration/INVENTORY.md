@@ -27,30 +27,37 @@ esta ronda) · ⚠️ pendiente/bloqueante.
 | `/` | Home integrada (Fase 2+): hero 3D + lenguaje cálido; proceso compacto (tabs), trabajos con miniaturas reales, franja "Experiencia detrás de RUN", cierre sin repetición | ✅ (verificado en vivo) |
 | `/servicios` · `/servicios/[especialidad]` | Software a medida / Agentes IA / Automatización | ✅ Fase 3 (lenguaje cálido) |
 | `/soluciones` · `/soluciones/[vertical]` | Agentes por industria (restaurantes/hoteles/real estate) | ✅ Fase 3 (lenguaje cálido) |
-| `/trabajos` · `/trabajos/[slug]` | Portfolio (6, numeración 01–06): 01 Aikestar, 02 Jota (operativos), 03 **Fixy** (MVP funcional · web pública), 04 Relevo (MVP en uso privado), 05 Margin, 06 Tips (MVPs no operativos). HOST fuera. Ficha Fixy verificada contra el repo (pagos/WhatsApp/email simulados o desactivados). | ✅ |
-| `/como-trabajamos` | Proceso en detalle | 🔎 |
-| `/blog` · `/blog/[slug]` | Blog | 🔎 |
-| `/labs` · `/labs/{agente,integraciones,operacion}` | Demos conceptuales (datos ficticios) | 🔎 |
-| `/contacto` | Captación consultiva a medida (form + pipeline) | ✅ Fase 3 (form cálido) + envío end-to-end |
+| `/trabajos` · `/trabajos/[slug]` | Portfolio (6, numeración 01–06): 01 Aikestar, 02 Jota (operativos), 03 **Fixy** (MVP funcional · web pública), 04 Relevo (MVP en uso privado), 05 Margin, 06 Tips (MVPs no operativos). HOST fuera. Tarjetas simplificadas (imagen, nombre, descripción breve, estado, ficha). Ficha Fixy comercial y proporcional: recorrido público (pedido→matching→presupuestos) con una única nota de alcance; sin conteos técnicos ni frases internas. | ✅ |
+| `/como-trabajamos` | Proceso en detalle | ✅ Fase 3 · grupo 2 (cálido) |
+| `/blog` · `/blog/[slug]` | Blog | ✅ Fase 3 · grupo 2 (cálido) |
+| `/labs` · `/labs/{agente,integraciones,operacion}` | Demos conceptuales (datos ficticios) | ✅ Fase 3 · grupo 2 (cálido; usabilidad conservada) |
+| `/express` | RUN Express — landing comercial | ✅ Fase 3 · grupo 2 (cálido) |
+| `/contacto` | Captación consultiva a medida (form + pipeline) | ✅ Fase 3 (form cálido; tel/WhatsApp consistente, acentos ember) + envío end-to-end |
 | `/hero` | **Propuesta de hero 3D (aislada, esta migración)** | ✅ |
-| Header (global) | Nav + dropdown Servicios (puente hover + teclado) + CTA Contacto | ✅ (dropdown) |
+| Header (global) | Nav + dropdown Servicios (puente hover + teclado) + CTA Contacto | ✅ (dropdown; cálido en rutas migradas) |
+| Banner de privacidad (global) | Consentimiento (Necesarias/Analítica/Marketing) + panel "Ajustes de privacidad" | ✅ Fase 3 (presentación cálida: fondo walnut, crema, botones sin gradiente azul/violeta, foco visible; textos/opciones/lógica y defaults intactos) |
 | Footer (global) | Enlaces, RUN Express, legales, ajustes de privacidad | 🔎 |
 
 ## 2. Público — Herramientas
 
+> Usan otro sistema de tokens (brand-*, utilidades) y/o son interactivas; se migran
+> en un pase propio cuidando la usabilidad. El **mascota Runit** (launcher) tiene
+> identidad visual propia (cian/índigo/violeta): recolorearla es decisión de marca,
+> no un residuo del tema anterior.
+
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `/runit-scan` | Autodiagnóstico Runit Scan → alimenta pipeline con consentimiento | 🔎 (consentimiento + espejo a `project_inquiries` agregados por código) |
-| `/mapa/ejemplo` · `/mapa/[id]` | Mapa de IA (React Flow) | 🔎 |
-| `/agents` | Agentes | 🔎 |
-| Runit (launcher global) | Asistente chat + voz (Web Speech) | 🔎 |
+| `/runit-scan` | Autodiagnóstico Runit Scan → alimenta pipeline con consentimiento | 🔎 (pendiente de migración cálida — herramienta) |
+| `/mapa/ejemplo` · `/mapa/[id]` | Mapa de IA (React Flow) | 🔎 (pendiente — herramienta) |
+| `/agents` | Agentes | 🔎 (pendiente — herramienta) |
+| Runit (launcher global) | Asistente chat + voz (Web Speech) | 🔎 (identidad propia; pase de herramientas) |
 
 ## 3. Express / Cotizador / Pagos
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `/express` | RUN Express (separado de desarrollos a medida) | 🔎 |
-| `/cotizar` | Cotizador de alcance cerrado (catálogo, precios, recorrido) | 🔎 |
+| `/express` | RUN Express — landing comercial (marketing) | ✅ Fase 3 · grupo 2 (cálido) |
+| `/cotizar` | Cotizador de alcance cerrado (catálogo, precios, recorrido) | 🔎 (tool con tokens brand-*; pase propio cuidando conversión) |
 | `/pago` · `/proyecto/[id]` | Pago (Mercado Pago) y seguimiento | 🔎 |
 
 ## 4. Hub (clientes)

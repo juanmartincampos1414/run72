@@ -66,7 +66,15 @@ export function ConsentManager() {
       )}
 
       {showBanner && (
-        <div role="dialog" aria-modal="false" aria-label="Preferencias de privacidad" style={styles.wrap}>
+        <div id="run-consent" role="dialog" aria-modal="false" aria-label="Preferencias de privacidad" style={styles.wrap}>
+          {/* Foco visible y acento cálido (no se pueden expresar con estilos inline). */}
+          <style>{`
+            #run-consent .cm-opt input { accent-color: #ff6a2a; width: 16px; height: 16px; }
+            #run-consent .cm-btn:focus-visible { outline: 2px solid #ffedd7; outline-offset: 2px; }
+            #run-consent .cm-btn-primary:focus-visible { outline-color: #ff6a2a; }
+            #run-consent .cm-btn-ghost:hover { border-color: rgba(255,237,215,0.4); background: rgba(255,237,215,0.05); }
+            #run-consent .cm-btn-primary:hover { background: #fff6ec; }
+          `}</style>
           <div style={styles.card}>
             <p style={styles.title}>Privacidad</p>
             <p style={styles.text}>
@@ -74,14 +82,14 @@ export function ConsentManager() {
               propia y marketing. Podés cambiarlo cuando quieras.
             </p>
             <div style={styles.opts}>
-              <label style={styles.opt}><input type="checkbox" checked readOnly disabled /> <span>Necesarias (siempre activas)</span></label>
-              <label style={styles.opt}><input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} /> <span>Analítica</span></label>
-              <label style={styles.opt}><input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} /> <span>Marketing</span></label>
+              <label style={styles.opt} className="cm-opt"><input type="checkbox" checked readOnly disabled /> <span>Necesarias (siempre activas)</span></label>
+              <label style={styles.opt} className="cm-opt"><input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} /> <span>Analítica</span></label>
+              <label style={styles.opt} className="cm-opt"><input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} /> <span>Marketing</span></label>
             </div>
             <div style={styles.actions}>
-              <button type="button" style={styles.ghost} onClick={() => save({ analytics: false, marketing: false })}>Solo necesarias</button>
-              <button type="button" style={styles.ghost} onClick={() => save({ analytics, marketing })}>Guardar preferencias</button>
-              <button type="button" style={styles.primary} onClick={() => save({ analytics: true, marketing: true })}>Aceptar todo</button>
+              <button type="button" className="cm-btn cm-btn-ghost" style={styles.ghost} onClick={() => save({ analytics: false, marketing: false })}>Solo necesarias</button>
+              <button type="button" className="cm-btn cm-btn-ghost" style={styles.ghost} onClick={() => save({ analytics, marketing })}>Guardar preferencias</button>
+              <button type="button" className="cm-btn cm-btn-primary" style={styles.primary} onClick={() => save({ analytics: true, marketing: true })}>Aceptar todo</button>
             </div>
           </div>
         </div>
@@ -90,14 +98,16 @@ export function ConsentManager() {
   );
 }
 
+// Paleta cálida (walnut / cream / ember), coherente con el sistema aprobado.
+// Se conservan textos, opciones, estado de consentimiento y la lógica.
 const styles: Record<string, React.CSSProperties> = {
   wrap: { position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 80, display: "flex", justifyContent: "center", padding: "16px", paddingBottom: "calc(16px + env(safe-area-inset-bottom))", pointerEvents: "none" },
-  card: { pointerEvents: "auto", width: "100%", maxWidth: 680, background: "rgba(10,10,10,0.96)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 18, padding: 20, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", color: "#fff", fontFamily: "ui-sans-serif, system-ui, sans-serif" },
-  title: { fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", color: "#9CA3AF", margin: 0 },
-  text: { fontSize: 14, lineHeight: "20px", color: "rgba(255,255,255,0.75)", margin: "8px 0 14px" },
-  opts: { display: "flex", flexWrap: "wrap", gap: "12px 20px", marginBottom: 16 },
-  opt: { display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, color: "#fff" },
-  actions: { display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-end" },
-  ghost: { height: 40, padding: "0 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.18)", background: "transparent", color: "#fff", fontSize: 14, cursor: "pointer" },
-  primary: { height: 40, padding: "0 18px", borderRadius: 12, border: 0, background: "linear-gradient(100deg,#18ACFF,#5583FF 48%,#8960FF)", color: "#fff", fontSize: 14, cursor: "pointer" },
+  card: { pointerEvents: "auto", width: "100%", maxWidth: 640, background: "rgba(23,14,7,0.97)", border: "1px solid rgba(255,237,215,0.14)", borderRadius: 16, padding: 20, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", color: "#ffedd7", fontFamily: "ui-sans-serif, system-ui, sans-serif", boxShadow: "0 24px 60px rgba(0,0,0,0.5)" },
+  title: { fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: "#c8b49c", margin: 0 },
+  text: { fontSize: 14, lineHeight: "20px", color: "rgba(255,237,215,0.72)", margin: "8px 0 14px" },
+  opts: { display: "flex", flexWrap: "wrap", gap: "12px 20px", margin: "0 0 16px", paddingTop: 14, borderTop: "1px solid rgba(255,237,215,0.12)" },
+  opt: { display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, color: "#ffedd7" },
+  actions: { display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-end", paddingTop: 14, borderTop: "1px solid rgba(255,237,215,0.12)" },
+  ghost: { height: 40, padding: "0 16px", borderRadius: 10, border: "1px solid rgba(255,237,215,0.22)", background: "transparent", color: "#ffedd7", fontSize: 14, cursor: "pointer", transition: "border-color .2s, background .2s" },
+  primary: { height: 40, padding: "0 18px", borderRadius: 10, border: 0, background: "#ffedd7", color: "#1a0f07", fontSize: 14, fontWeight: 500, cursor: "pointer", transition: "background .2s" },
 };
