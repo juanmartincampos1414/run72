@@ -4,6 +4,7 @@ import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import { GradientButton } from "@/components/marketing/GradientButton";
 import { GradientText } from "@/components/marketing/GradientText";
 import { PointerGlow } from "@/components/marketing/PointerGlow";
+import { SolCardGlyph } from "@/components/marketing/soluciones/SolCardGlyph";
 import { VERTICALS, VERTICALS_INDEX, VERTICALS_PROMISE } from "@/lib/marketing/verticals";
 import "./soluciones.css";
 
@@ -52,6 +53,7 @@ export default function SolucionesPage() {
                     </span>
                     <span className="sol-card-title">{v.name}</span>
                     <span className="sol-card-text">{v.tagline}</span>
+                    <SolCardGlyph />
                     <span className="sol-card-cta">
                       Ver el agente
                       <AnimatedArrow />

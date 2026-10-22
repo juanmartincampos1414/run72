@@ -5,6 +5,7 @@ import { DetailBreadcrumbs } from "@/components/marketing/DetailBreadcrumbs";
 import { GradientButton } from "@/components/marketing/GradientButton";
 import { GradientText } from "@/components/marketing/GradientText";
 import { PointerGlow } from "@/components/marketing/PointerGlow";
+import { SolAgentJourney, type VerticalSlug } from "@/components/marketing/soluciones/SolAgentJourney";
 import { VERTICALS, VERTICALS_INDEX, VERTICALS_PROMISE, getVertical } from "@/lib/marketing/verticals";
 import "../soluciones.css";
 
@@ -73,6 +74,7 @@ export default async function VerticalPage({ params }: { params: Promise<Params>
               <AnimatedArrow />
             </GradientButton>
           </div>
+          <SolAgentJourney slug={v.slug as VerticalSlug} />
         </div>
       </header>
 

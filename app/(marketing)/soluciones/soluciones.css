@@ -348,3 +348,79 @@
   .marketing .sol-closing-inner { align-items: stretch; }
   .marketing .sol-closing .m-btn { justify-content: center; }
 }
+
+/* ============================================================
+ * Soluciones — recorrido operativo del agente por industria (RUN-18).
+ * Estructura común (consulta→agente→acción→resultado) + etiquetas propias.
+ * Volumen por inclinación 3D al puntero + pulso; reduced-motion quieto.
+ * ============================================================ */
+.marketing .sol-journey {
+  position: relative;
+  margin: clamp(24px, 4vw, 44px) 0 0;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--m-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(90% 120% at 18% 0%, rgba(255, 106, 42, 0.12) 0%, rgba(255, 106, 42, 0) 60%),
+    var(--m-deep, #0c0703);
+  overflow: hidden;
+}
+.marketing .sol-journey.sv-tilt {
+  transition: transform 0.45s var(--m-ease);
+  transform: perspective(1100px) rotateX(calc(var(--ty, 0) * -3deg)) rotateY(calc(var(--tx, 0) * 4deg));
+  will-change: transform;
+}
+.marketing .sol-journey .sv-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.marketing .sol-journey .sv-tag {
+  fill: rgba(255, 237, 215, 0.62);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.3px;
+}
+.marketing .sol-journey .sj-stage { fill: rgba(255, 237, 215, 0.4); font-size: 9px; letter-spacing: 1.2px; }
+.marketing .sol-journey .sv-tag-dim { fill: rgba(255, 237, 215, 0.4); }
+.marketing .sol-journey .sj-label { fill: #ffdcb6; }
+.marketing .sol-journey .sj-track { stroke: rgba(255, 237, 215, 0.24); stroke-width: 2; stroke-dasharray: 4 6; }
+.marketing .sol-journey .sj-branch { stroke: rgba(96, 216, 165, 0.45); stroke-width: 1.5; stroke-dasharray: 3 5; fill: none; }
+.marketing .sol-journey .sj-person circle { fill: rgba(96, 216, 165, 0.25); stroke: #60d8a5; stroke-width: 1.3; }
+.marketing .sol-journey .sj-node { fill: rgba(255, 106, 42, 0.18); stroke: #ff6a2a; stroke-width: 1.6; }
+.marketing .sol-journey .sj-agent { fill: rgba(255, 106, 42, 0.16); stroke-width: 1.9; }
+.marketing .sol-journey .sj-core { fill: #ff8a4c; animation: sj-core 2.6s ease-in-out infinite; }
+.marketing .sol-journey .sj-node-end { fill: rgba(96, 216, 165, 0.22); stroke: #60d8a5; }
+.marketing .sol-journey .sv-event { fill: #ffd29a; animation: sj-flow 3.8s var(--m-ease) infinite; }
+@keyframes sj-core { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+@keyframes sj-flow {
+  0% { transform: translateX(0); opacity: 0; }
+  8% { opacity: 1; }
+  30% { transform: translateX(140px); }
+  58% { transform: translateX(280px); }
+  84%, 100% { transform: translateX(400px); opacity: 0; }
+}
+.marketing .sol-journey-cap { position: absolute; left: clamp(16px, 3vw, 28px); bottom: 10px; color: var(--m-faint); }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .sol-journey.sv-tilt { transition: none; }
+  .marketing .sol-journey .sj-core,
+  .marketing .sol-journey .sv-event { animation: none; }
+  .marketing .sol-journey .sv-event { transform: translateX(140px); opacity: 1; }
+}
+
+/* Mini-recorrido en las tarjetas del índice de Soluciones. */
+.marketing .sol-cg { display: block; margin-top: 14px; }
+.marketing .sol-cg-svg { width: 160px; max-width: 72%; height: auto; overflow: visible; }
+.marketing .sol-cg-track { stroke: rgba(255, 237, 215, 0.22); stroke-width: 1.6; stroke-dasharray: 3 5; }
+.marketing .sol-cg-dot { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; stroke-width: 1.4; }
+.marketing .sol-cg-agent { fill: rgba(255, 106, 42, 0.16); stroke-width: 1.7; }
+.marketing .sol-cg-core { fill: #ff8a4c; animation: sj-core 2.6s ease-in-out infinite; }
+.marketing .sol-cg-end { fill: rgba(96, 216, 165, 0.22); stroke: #60d8a5; }
+.marketing .sol-cg-event { fill: #ffd29a; animation: sol-cg-flow 3.6s var(--m-ease) infinite; }
+@keyframes sol-cg-flow {
+  0% { transform: translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  32% { transform: translateX(48px); }
+  60% { transform: translateX(96px); }
+  86%, 100% { transform: translateX(142px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketing .sol-cg-core, .marketing .sol-cg-event { animation: none; }
+  .marketing .sol-cg-event { transform: translateX(48px); opacity: 1; }
+}
