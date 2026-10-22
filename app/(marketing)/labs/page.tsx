@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import { GradientText } from "@/components/marketing/GradientText";
 import { LABS_INDEX } from "@/lib/marketing/labs";
+import { LabCards } from "@/components/marketing/labs/LabCards";
 import "./labs.css";
 
 export const metadata: Metadata = {
@@ -28,32 +27,7 @@ export default function LabsPage() {
           <p className="lab-lede">{LABS_INDEX.bajada}</p>
         </header>
 
-        <ul className="lab-cards-grid">
-          {LABS_INDEX.cards.map((c) => (
-            <li key={c.id}>
-              <Link href={c.href} className="lab-index-card m-arrow-host">
-                <span className="m-eyebrow">{c.kind}</span>
-                <span className="lab-index-title">{c.title}</span>
-                <p className="lab-index-text">{c.text}</p>
-                <span className="lab-index-cta">
-                  {c.cta}
-                  <AnimatedArrow />
-                </span>
-              </Link>
-            </li>
-          ))}
-          <li>
-            <Link href={LABS_INDEX.map.href} className="lab-index-card lab-index-card--map m-arrow-host">
-              <span className="m-eyebrow">Mapa</span>
-              <span className="lab-index-title">{LABS_INDEX.map.title}</span>
-              <p className="lab-index-text">{LABS_INDEX.map.text}</p>
-              <span className="lab-index-cta">
-                Abrir el mapa
-                <AnimatedArrow />
-              </span>
-            </Link>
-          </li>
-        </ul>
+        <LabCards />
       </div>
     </div>
   );

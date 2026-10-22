@@ -405,3 +405,94 @@
   .marketing .lab-filter,
   .marketing .lab-choice { transition: none; }
 }
+
+/* ============================================================
+ * Labs — mini-visuales por categoría + linterna cálida (RUN-16)
+ * Volumen/movimiento en CSS; prefers-reduced-motion los detiene.
+ * ============================================================ */
+.marketing .lab-index-card { position: relative; overflow: hidden; }
+.marketing .lab-index-inner { display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto; position: relative; z-index: 2; }
+
+/* Linterna: resplandor cálido que sigue el puntero; con teclado se centra. */
+.marketing .lab-index-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(300px circle at var(--lx, 50%) var(--ly, 24%), rgba(255, 138, 76, 0.26), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s var(--m-ease);
+}
+.marketing .lab-index-card:hover::before,
+.marketing .lab-index-card:focus-visible::before,
+.marketing .lab-index-card:focus-within::before { opacity: 1; }
+
+/* Banda del mini-visual: se "enciende" bajo la linterna. */
+.marketing .lab-viz { display: block; position: relative; z-index: 0; height: 104px; margin: -6px -6px 2px; }
+.marketing .lab-viz .lv { width: 100%; height: 100%; display: block; transition: filter 0.35s var(--m-ease); }
+.marketing .lab-index-card:hover .lv,
+.marketing .lab-index-card:focus-visible .lv,
+.marketing .lab-index-card:focus-within .lv { filter: brightness(1.35) saturate(1.15); }
+.marketing .lab-viz .lv * { vector-effect: non-scaling-stroke; }
+
+/* --- Sistema operativo: registros que se ordenan --- */
+.marketing .lv-op .lv-row { fill: rgba(255, 237, 215, 0.14); }
+.marketing .lv-op .lv-row-b { fill: rgba(255, 106, 42, 0.5); }
+.marketing .lv-op .lv-dot { fill: rgba(255, 237, 215, 0.3); }
+.marketing .lv-op .lv-dot-b { fill: #ff6a2a; }
+.marketing .lv-op .lv-row { animation: lv-sort 4.6s var(--m-ease) infinite; }
+.marketing .lv-op .lv-row-a { animation-delay: 0s; }
+.marketing .lv-op .lv-row-b { animation-delay: 0.5s; }
+.marketing .lv-op .lv-row-c { animation-delay: 1s; }
+.marketing .lv-op .lv-row-d { animation-delay: 1.5s; }
+@keyframes lv-sort { 0%, 70%, 100% { transform: translateX(0); } 20%, 50% { transform: translateX(10px); } }
+
+/* --- Agente: consulta una fuente y deriva a aprobación --- */
+.marketing .lv-ag .lv-link { stroke: rgba(255, 237, 215, 0.28); stroke-width: 1.6; }
+.marketing .lv-ag .lv-link-dim { stroke: rgba(255, 237, 215, 0.14); }
+.marketing .lv-ag .lv-source { stroke: rgba(255, 237, 215, 0.4); stroke-width: 1.6; fill: rgba(255, 237, 215, 0.06); }
+.marketing .lv-ag .lv-node-main { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.6; }
+.marketing .lv-ag .lv-node-core { fill: #ff8a4c; }
+.marketing .lv-ag .lv-approve rect { fill: rgba(96, 216, 165, 0.14); stroke: rgba(96, 216, 165, 0.7); stroke-width: 1.4; }
+.marketing .lv-ag .lv-check { stroke: #60d8a5; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.marketing .lv-ag .lv-wait { fill: rgba(255, 237, 215, 0.05); stroke: rgba(255, 237, 215, 0.2); stroke-width: 1.4; }
+.marketing .lv-ag .lv-node-core { animation: lv-core 2.4s ease-in-out infinite; }
+.marketing .lv-ag .lv-pulse { fill: #ffd29a; offset-path: path("M34 58 L120 60 Q150 60 150 40 L206 40"); offset-distance: 0%; animation: lv-ag-travel 3s var(--m-ease) infinite; }
+@keyframes lv-core { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes lv-ag-travel { 0% { offset-distance: 0%; opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+
+/* --- Integración: un evento recorre los nodos --- */
+.marketing .lv-in .lv-track { stroke: rgba(255, 237, 215, 0.2); stroke-width: 2; stroke-dasharray: 4 6; }
+.marketing .lv-in .lv-stop { fill: rgba(255, 237, 215, 0.08); stroke: rgba(255, 237, 215, 0.35); stroke-width: 1.6; }
+.marketing .lv-in .lv-stop-end { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; }
+.marketing .lv-in .lv-event { fill: #ff6a2a; animation: lv-in-travel 3.2s var(--m-ease) infinite; }
+@keyframes lv-in-travel {
+  0% { transform: translateX(28px); opacity: 0; }
+  10% { opacity: 1; }
+  30% { transform: translateX(104px); }
+  60% { transform: translateX(180px); }
+  85%, 100% { transform: translateX(212px); opacity: 0; }
+}
+
+/* --- Mapa: etapas y conexiones con profundidad --- */
+.marketing .lv-mp .lv-edges path { stroke: rgba(255, 237, 215, 0.22); stroke-width: 1.4; }
+.marketing .lv-mp .lv-m-node { stroke: #ff8a4c; stroke-width: 1.4; }
+.marketing .lv-mp .lv-depth-near { fill: rgba(255, 106, 42, 0.5); }
+.marketing .lv-mp .lv-depth-mid { fill: rgba(255, 138, 76, 0.28); }
+.marketing .lv-mp .lv-depth-far { fill: rgba(255, 237, 215, 0.14); stroke: rgba(255, 237, 215, 0.3); }
+.marketing .lv-mp .lv-m-node { animation: lv-float 5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.marketing .lv-mp .lv-depth-mid { animation-duration: 6s; }
+.marketing .lv-mp .lv-depth-far { animation-duration: 7s; }
+@keyframes lv-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .lv-op .lv-row,
+  .marketing .lv-ag .lv-node-core,
+  .marketing .lv-ag .lv-pulse,
+  .marketing .lv-in .lv-event,
+  .marketing .lv-mp .lv-m-node { animation: none; }
+  .marketing .lv-ag .lv-pulse { offset-distance: 52%; opacity: 1; }
+  .marketing .lv-in .lv-event { transform: translateX(104px); opacity: 1; }
+  .marketing .lab-index-card::before { transition: none; }
+}
