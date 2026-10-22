@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { RunWordmarkSvg } from "./RunWordmarkSvg";
 
-// Wordmark RUN (Switzer 600, tracking -0.04em). Vector propio editable:
-// se dibuja con la familia cargada; no reutiliza el logo RUN raster.
+// Logo del header: vector definitivo del manual de marca (RUN-crema sobre oscuro),
+// no una reconstrucción tipográfica. Hereda el color del tema (crema) y conserva
+// su posición y jerarquía. Altura ~24px (≈ al wordmark anterior).
 export function Wordmark({ className = "", onClick }: { className?: string; onClick?: () => void }) {
   return (
     <Link
@@ -10,18 +12,13 @@ export function Wordmark({ className = "", onClick }: { className?: string; onCl
       aria-label="RUN · Inicio"
       className={`m-wordmark ${className}`}
       style={{
-        fontFamily: "var(--font-run-display), system-ui, sans-serif",
-        fontWeight: 600,
-        letterSpacing: "-0.04em",
-        fontSize: "22px",
-        lineHeight: 1,
         color: "var(--m-text)",
         textDecoration: "none",
         display: "inline-flex",
         alignItems: "center",
       }}
     >
-      RUN
+      <RunWordmarkSvg className="m-wordmark-svg" />
     </Link>
   );
 }

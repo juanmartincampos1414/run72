@@ -606,6 +606,8 @@
   .marketing .rl-panel { right: 16px; left: 16px; width: auto; bottom: calc(84px + env(safe-area-inset-bottom)); }
 }
 .marketing .rl-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--m-line); }
+/* Logo del header: vector definitivo del manual de marca, altura fija. */
+.marketing .m-wordmark-svg { height: 24px; width: auto; }
 .marketing .rl-title { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-run-mono), monospace; font-size: 12px; color: var(--m-text); }
 .marketing .rl-title-mark { flex-shrink: 0; }
 .marketing .rl-close { background: none; border: 0; color: var(--m-faint); font-size: 14px; cursor: pointer; width: 32px; height: 32px; border-radius: 8px; }

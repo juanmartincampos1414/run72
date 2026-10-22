@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HeroCoreScene } from "./HeroCoreScene";
 import { HeroCoreFallback } from "./HeroCoreFallback";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 
 function webglAvailable(): boolean {
   try {
@@ -43,7 +44,9 @@ export function HeroV2() {
         ) : mode === "pending" ? null : (
           <HeroCoreScene onError={() => setMode("static")} />
         )}
-        <span className="hv2-watermark" aria-hidden="true">RUN</span>
+        <span className="hv2-watermark" aria-hidden="true">
+          <RunWordmarkSvg className="hv2-watermark-svg" />
+        </span>
         <div className="hv2-vignette" aria-hidden="true" />
 
         <header className="hv2-bar">

@@ -49,16 +49,14 @@
   top: 46%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  font-size: clamp(9rem, 34vw, 32rem);
-  line-height: 0.8;
   color: var(--hv2-cream);
-  opacity: 0.045;
+  opacity: 0.05;
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
 }
+/* "RUN" del fondo con el vector definitivo del manual (misma posición/jerarquía). */
+.hv2-watermark-svg { width: clamp(18rem, 66vw, 62rem); height: auto; }
 
 /* Viñeta cálida para legibilidad del texto (oscurece bordes y base) */
 .hv2-vignette {

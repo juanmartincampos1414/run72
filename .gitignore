@@ -30,3 +30,4 @@ next-env.d.ts
 
 # Carpeta suelta, no es parte del landing
 Run72 Core/
+RUN72-monorepo/
