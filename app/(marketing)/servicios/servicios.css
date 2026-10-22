@@ -675,3 +675,74 @@
   .marketing .svc-hero--index + .svc-bands-section,
   .marketing .svc-bands-section { padding-top: 112px; }
 }
+
+/* ============================================================
+ * Servicios — composición protagonista del índice (RUN-18):
+ * software + agentes + integración conectados, con profundidad
+ * (parallax al puntero) y un pulso que recorre los enlaces.
+ * ============================================================ */
+.marketing .svc-connect {
+  --px: 0; --py: 0;
+  position: relative;
+  max-width: 720px;
+  margin: clamp(28px, 5vw, 56px) auto 0;
+  touch-action: pan-y;
+}
+.marketing .svc-connect-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.marketing .svc-connect .scx-group {
+  transition: transform 0.5s var(--m-ease);
+}
+.marketing .svc-connect .scx-soft { transform: translate(calc(var(--px) * -14px), calc(var(--py) * -8px)); }
+.marketing .svc-connect .scx-ag { transform: translate(calc(var(--px) * 7px), calc(var(--py) * 5px)); }
+.marketing .svc-connect .scx-int { transform: translate(calc(var(--px) * 16px), calc(var(--py) * 10px)); }
+.marketing .svc-connect .scx-links { transform: translate(calc(var(--px) * 3px), calc(var(--py) * 2px)); transition: transform 0.5s var(--m-ease); }
+
+/* Enlaces */
+.marketing .scx-link { stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.6; }
+.marketing .scx-link-dim { stroke: rgba(255, 237, 215, 0.12); stroke-dasharray: 3 7; }
+
+/* Software: capas */
+.marketing .scx-layer-3 { fill: rgba(255, 237, 215, 0.12); }
+.marketing .scx-layer-2 { fill: rgba(255, 178, 122, 0.35); }
+.marketing .scx-layer-1 { fill: #ff6a2a; }
+.marketing .scx-soft .scx-layer { animation: scx-assemble 5s var(--m-ease) infinite; }
+.marketing .scx-soft .scx-layer-2 { animation-delay: 0.18s; }
+.marketing .scx-soft .scx-layer-1 { animation-delay: 0.36s; }
+@keyframes scx-assemble { 0%, 64%, 100% { transform: translateX(0); } 24%, 44% { transform: translateX(12px); } }
+
+/* Agentes */
+.marketing .scx-tool { stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.4; }
+.marketing .scx-tool-dot { fill: rgba(255, 237, 215, 0.4); }
+.marketing .scx-approve { fill: #60d8a5; }
+.marketing .scx-node { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.8; }
+.marketing .scx-node-core { fill: #ff8a4c; animation: scx-core 2.6s ease-in-out infinite; }
+@keyframes scx-core { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* Integración */
+.marketing .scx-flow { stroke: rgba(255, 237, 215, 0.22); stroke-width: 1.6; }
+.marketing .scx-flow-node { fill: rgba(255, 106, 42, 0.22); stroke: #ff6a2a; stroke-width: 1.4; }
+.marketing .scx-flow-end { fill: rgba(255, 106, 42, 0.5); }
+
+/* Etiquetas */
+.marketing .scx-label {
+  fill: rgba(255, 237, 215, 0.55);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-anchor: middle;
+}
+
+/* Pulsos por los enlaces */
+.marketing .scx-pulse { fill: #ffd29a; opacity: 0; }
+.marketing .scx-pulse-1 { offset-path: path("M232 150 C300 150 300 118 372 118"); animation: scx-travel 3.4s var(--m-ease) infinite; }
+.marketing .scx-pulse-2 { offset-path: path("M452 118 C540 118 500 156 556 156"); animation: scx-travel 3.4s var(--m-ease) 1.2s infinite; }
+@keyframes scx-travel { 0% { offset-distance: 0%; opacity: 0; } 14% { opacity: 1; } 78% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .svc-connect .scx-group,
+  .marketing .svc-connect .scx-links { transition: none; }
+  .marketing .scx-soft .scx-layer,
+  .marketing .scx-node-core,
+  .marketing .scx-pulse { animation: none; }
+  .marketing .scx-pulse { opacity: 0; }
+}

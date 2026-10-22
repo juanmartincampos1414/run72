@@ -4,6 +4,7 @@ import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import { GradientButton } from "@/components/marketing/GradientButton";
 import { GradientText } from "@/components/marketing/GradientText";
 import { PointerGlow } from "@/components/marketing/PointerGlow";
+import { ServicesConnectVisual } from "@/components/marketing/servicios/ServicesConnectVisual";
 import { SERVICES_INDEX, SOLUTIONS } from "@/lib/marketing/solutions";
 import "./servicios.css";
 
@@ -27,6 +28,7 @@ export default function ServiciosPage() {
           <p className="m-eyebrow svc-hero-eyebrow">Servicios</p>
           <h1 className="svc-h1">{SERVICES_INDEX.h1}</h1>
           <p className="svc-bajada">{SERVICES_INDEX.bajada}</p>
+          <ServicesConnectVisual />
         </div>
       </header>
 
