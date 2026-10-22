@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Logo } from "../Logo";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { ArrowRight, CheckIcon } from "../icons";
 import { PROJECT_TYPES, STAGES, OBJECTIVES_V2 } from "@/lib/configurator";
 
@@ -343,7 +343,7 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack: () => 
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">
-            <Logo />
+            <RunWordmarkSvg className="h-6 w-auto" />
           </Link>
           <button type="button" onClick={onBack} className="text-sm text-muted transition-colors hover:text-fg">
             Volver

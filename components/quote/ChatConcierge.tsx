@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Logo } from "../Logo";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { Confirmation } from "./Confirmation";
 import { ArrowRight, CheckIcon, BoltIcon } from "../icons";
 import { formatARS } from "@/lib/pricing";
@@ -360,7 +360,7 @@ function Shell({ children, onBack }: { children: React.ReactNode; onBack: () => 
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">
-            <Logo />
+            <RunWordmarkSvg className="h-6 w-auto" />
           </Link>
           <button onClick={onBack} className="text-sm text-muted transition-colors hover:text-fg">
             ← Cambiar modo

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Logo } from "@/components/Logo";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { CheckIcon, BoltIcon } from "@/components/icons";
 
 export const metadata: Metadata = {
@@ -38,11 +38,11 @@ export default async function PagoPage({
   const c = COPY[key];
 
   return (
-    <div className="min-h-screen">
+    <div className="run-cotizar min-h-screen">
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">
-            <Logo />
+            <RunWordmarkSvg className="h-6 w-auto" />
           </Link>
           <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
             Volver al sitio

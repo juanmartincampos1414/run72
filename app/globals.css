@@ -371,3 +371,28 @@
   #mapa-print, #mapa-print * { visibility: visible !important; }
   #mapa-print { position: absolute; left: 0; top: 0; width: 100%; }
 }
+
+/* ------------------------------------------------------------------ *
+ * RUN Express / Cotizador — tema cálido del sistema de marca.
+ * Scope local: redefine los tokens --color-* SÓLO dentro de .run-cotizar,
+ * así las utilidades de Tailwind (bg-ink, text-fg, text-brand-cyan, …) se
+ * resuelven en cálido sin tocar admin, hub, mapa, scan ni el resto del sitio.
+ * Rojo/esmeralda (error/éxito) se conservan por semántica.
+ * ------------------------------------------------------------------ */
+.run-cotizar {
+  --color-ink: #120a05;
+  --color-ink-soft: #0c0703;
+  --color-surface: #1b1109;
+  --color-surface-2: #201813;
+  --color-line: rgba(255, 237, 215, 0.10);
+  --color-line-strong: rgba(255, 237, 215, 0.16);
+  --color-fg: #ffedd7;
+  --color-muted: #c8b49c;
+  --color-faint: #9a8b79;
+  --color-brand-cyan: #ff6a2a;
+  --color-brand-blue: #dc5000;
+  --color-brand-violet: #ff8a4c;
+  min-height: 100vh;
+  background: var(--color-ink);
+  color: var(--color-fg);
+}

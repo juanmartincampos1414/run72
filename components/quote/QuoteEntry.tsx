@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Logo } from "../Logo";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { QuoteConfigurator } from "./QuoteConfigurator";
 import { ChatConcierge } from "./ChatConcierge";
 import { MeetingRequest } from "./MeetingRequest";
@@ -26,7 +26,7 @@ export function QuoteEntry({ initialServices, initialMicros }: { initialServices
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">
-            <Logo />
+            <RunWordmarkSvg className="h-6 w-auto" />
           </Link>
           <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
             Volver al sitio

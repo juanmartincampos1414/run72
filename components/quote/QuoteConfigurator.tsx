@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Logo } from "../Logo";
+import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { OptionCard } from "./OptionCard";
 import { CostPanel } from "./CostPanel";
 import { Confirmation } from "./Confirmation";
@@ -283,7 +283,7 @@ export function QuoteConfigurator({ initialServices, initialMicros }: { initialS
               : loadError}
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <Link href="/contacto" className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110">
+            <Link href="/contacto" className="rounded-full bg-[linear-gradient(100deg,#ff6a2a,#dc5000_48%,#ff8a4c)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110">
               Contanos tu proyecto
             </Link>
             <Link href="/" className="rounded-full border border-line px-5 py-2.5 text-sm text-muted transition hover:text-fg">
@@ -361,7 +361,7 @@ export function QuoteConfigurator({ initialServices, initialMicros }: { initialS
                     </p>
                     <Link
                       href="/contacto"
-                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110"
+                      className="mt-3 inline-flex items-center gap-2 rounded-full bg-[linear-gradient(100deg,#ff6a2a,#dc5000_48%,#ff8a4c)] px-5 py-2.5 text-sm font-medium text-white transition hover:brightness-110"
                     >
                       Contanos qué necesitás resolver
                     </Link>
@@ -797,7 +797,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">
-            <Logo />
+            <RunWordmarkSvg className="h-6 w-auto" />
           </Link>
           <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
             Volver al sitio

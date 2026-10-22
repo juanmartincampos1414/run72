@@ -36,5 +36,9 @@ async function loadCatalog(): Promise<{ services: Service[]; microservices: Micr
 
 export default async function CotizarPage() {
   const { services, microservices } = await loadCatalog();
-  return <QuoteEntry initialServices={services} initialMicros={microservices} />;
+  return (
+    <div className="run-cotizar">
+      <QuoteEntry initialServices={services} initialMicros={microservices} />
+    </div>
+  );
 }
