@@ -285,3 +285,14 @@
 .marketing.run-warm .lab-status { border-left-color: var(--hv2-ember); background: rgba(255, 106, 42, 0.07); }
 .marketing.run-warm .lab-chip[data-tone="info"] { border-color: color-mix(in srgb, var(--hv2-ember) 55%, transparent); }
 .marketing.run-warm .lab-table tr[data-selected="true"] { background: rgba(255, 106, 42, 0.1); }
+
+/* Migas de navegación (fichas, Labs, blog): cápsula y línea superior cálidas
+   (eran negro frío + gradiente azul/violeta). */
+.marketing.run-warm .svc-crumbs { background: rgba(18, 10, 5, 0.82); border-color: var(--m-line); }
+.marketing.run-warm .svc-crumbs::before { background: linear-gradient(90deg, var(--hv2-ember), #ff8a4c 40%, #ffb27a 72%, var(--m-gold)); }
+
+/* Runit (asistente): FAB y chrome del panel cálidos en rutas migradas. El
+   personaje/identidad no se toca; esto es solo la superficie de la UI. */
+.marketing.run-warm .rl-fab { background: rgba(23, 14, 7, 0.88); }
+.marketing.run-warm .rl-user { background: color-mix(in srgb, var(--hv2-ember) 20%, transparent); color: var(--m-text); }
+.marketing.run-warm .rl-input:focus-visible { border-color: color-mix(in srgb, var(--hv2-ember) 70%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hv2-ember) 28%, transparent); }

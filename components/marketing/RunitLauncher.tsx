@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { RunMark } from "./RunMark";
+import { RunDiamond } from "./RunDiamond";
 
 // Lanzador discreto de Runit (§12.1). Sin zigzag, glitch fuerte ni promesas de
 // 72h. Abre un panel accesible de orientación que conversa con /api/assistant.
@@ -164,13 +164,13 @@ export function RunitLauncher() {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <RunMark size={34} />
+        <RunDiamond size={34} />
       </button>
 
       {open && (
         <div ref={panelRef} className="rl-panel" role="dialog" aria-label="Runit · Orientación de proyectos">
           <div className="rl-head">
-            <span className="rl-title">Runit · Orientación de proyectos</span>
+            <span className="rl-title"><RunDiamond size={18} className="rl-title-mark" /> Runit · Orientación de proyectos</span>
             <button type="button" className="rl-close" aria-label="Minimizar asistente" onClick={() => { setOpen(false); launcherRef.current?.focus(); }}>✕</button>
           </div>
 

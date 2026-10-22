@@ -71,7 +71,7 @@ export function HeroCoreScene({ onError, scrollDriven = true }: { onError?: () =
       const camZ = () => (isMobile() ? 8.2 : 6.2);
       camera.position.set(0, 0, camZ());
       // Altura base: eleva el núcleo al tercio superior, dejando el titular debajo.
-      const baseY = () => (isMobile() ? 2.0 : 1.05);
+      const baseY = () => (isMobile() ? 1.5 : 0.8);
 
       const root = new THREE.Group();
       scene.add(root);

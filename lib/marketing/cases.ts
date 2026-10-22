@@ -428,7 +428,7 @@ export const WORKS: Work[] = [
       "Un restaurante suele no saber cuánto cuesta realmente cada plato, cuál es su margen, qué proveedores deterioran el costo ni qué turnos son rentables. Margin cruza lo que se compra con lo que se vende para responder esas preguntas.",
     userType: "Restaurantes y operadores gastronómicos, con aislamiento multi-tenant por restaurante.",
     built:
-      "Aplicación Next.js completa, 21 migraciones SQL y documentación de producto y arquitectura, con un único autor.",
+      "Aplicación Next.js completa, con documentación de producto y de arquitectura.",
     features: [
       "Facturas con OCR por IA: extrae proveedor, ingredientes y precios, con revisión humana antes de confirmar.",
       "Recetas y costeo, con importación desde PDF o XLSX y conversión de unidades.",
@@ -450,8 +450,8 @@ export const WORKS: Work[] = [
       "El historial de precios es append-only con borrado lógico. El restaurante se resuelve desde la sesión, nunca desde el cliente. Toda salida de OCR o IA pasa por revisión humana. Quedan fuera de alcance por decisión: inventario, órdenes de compra y contabilidad.",
     status: MVP_STATUS,
     evidence: [
-      "Repositorio privado, con un único autor.",
-      "Auditoría interna del producto que documenta sus brechas: no está listo para clientes pagos. Sin despliegue público verificado.",
+      "Producto construido y documentado (código y arquitectura).",
+      "Sin despliegue público verificado.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/margin/logo.png",
