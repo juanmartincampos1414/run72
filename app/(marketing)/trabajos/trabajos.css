@@ -606,3 +606,17 @@
   background: rgba(255, 255, 255, 0.04);
 }
 .marketing .work-note strong { color: var(--m-text); font-weight: 500; }
+
+/* Microinteracción de profundidad en las tarjetas (RUN-18): leve elevación +
+   zoom suave de la portada dentro de su marco, sin tapar ni alterar la captura. */
+.marketing .work-card { transition: border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s var(--m-ease); }
+.marketing .work-card:hover,
+.marketing .work-card:focus-visible { transform: translateY(-3px); }
+.marketing .work-poster-img { transition: transform 0.6s var(--m-ease); }
+.marketing .work-card:hover .work-poster-img,
+.marketing .work-card:focus-visible .work-poster-img { transform: scale(1.045); }
+@media (prefers-reduced-motion: reduce) {
+  .marketing .work-card, .marketing .work-poster-img { transition: none; }
+  .marketing .work-card:hover, .marketing .work-card:focus-visible { transform: none; }
+  .marketing .work-card:hover .work-poster-img, .marketing .work-card:focus-visible .work-poster-img { transform: none; }
+}
