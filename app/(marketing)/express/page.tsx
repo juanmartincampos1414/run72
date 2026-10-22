@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./express.css";
 import { GradientButton } from "@/components/marketing/GradientButton";
+import { ExpressModulesVisual } from "@/components/marketing/express/ExpressModulesVisual";
 
 export const metadata: Metadata = {
   title: "RUN Express",
@@ -40,6 +41,7 @@ export default function ExpressPage() {
             <GradientButton href="/cotizar">Cotizar mi proyecto</GradientButton>
             <Link href="/contacto" className="m-btn-ghost">Necesito una solución a medida</Link>
           </div>
+          <ExpressModulesVisual />
         </div>
       </section>
 

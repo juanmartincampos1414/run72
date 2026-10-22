@@ -25,3 +25,43 @@
 @media (min-width: 1024px) {
   .marketing .ex-cards { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ============================================================
+ * RUN Express (RUN-12): módulos de alcance cerrado que se ensamblan
+ * y conducen al cotizador. Volumen por inclinación + pulso.
+ * ============================================================ */
+.marketing .ex-modules {
+  --tx: 0; --ty: 0;
+  max-width: 560px;
+  margin: clamp(28px, 5vw, 52px) 0 0;
+  transition: transform 0.45s var(--m-ease);
+  transform: perspective(1100px) rotateX(calc(var(--ty) * -3deg)) rotateY(calc(var(--tx) * 4deg));
+  will-change: transform;
+}
+.marketing .ex-mod-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.marketing .ex-mod text {
+  fill: rgba(255, 237, 215, 0.72);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.3px;
+}
+.marketing .ex-mod rect { fill: rgba(255, 237, 215, 0.06); stroke: rgba(255, 237, 215, 0.2); stroke-width: 1.3; }
+.marketing .ex-mod-a rect { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; }
+.marketing .ex-mod-a text { fill: #ffdcb6; }
+.marketing .ex-mod { animation: ex-assemble 5s var(--m-ease) infinite; }
+.marketing .ex-mod-b { animation-delay: 0.14s; }
+.marketing .ex-mod-c { animation-delay: 0.28s; }
+.marketing .ex-mod-d { animation-delay: 0.42s; }
+@keyframes ex-assemble { 0%, 66%, 100% { transform: translateX(0); opacity: 1; } 16% { transform: translateX(-18px); opacity: 0.35; } 40% { transform: translateX(0); opacity: 1; } }
+.marketing .ex-mod-link { stroke: rgba(255, 237, 215, 0.26); stroke-width: 1.6; stroke-dasharray: 4 5; }
+.marketing .ex-mod-pulse { fill: #ffd29a; offset-path: path("M214 108 H306"); animation: ex-travel 3.2s var(--m-ease) infinite; opacity: 0; }
+@keyframes ex-travel { 0% { offset-distance: 0%; opacity: 0; } 16% { opacity: 1; } 82% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+.marketing .ex-mod-quote circle { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.8; }
+.marketing .ex-mod-sign { fill: #ff8a4c; font-family: var(--font-run-display), sans-serif; font-size: 20px; font-weight: 600; }
+.marketing .ex-mod-label { fill: rgba(255, 237, 215, 0.62); font-family: var(--font-run-mono), ui-monospace, monospace; font-size: 10px; letter-spacing: 1.4px; }
+.marketing .ex-mod-sub { fill: rgba(255, 237, 215, 0.4); font-family: var(--font-run-mono), ui-monospace, monospace; font-size: 9px; letter-spacing: 0.4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .ex-modules { transition: none; }
+  .marketing .ex-mod, .marketing .ex-mod-pulse { animation: none; }
+  .marketing .ex-mod-pulse { opacity: 0; }
+}

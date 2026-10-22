@@ -59,7 +59,7 @@ export function HubLogin() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="run-warm-tool min-h-screen">
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">

@@ -379,7 +379,8 @@
  * resuelven en cálido sin tocar admin, hub, mapa, scan ni el resto del sitio.
  * Rojo/esmeralda (error/éxito) se conservan por semántica.
  * ------------------------------------------------------------------ */
-.run-cotizar {
+.run-cotizar,
+.run-warm-tool {
   --color-ink: #120a05;
   --color-ink-soft: #0c0703;
   --color-surface: #1b1109;

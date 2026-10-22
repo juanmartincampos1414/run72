@@ -12,8 +12,8 @@ export function LegalShell({
   children: React.ReactNode;
 }) {
   return (
-    <MarketingShell withSmooth={false}>
-      <div className="container-x pt-28 pb-24 md:pt-36">
+    <MarketingShell withSmooth={false} theme="warm">
+      <div className="run-warm-tool container-x pt-28 pb-24 md:pt-36">
         <div className="mx-auto max-w-2xl">
           <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
           <p className="mt-2 text-sm text-faint">Última actualización: {updated}</p>

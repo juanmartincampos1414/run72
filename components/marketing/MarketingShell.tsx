@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "../../app/home-warm.css";
 import { marketingFontVars } from "@/lib/marketing/fonts";
 import { MarketingHeader } from "./MarketingHeader";
 import { MarketingFooter } from "./MarketingFooter";
