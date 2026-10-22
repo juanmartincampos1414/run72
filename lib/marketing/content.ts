@@ -95,7 +95,7 @@ export const HOME = {
   works: {
     eyebrow: "TRABAJOS SELECCIONADOS",
     rows: [
-      { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA.", img: "/work/aikestar/dashboard.jpg", alt: "Panel de Aikestar: salud financiera y cuentas operativas." },
+      { title: "Aikestar", slug: "aikestar", tag: "Software · IA", state: "Operativo", desc: "Gestión financiera y administrativa con IA.", img: "/work/aikestar/landing.jpg", alt: "Landing pública de Aikestar (aikestar.com)." },
       { title: "Jota", slug: "jota", tag: "IA · Marketing", state: "Operativo", desc: "Sistema operativo de marketing con IA.", img: "/work/jota/landing.jpg", alt: "Landing pública de Jota (jcaigency.com)." },
       { title: "Fixy", slug: "fixy", tag: "Software · Plataforma", state: "MVP funcional · web pública", desc: "Conecta clientes con profesionales y centraliza servicios para hogares y empresas.", img: "/work/fixy/landing.jpg", alt: "Landing pública de Fixy." },
     ],

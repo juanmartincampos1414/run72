@@ -223,6 +223,11 @@ export const WORKS: Work[] = [
     teamRole: OWN_PRODUCT_ROLE,
     gallery: [
       {
+        src: "/work/aikestar/landing.jpg",
+        alt: "Landing pública de Aikestar (aikestar.com): «ERP SaaS para organizar finanzas personales, de pareja y de pequeñas empresas», con IA para finanzas, operaciones y decisiones.",
+        caption: "Landing pública de Aikestar (aikestar.com).",
+      },
+      {
         src: "/work/aikestar/dashboard.jpg",
         alt: "Dashboard de Aikestar con salud financiera, cuentas operativas y últimos movimientos.",
         caption: "Dashboard con salud financiera y cuentas operativas.",
@@ -243,6 +248,7 @@ export const WORKS: Work[] = [
         caption: "CRM comercial con pipeline por etapas y pedidos al asistente Aike.",
       },
     ],
+    galleryNote: "La portada es la landing pública (aikestar.com). Las demás son capturas reales de la aplicación con una organización de demostración.",
   }),
   product({
     slug: "jota",
@@ -484,7 +490,7 @@ export const WORKS: Work[] = [
       "Un restaurante no captura ni mide el buen servicio, ni su retorno: reseñas, datos del cliente y visitas repetidas. Tips conecta cada interacción con la persona que atendió y con lo que genera después.",
     userType: "Cliente, camarero, restaurante (owner o manager) y el equipo de Tips.",
     built:
-      "Aplicación Next.js y 23 migraciones SQL sobre Supabase: pagos, CRM Guest 360, campañas, aislamiento por tenant y documentación de producto extensa, con un único autor.",
+      "Aplicación full-stack sobre Supabase: tap NFC y perfiles de staff, pagos de propinas, ruteo de reseñas, CRM Guest 360, campañas y wallet, con aislamiento por tenant y documentación de producto.",
     features: [
       "Tap NFC público: perfil del staff, calificación, propina y ruteo de reseña (4 o más estrellas a Google, 3 o menos a feedback privado).",
       "Rewards y Wallet: pase web móvil con QR dinámico.",
