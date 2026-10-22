@@ -9,7 +9,11 @@ import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 function webglAvailable(): boolean {
   try {
     const c = document.createElement("canvas");
-    return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl")));
+    const gl = (window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl"))) || null;
+    // Liberar el contexto de prueba: en móviles el límite de contextos WebGL es bajo
+    // y, si este queda tomado, el renderer real podía fallar y caer al respaldo.
+    (gl as WebGLRenderingContext | null)?.getExtension("WEBGL_lose_context")?.loseContext();
+    return !!gl;
   } catch {
     return false;
   }

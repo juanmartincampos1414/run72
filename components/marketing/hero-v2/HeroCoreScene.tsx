@@ -211,9 +211,11 @@ export function HeroCoreScene({ onError, scrollDriven = true }: { onError?: () =
         pos.needsUpdate = true;
         lineMat.opacity = (0.2 + 0.06 * Math.sin(t * 1.0)) * e;
 
-        // Movimiento idle: lento y coordinado
+        // Movimiento idle autónomo: por tiempo (independiente del framerate) y un poco
+        // más marcado en móvil, donde no hay puntero. El núcleo gira solo, sin gesto.
         if (!reduce) {
-          core.rotation.y += 0.0010;
+          const spin = isMobile() ? 0.16 : 0.09; // rad/s
+          core.rotation.y = t * spin;
           core.rotation.x = Math.sin(t * 0.18) * 0.07;
           nodeGroup.rotation.y = -t * 0.035;
           emberLight.intensity = 2.4 + 0.4 * Math.sin(t * 1.6);
