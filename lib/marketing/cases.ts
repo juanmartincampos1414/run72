@@ -374,14 +374,19 @@ export const WORKS: Work[] = [
     statusLabel: "MVP FUNCIONAL · EN USO PRIVADO",
     gallery: [
       {
-        src: "/work/relevo/mision.jpg",
-        alt: "Vista Misión de Relevo: resumen de la misión en una mirada (dónde estamos, qué buscamos, avances, qué bloquea, qué viene) sobre un espacio de trabajo demostrativo.",
-        caption: "Vista Misión: el resumen de la misión en una mirada. Datos demostrativos.",
+        src: "/work/relevo/agenda.jpg",
+        alt: "Pantalla de inicio (Agenda) de Relevo: el día con cada conversación, su estado (reprogramada, realizada), el objetivo, las notas y el próximo paso, sobre un espacio de trabajo demostrativo.",
+        caption: "Inicio (Agenda): el día con cada conversación, su estado y su próximo paso. Datos demostrativos.",
       },
       {
         src: "/work/relevo/oportunidades.jpg",
-        alt: "Vista Oportunidades de Relevo mostrando el estado del pipeline sobre un espacio de trabajo demostrativo.",
-        caption: "Vista Oportunidades: estado del pipeline. Datos demostrativos.",
+        alt: "Vista Oportunidades de Relevo: una oportunidad en su etapa del CRM (en validación) con la tesis, cómo evolucionó, qué se sabe y los datos económicos que faltan, sobre un espacio de trabajo demostrativo.",
+        caption: "Oportunidades: cada una en su etapa, con lo que se sabe y lo que falta validar. Datos demostrativos.",
+      },
+      {
+        src: "/work/relevo/mision.jpg",
+        alt: "Vista Misión de Relevo: resumen de la misión en una mirada (dónde estamos, qué buscamos, avances, qué bloquea, qué viene) sobre un espacio de trabajo demostrativo.",
+        caption: "Misión: el resumen de la misión en una mirada. Datos demostrativos.",
       },
     ],
     summary:
