@@ -611,7 +611,7 @@ export function QuoteConfigurator({ initialServices, initialMicros }: { initialS
                 disabled={!stepValid || submitting}
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-40"
               >
-                {submitting ? "Generando…" : "Run72"}
+                {submitting ? "Generando…" : "Ver mi cotización"}
                 {!submitting && <ArrowRight className="h-4 w-4" />}
               </button>
             )}

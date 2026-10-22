@@ -22,7 +22,7 @@ export default function LabsPage() {
         <header className="lab-head">
           <p className="m-eyebrow">{LABS_INDEX.eyebrow}</p>
           <h1 className="lab-h1">
-            {LABS_INDEX.h1Lead}{" "}<GradientText>{LABS_INDEX.h1Accent}</GradientText>
+            {`${LABS_INDEX.h1Lead} `}<GradientText>{LABS_INDEX.h1Accent}</GradientText>
           </h1>
           <p className="lab-lede">{LABS_INDEX.bajada}</p>
         </header>

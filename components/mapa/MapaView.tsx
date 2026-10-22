@@ -54,8 +54,8 @@ function initials(name: string) {
 /* ---------- Nodos ---------- */
 function RootNode({ data }: { data: { negocio: string } }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-[linear-gradient(135deg,#0b1220,#1a0f2e)] px-5 py-4 text-center shadow-[0_0_40px_-10px_rgba(168,85,247,0.6)]">
-      <div className="mx-auto mb-1.5 h-6 w-6 rounded-md bg-[conic-gradient(from_210deg,#38bdf8,#6366f1,#a855f7)]" />
+    <div className="rounded-2xl border border-white/15 bg-[linear-gradient(135deg,#1b1109,#2b1b11)] px-5 py-4 text-center shadow-[0_0_40px_-10px_rgba(255,106,42,0.5)]">
+      <div className="mx-auto mb-1.5 h-6 w-6 rounded-md bg-[conic-gradient(from_210deg,#ffb27a,#ff8a4c,#ff6a2a)]" />
       <p className="text-[10px] font-semibold uppercase tracking-wider text-brand-violet">Mapa de IA</p>
       <p className="mt-0.5 max-w-[160px] font-display text-sm font-semibold leading-tight text-white">{data.negocio || "Tu negocio"}</p>
       <Handle type="source" position={Position.Right} className="!bg-brand-violet" />
@@ -223,7 +223,7 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand-violet">
-            <span className="inline-block h-4 w-4 rounded bg-[conic-gradient(from_210deg,#38bdf8,#6366f1,#a855f7)]" />
+            <span className="inline-block h-4 w-4 rounded bg-[conic-gradient(from_210deg,#ffb27a,#ff8a4c,#ff6a2a)]" />
             Mapa de IA · RUN
           </div>
           <h2 className="mt-2 font-display text-2xl font-semibold">{data.negocio || "Tu negocio"}</h2>
@@ -353,7 +353,7 @@ export function MapaView({ data, print = false, cta = false }: { data: MapData; 
             <p className="font-display text-lg font-semibold">¿Lo ejecutamos juntos?</p>
             <p className="text-sm text-muted">Coordinemos una videollamada y arrancamos por tu primera fase.</p>
           </div>
-          <a href="/contacto?origen=mapa-ejemplo" className="shrink-0 rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110">
+          <a href="/contacto?origen=mapa-ejemplo" className="shrink-0 rounded-full bg-[linear-gradient(100deg,#ffb27a,#ff8a4c_48%,#ff6a2a)] px-6 py-3 text-sm font-medium text-ink transition hover:brightness-110">
             Hablar con RUN
           </a>
         </div>
