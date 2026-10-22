@@ -12,7 +12,7 @@ export function HeroCoreFallback() {
         fill
         priority
         sizes="100vw"
-        style={{ objectFit: "cover", objectPosition: "center 42%" }}
+        style={{ objectFit: "cover", objectPosition: "center 46%" }}
       />
     </div>
   );

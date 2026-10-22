@@ -68,10 +68,13 @@ export function HeroCoreScene({ onError, scrollDriven = true }: { onError?: () =
       scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.045).texture;
 
       const camera = new THREE.PerspectiveCamera(46, w() / h(), 0.1, 100);
-      const camZ = () => (isMobile() ? 8.2 : 6.2);
+      // Cámara un poco más lejos: el núcleo baja del tercio superior al centro
+      // visual sin invadir el titular (se revisa escala + posición, no solo baseY).
+      const camZ = () => (isMobile() ? 9.0 : 7.1);
       camera.position.set(0, 0, camZ());
-      // Altura base: eleva el núcleo al tercio superior, dejando el titular debajo.
-      const baseY = () => (isMobile() ? 1.5 : 0.8);
+      // Altura base: núcleo centrado sobre la marca de agua "RUN", con el titular
+      // y los CTA despejados debajo.
+      const baseY = () => (isMobile() ? 1.05 : 0.35);
 
       const root = new THREE.Group();
       scene.add(root);

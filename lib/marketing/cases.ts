@@ -450,19 +450,24 @@ export const WORKS: Work[] = [
       "El historial de precios es append-only con borrado lógico. El restaurante se resuelve desde la sesión, nunca desde el cliente. Toda salida de OCR o IA pasa por revisión humana. Quedan fuera de alcance por decisión: inventario, órdenes de compra y contabilidad.",
     status: MVP_STATUS,
     evidence: [
-      "Producto construido y documentado (código y arquitectura).",
-      "Sin despliegue público verificado.",
+      "Landing pública (margin.business).",
+      "Aplicación construida y documentada; sin operación comercial verificada.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/margin/logo.png",
     gallery: [
+      {
+        src: "/work/margin/landing.jpg",
+        alt: "Landing pública de Margin (margin.business): «No es solo software. Es el sistema nervioso de tu negocio gastronómico.», con sus capacidades de margen por plato, IA y OCR de facturas.",
+        caption: "Landing pública de Margin.",
+      },
       {
         src: "/work/margin/producto.jpg",
         alt: "Diseño del tablero de margen por plato de Margin (prototipo): KPIs de precio, costo y margen bruto/neto, composición de costo, qué afectó el margen y recomendaciones para «Milanesa Napolitana».",
         caption: "Diseño del tablero de margen por plato (prototipo).",
       },
     ],
-    galleryNote: "Imagen de diseño del producto (prototipo), no una aplicación en operación.",
+    galleryNote: "La portada es la landing pública (margin.business). El tablero es una imagen de diseño (prototipo), no una aplicación en operación.",
   }),
   product({
     slug: "tips",
@@ -501,11 +506,19 @@ export const WORKS: Work[] = [
       "La banda pertenece a una persona, no a una mesa. Los datos nunca se borran: se archivan por estado. Los pagos son agnósticos de pasarela y con idempotencia: el dinero solo se confirma por webhook. Las credenciales se guardan solo por referencia.",
     status: MVP_STATUS,
     evidence: [
-      "Repositorio privado, con un único autor.",
-      "Probado en un entorno de laboratorio propio; sin clientes pagos ni URL pública verificados.",
+      "Landing pública de Tips.",
+      "Aplicación construida y documentada; sin operación comercial verificada.",
     ],
     teamRole: OWN_PRODUCT_ROLE,
     logo: "/work/tips/logo.png",
+    gallery: [
+      {
+        src: "/work/tips/landing.jpg",
+        alt: "Landing pública de Tips: «De atención a fidelización.», plataforma de reconocimiento para hospitality que convierte la atención en propinas, reseñas y clientes recurrentes.",
+        caption: "Landing pública de Tips.",
+      },
+    ],
+    galleryNote: "La portada es la landing pública de Tips.",
   }),
   // ---- Labs: demos conceptuales con datos ficticios ----
   {

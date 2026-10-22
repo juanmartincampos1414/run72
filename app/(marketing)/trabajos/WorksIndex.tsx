@@ -154,7 +154,7 @@ export function WorksIndex({ groups, order }: { groups: WorkGroup[]; order: stri
         <p className="m-container work-empty">Todavía no hay productos publicados en esta categoría.</p>
       ) : (
         visibleGroups.map((g) => (
-          <section key={g.id} className="m-container work-index-list" aria-label={g.title}>
+          <section key={g.id} className="m-container work-index-list work-group" aria-label={g.title}>
             <h3 className="work-section-title work-section-title-sm">{g.title}</h3>
             <ul className="work-rows" role="list">
               {g.works.map((w) => (
