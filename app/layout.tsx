@@ -38,7 +38,8 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
-  icons: { icon: "/logo.png", apple: "/logo.png" },
+  // Favicon de marca (núcleo): app/favicon.ico + app/icon.svg + app/apple-icon.png
+  // se sirven por convención de Next; sin esta clave no se pisa con el logo viejo.
   robots: { index: true, follow: true },
   other: {
     "facebook-domain-verification": "h0xe0a7tp2hivyyflukxgxhlf3480a",
