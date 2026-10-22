@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactElement } from "react";
 import { AnimatedArrow } from "@/components/marketing/AnimatedArrow";
 import { DetailBreadcrumbs } from "@/components/marketing/DetailBreadcrumbs";
 import { GradientButton } from "@/components/marketing/GradientButton";
 import { GradientText } from "@/components/marketing/GradientText";
 import { PointerGlow } from "@/components/marketing/PointerGlow";
+import { SpecialtyVisual } from "@/components/marketing/servicios/SpecialtyVisual";
 import { HOME } from "@/lib/marketing/content";
-import { SOLUTIONS, getSolution, type MarketingSolutionId } from "@/lib/marketing/solutions";
+import { SOLUTIONS, getSolution } from "@/lib/marketing/solutions";
 import "../servicios.css";
 
 type Params = { especialidad: string };
@@ -32,122 +32,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
-// ---------- Recursos visuales propios (16:10, paleta RUN, sin fotos de stock) ----------
-// Decorativos: ilustran el tipo de demo implementada en Labs, con datos ficticios.
-
-function SoftwareVisual() {
-  const rows = [
-    { w: "62%", s: "ok", t: "Al día" },
-    { w: "48%", s: "wip", t: "En curso" },
-    { w: "70%", s: "ok", t: "Al día" },
-    { w: "40%", s: "wait", t: "Pendiente" },
-  ] as const;
-  return (
-    <div className="svc-ui">
-      <div className="svc-ui-side">
-        <i className="svc-ui-logo" />
-        <i className="is-on" />
-        <i />
-        <i />
-        <i />
-      </div>
-      <div className="svc-ui-main">
-        <div className="svc-ui-top">
-          <i style={{ width: "28%" }} />
-          <b />
-        </div>
-        <div className="svc-ui-stats">
-          <div><em>Abiertos</em><strong>24</strong></div>
-          <div><em>En curso</em><strong>9</strong></div>
-          <div><em>Resueltos</em><strong>131</strong></div>
-        </div>
-        <div className="svc-ui-table">
-          {rows.map((r, i) => (
-            <div key={i} className="svc-ui-row">
-              <i style={{ width: r.w }} />
-              <span className={`svc-chip svc-chip--${r.s}`}>{r.t}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AgentVisual() {
-  return (
-    <div className="svc-chat">
-      <div className="svc-msg svc-msg--user">
-        <i style={{ width: "92%" }} />
-        <i style={{ width: "58%" }} />
-      </div>
-      <div className="svc-msg svc-msg--agent">
-        <i style={{ width: "96%" }} />
-        <i style={{ width: "84%" }} />
-        <i style={{ width: "40%" }} />
-        <div className="svc-chat-chips">
-          <span className="svc-chip svc-chip--src">Fuente · Documento interno</span>
-        </div>
-      </div>
-      <div className="svc-action">
-        <span className="svc-action-k">Acción propuesta</span>
-        <span className="svc-action-v">Crear tarea y derivar al equipo</span>
-        <span className="svc-chip svc-chip--wait">Requiere aprobación</span>
-      </div>
-    </div>
-  );
-}
-
-function FlowVisual() {
-  const nodes = [
-    { k: "Evento", s: "ok", t: "Recibido" },
-    { k: "Validación", s: "ok", t: "Correcta" },
-    { k: "Sincronización", s: "wip", t: "Reintento 1/3" },
-  ] as const;
-  return (
-    <div className="svc-flow">
-      <div className="svc-flow-track">
-        {nodes.map((n, i) => (
-          <div key={n.k} className="svc-flow-step">
-            <div className="svc-node">
-              <span className="svc-node-n">{String(i + 1).padStart(2, "0")}</span>
-              <span className="svc-node-k">{n.k}</span>
-              <span className={`svc-chip svc-chip--${n.s}`}>{n.t}</span>
-            </div>
-            {i < nodes.length - 1 && <span className="svc-flow-link" />}
-          </div>
-        ))}
-      </div>
-      <div className="svc-flow-log">
-        <i style={{ width: "74%" }} />
-        <i style={{ width: "52%" }} />
-        <i style={{ width: "63%" }} />
-      </div>
-    </div>
-  );
-}
-
-const VISUALS: Record<MarketingSolutionId, { alt: string; node: () => ReactElement }> = {
-  software: {
-    alt: "Ilustración conceptual de una interfaz de sistema interno con datos ficticios.",
-    node: SoftwareVisual,
-  },
-  agentes: {
-    alt: "Ilustración conceptual de una conversación con un agente, con fuente citada y una acción pendiente de aprobación.",
-    node: AgentVisual,
-  },
-  automatizacion: {
-    alt: "Ilustración conceptual de un flujo entre herramientas con estados, validación y reintento.",
-    node: FlowVisual,
-  },
-};
 
 export default async function SpecialtyPage({ params }: { params: Promise<Params> }) {
   const { especialidad } = await params;
   const solution = getSolution(especialidad);
   if (!solution) notFound();
-
-  const Visual = VISUALS[solution.id];
 
   return (
     <article className={`svc-detail svc-detail--${solution.id}`}>
@@ -178,15 +67,7 @@ export default async function SpecialtyPage({ params }: { params: Promise<Params
 
       <section className="svc-intro" aria-label="Punto de partida">
         <div className="m-container svc-intro-grid">
-          <figure className="svc-visual" role="img" aria-label={Visual.alt}>
-            <div className="svc-visual-glow" aria-hidden="true" />
-            <div className="svc-visual-inner" aria-hidden="true">
-              <Visual.node />
-            </div>
-            <figcaption className="svc-visual-cap m-eyebrow" aria-hidden="true">
-              Concepto · Datos ficticios
-            </figcaption>
-          </figure>
+          <SpecialtyVisual kind={solution.id} />
           <div className="svc-problem">
             <p className="m-eyebrow">Punto de partida</p>
             <p className="svc-problem-text">{solution.problema}</p>

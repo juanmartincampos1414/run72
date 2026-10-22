@@ -746,3 +746,74 @@
   .marketing .scx-pulse { animation: none; }
   .marketing .scx-pulse { opacity: 0; }
 }
+
+/* ============================================================
+ * Servicios — visual por especialidad (RUN-18): volumen por
+ * inclinación 3D al puntero + movimiento del mecanismo.
+ * ============================================================ */
+.marketing .sv-tilt {
+  transition: transform 0.45s var(--m-ease);
+  transform: perspective(1000px) rotateX(calc(var(--ty, 0) * -4deg)) rotateY(calc(var(--tx, 0) * 5deg));
+  will-change: transform;
+}
+.marketing .sv-stage { position: absolute; inset: 0; display: grid; place-items: center; z-index: 1; }
+.marketing .sv-svg { width: 88%; height: auto; overflow: visible; }
+.marketing .sv-tag {
+  fill: rgba(255, 237, 215, 0.6);
+  font-family: var(--font-run-mono), ui-monospace, monospace;
+  font-size: 11px; letter-spacing: 0.6px;
+}
+.marketing .sv-tag-on { fill: #ffd29a; }
+.marketing .sv-tag-dim { fill: rgba(255, 237, 215, 0.4); }
+
+/* --- Software: capas que se ensamblan --- */
+.marketing .sv-layer { stroke-width: 1.4; }
+.marketing .sv-l-back { fill: rgba(255, 237, 215, 0.07); stroke: rgba(255, 237, 215, 0.22); }
+.marketing .sv-l-mid { fill: rgba(255, 178, 122, 0.16); stroke: rgba(255, 178, 122, 0.55); }
+.marketing .sv-l-front { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; }
+.marketing .sv-connectors path { stroke: rgba(255, 237, 215, 0.25); stroke-width: 1.4; }
+.marketing .sv-software .sv-depth-1,
+.marketing .sv-software .sv-depth-2,
+.marketing .sv-software .sv-depth-3 { animation: sv-assemble 5s var(--m-ease) infinite; }
+.marketing .sv-software .sv-depth-2 { animation-delay: 0.2s; }
+.marketing .sv-software .sv-depth-1 { animation-delay: 0.4s; }
+@keyframes sv-assemble { 0%, 68%, 100% { transform: translateX(0); } 22%, 46% { transform: translateX(16px); } }
+
+/* --- Agentes: consulta → herramientas → acción, con supervisión --- */
+.marketing .sv-edges path { stroke: rgba(255, 237, 215, 0.26); stroke-width: 1.5; }
+.marketing .sv-edges .sv-edge-out { stroke: rgba(255, 106, 42, 0.6); }
+.marketing .sv-edges .sv-edge-sup { stroke: rgba(96, 216, 165, 0.5); stroke-dasharray: 3 5; }
+.marketing .sv-io rect { fill: rgba(255, 237, 215, 0.05); stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.4; }
+.marketing .sv-io-out rect { fill: rgba(255, 106, 42, 0.14); stroke: #ff6a2a; }
+.marketing .sv-tool { fill: rgba(255, 106, 42, 0.2); stroke: #ff8a4c; stroke-width: 1.4; }
+.marketing .sv-node { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.8; }
+.marketing .sv-node-core { fill: #ff8a4c; animation: scx-core 2.6s ease-in-out infinite; }
+.marketing .sv-sup rect { fill: rgba(96, 216, 165, 0.12); stroke: rgba(96, 216, 165, 0.6); stroke-width: 1.3; }
+.marketing .sv-sup-check { stroke: #60d8a5; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.marketing .sv-pulse-ag { fill: #ffd29a; offset-path: path("M50 125 L168 125 L326 125"); animation: scx-travel 3.4s var(--m-ease) infinite; opacity: 0; }
+
+/* --- Automatización: flujo con secuencia legible --- */
+.marketing .sv-track { stroke: rgba(255, 237, 215, 0.24); stroke-width: 2; stroke-dasharray: 4 6; }
+.marketing .sv-retry { stroke: rgba(255, 106, 42, 0.4); stroke-width: 1.5; stroke-dasharray: 3 5; fill: none; }
+.marketing .sv-step { fill: rgba(255, 106, 42, 0.18); stroke: #ff6a2a; stroke-width: 1.6; }
+.marketing .sv-step-end { fill: rgba(96, 216, 165, 0.2); stroke: #60d8a5; }
+.marketing .sv-event { fill: #ff6a2a; animation: sv-flow 3.6s var(--m-ease) infinite; }
+@keyframes sv-flow {
+  0% { transform: translateX(0); opacity: 0; }
+  8% { opacity: 1; }
+  28% { transform: translateX(110px); }
+  56% { transform: translateX(220px); }
+  84%, 100% { transform: translateX(306px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .sv-tilt { transition: none; }
+  .marketing .sv-software .sv-depth-1,
+  .marketing .sv-software .sv-depth-2,
+  .marketing .sv-software .sv-depth-3,
+  .marketing .sv-node-core,
+  .marketing .sv-pulse-ag,
+  .marketing .sv-event { animation: none; }
+  .marketing .sv-pulse-ag { opacity: 0; }
+  .marketing .sv-event { transform: translateX(110px); opacity: 1; }
+}
