@@ -18,3 +18,21 @@
 .marketing .cw-cta { margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--m-line); }
 .marketing .cw-ctatext { font-size: clamp(1.5rem, 4vw, 2.25rem); line-height: 1.1; letter-spacing: -0.02em; color: var(--m-text); margin-bottom: 20px; }
 .marketing .cw-ctabtns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Secuencia con movimiento (RUN-18 editorial): riel con pulso que recorre los
+   pasos y marcadores ember. prefers-reduced-motion lo deja quieto. */
+.marketing .cw-steps { position: relative; padding-left: 28px; }
+.marketing .cw-steps::before { content: ""; position: absolute; left: 6px; top: 14px; bottom: 14px; width: 2px; background: var(--m-line); }
+.marketing .cw-steps::after {
+  content: ""; position: absolute; left: 1px; width: 12px; height: 72px; border-radius: 6px;
+  background: linear-gradient(180deg, transparent, var(--hv2-ember, #ff6a2a), transparent);
+  opacity: 0.5; filter: blur(1px); animation: cw-flow 6.5s linear infinite;
+}
+@keyframes cw-flow { 0% { top: -8%; opacity: 0; } 12% { opacity: 0.5; } 88% { opacity: 0.5; } 100% { top: 100%; opacity: 0; } }
+.marketing .cw-step { position: relative; }
+.marketing .cw-step::before {
+  content: ""; position: absolute; left: -23px; top: 30px; width: 9px; height: 9px; border-radius: 50%;
+  background: #1b1109; border: 2px solid var(--hv2-ember, #ff6a2a);
+}
+.run-warm .cw-n { color: var(--hv2-ember); }
+@media (prefers-reduced-motion: reduce) { .marketing .cw-steps::after { animation: none; opacity: 0; } }
