@@ -362,7 +362,7 @@
 }
 .marketing .m-footer-link:hover,
 .marketing .m-footer-link:focus-visible {
-  background-image: linear-gradient(90deg, #18acff, #5583ff, #8960ff, #ffd873);
+  background-image: linear-gradient(90deg, #ffb27a, #ff8a4c, #ff6a2a, #ffd29a);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -622,7 +622,10 @@
 .marketing .rl-chip:hover { border-color: var(--m-line-active); color: var(--m-text); }
 .marketing .rl-form { display: flex; gap: 8px; padding: 0 16px 10px; align-items: flex-end; }
 .marketing .rl-input { flex: 1; resize: none; border-radius: 10px; padding: 10px 12px; background: var(--m-input); color: var(--m-input-text); border: 1px solid var(--m-input-border); font: inherit; font-family: var(--font-run-display); font-size: 14px; }
-.marketing .rl-input:focus-visible { outline: none; border-color: rgba(137,96,255,0.8); box-shadow: 0 0 0 3px rgba(137,96,255,0.3); }
+.marketing .rl-input:focus-visible { outline: none; border-color: rgba(255,106,42,0.7); box-shadow: 0 0 0 3px rgba(255,106,42,0.28); }
+/* Selección de texto cálida dentro del sistema RUN (el ::selection global queda para admin). */
+.marketing ::selection { background: color-mix(in oklab, #ff6a2a 42%, transparent); color: #fff; }
+.marketing ::-moz-selection { background: color-mix(in oklab, #ff6a2a 42%, transparent); color: #fff; }
 .marketing .rl-send { height: 40px; padding-inline: 16px; }
 .marketing .rl-pass { margin: 0 16px 8px; background: none; border: 0; color: var(--m-gold); font-family: var(--font-run-mono), monospace; font-size: 12px; cursor: pointer; text-align: left; }
 .marketing .rl-note { padding: 0 16px 14px; font-size: 11px; color: var(--m-input-help); }

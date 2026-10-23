@@ -73,8 +73,8 @@
 .marketing .blog-card-cta .m-arrow { width: 16px; height: 16px; }
 
 /* Destacado */
-.marketing .blog-card--featured { padding: 32px 24px; background: radial-gradient(120% 220% at 4% 50%, rgba(137, 96, 255, 0.12), transparent 85%), var(--m-panel); }
-.marketing .blog-card--featured:hover { background: radial-gradient(120% 220% at 4% 50%, rgba(137, 96, 255, 0.2), transparent 85%), var(--m-panel); }
+.marketing .blog-card--featured { padding: 32px 24px; background: radial-gradient(120% 220% at 4% 50%, rgba(255, 106, 42, 0.12), transparent 85%), var(--m-panel); }
+.marketing .blog-card--featured:hover { background: radial-gradient(120% 220% at 4% 50%, rgba(255, 106, 42, 0.22), transparent 85%), var(--m-panel); }
 .marketing .blog-card--featured .blog-card-title {
   font-size: 24px;
   line-height: 30px;
