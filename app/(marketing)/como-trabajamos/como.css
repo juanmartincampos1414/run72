@@ -36,3 +36,59 @@
 }
 .run-warm .cw-n { color: var(--hv2-ember); }
 @media (prefers-reduced-motion: reduce) { .marketing .cw-steps::after { animation: none; opacity: 0; } }
+
+/* ============================================================
+ * Evolución del trabajo en 3D (RUN-18): escalera problema →
+ * alcance → construcción → operación, con volumen y un pulso que
+ * la recorre. Sin WebGL. Entrada al entrar en viewport.
+ * ============================================================ */
+.marketing .cw3 { --px: 0; --py: 0; max-width: 720px; margin: clamp(28px, 5vw, 48px) 0 0; }
+.marketing .cw3-scene { position: relative; width: 100%; aspect-ratio: 16 / 6.5; perspective: 1200px; perspective-origin: 50% 46%; }
+.marketing .cw3-stage {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(calc(18deg + var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg));
+  transition: transform 0.5s var(--m-ease); will-change: transform;
+}
+.marketing .cw3-key { position: absolute; inset: -30% -8% -42%; background: radial-gradient(52% 60% at 60% 30%, rgba(255, 168, 98, 0.3), rgba(255, 106, 42, 0.1) 48%, transparent 74%); filter: blur(16px); transform: translateZ(-150px); }
+.marketing .cw3-step { position: absolute; transform-style: preserve-3d; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.marketing .cw3-step b { transform: translateZ(10px); font-family: var(--font-run-display), sans-serif; font-weight: 500; font-size: clamp(10px, 1.4vw, 13px); color: #ffedd7; white-space: nowrap; }
+.marketing .cw3-plat { position: relative; width: clamp(46px, 9vw, 74px); aspect-ratio: 1.6 / 1; transform-style: preserve-3d; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(148deg, rgba(45, 28, 17, 0.96), rgba(22, 14, 9, 0.96)); box-shadow: 0 16px 24px -14px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 237, 215, 0.12); }
+.marketing .cw3-plat::before { content: ""; position: absolute; inset: 0; border-radius: 10px; transform: translateZ(-12px); background: #120a05; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.22); }
+.marketing .cw3-glyph { transform: translateZ(8px); }
+.marketing .cw3-s1 { left: 12%; top: 66%; transform: translate(-50%, -50%) translateZ(18px); }
+.marketing .cw3-s2 { left: 37%; top: 52%; transform: translate(-50%, -50%) translateZ(44px); }
+.marketing .cw3-s3 { left: 62%; top: 38%; transform: translate(-50%, -50%) translateZ(68px); }
+.marketing .cw3-s4 { left: 87%; top: 24%; transform: translate(-50%, -50%) translateZ(92px); }
+/* Glifos de completitud creciente. */
+.marketing .cw3-s1 .cw3-glyph { width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle, #ffd29a, #ff6a2a); box-shadow: 0 0 10px #ff8a4c; }
+.marketing .cw3-s2 .cw3-glyph { width: 28px; height: 17px; border-radius: 4px; border: 1.5px dashed rgba(255, 178, 122, 0.75); }
+.marketing .cw3-s3 .cw3-glyph { width: 28px; height: 17px; border-radius: 3px; background: repeating-linear-gradient(0deg, #ff8a4c 0 3px, transparent 3px 6px); }
+.marketing .cw3-s4 .cw3-glyph { width: 28px; height: 17px; border-radius: 3px; background: linear-gradient(135deg, #ff6a2a, #ff8a4c); box-shadow: 0 0 12px rgba(255, 106, 42, 0.6); }
+.marketing .cw3-s4 .cw3-plat { box-shadow: 0 16px 24px -14px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 237, 215, 0.12), 0 0 0 1px rgba(255, 138, 76, 0.55), 0 0 22px -6px rgba(255, 106, 42, 0.5); }
+.marketing .cw3.in .cw3-s4 .cw3-glyph { animation: cw3-run 1.8s ease-in-out infinite; }
+@keyframes cw3-run { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+.marketing .cw3-pulse { position: absolute; left: 12%; top: 66%; width: 8px; height: 8px; border-radius: 50%; background: #ffe0b8; box-shadow: 0 0 12px #ffb27a; transform: translate(-50%, -50%) translateZ(60px); opacity: 0; }
+.marketing .cw3.in .cw3-pulse { animation: cw3-travel 4.6s var(--m-ease) infinite; }
+@keyframes cw3-travel {
+  0% { left: 12%; top: 66%; opacity: 0; } 6% { opacity: 1; }
+  30% { left: 37%; top: 52%; } 55% { left: 62%; top: 38%; } 85% { left: 87%; top: 24%; opacity: 1; }
+  100% { left: 87%; top: 24%; opacity: 0; }
+}
+.marketing .cw3.in .cw3-step { animation: cw3-in 0.6s var(--m-ease) both; }
+.marketing .cw3.in .cw3-s2 { animation-delay: 0.12s; }
+.marketing .cw3.in .cw3-s3 { animation-delay: 0.24s; }
+.marketing .cw3.in .cw3-s4 { animation-delay: 0.36s; }
+@keyframes cw3-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+.marketing .cw3-cap { margin-top: 14px; color: var(--m-faint); }
+
+@media (max-width: 620px) {
+  .marketing .cw3-scene { aspect-ratio: 16 / 8; perspective: 900px; }
+  .marketing .cw3-stage { transform: rotateX(calc(15deg + var(--py) * -4deg)) rotateY(calc(var(--px) * 5deg)) scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing .cw3-stage { transition: none; }
+  .marketing .cw3-step, .marketing .cw3-pulse, .marketing .cw3-s4 .cw3-glyph { animation: none !important; }
+  .marketing .cw3-step { opacity: 1 !important; }
+  .marketing .cw3-pulse { opacity: 0 !important; }
+}

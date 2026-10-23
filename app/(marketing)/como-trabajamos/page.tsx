@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./como.css";
 import { GradientButton } from "@/components/marketing/GradientButton";
+import { ComoEvolution } from "@/components/marketing/como/ComoEvolution";
 
 export const metadata: Metadata = {
   title: "Cómo trabajamos",
@@ -37,6 +38,7 @@ export default function ComoTrabajamosPage() {
             Cada proyecto necesita un alcance verificable y una forma de comprobar que funciona en la
             operación.
           </p>
+          <ComoEvolution />
         </header>
 
         <ol className="cw-steps">
