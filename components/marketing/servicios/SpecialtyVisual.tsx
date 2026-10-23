@@ -1,136 +1,113 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { PointerEvent } from "react";
 
-// Visual protagonista por especialidad (figura 16:10 del detalle de Servicios).
-// Volumen por inclinación 3D al puntero + movimiento del mecanismo:
-//  - software: capas/módulos que se ensamblan
-//  - agentes: consulta → herramientas → acción, con supervisión
-//  - automatización: conexiones y flujo con una secuencia legible
-// SVG + CSS; prefers-reduced-motion deja el estado quieto (ver servicios.css).
+// Visual protagonista por especialidad (figura del detalle de Servicios), con
+// volumen real (perspective + preserve-3d), iluminación cálida y un mecanismo que
+// explica el contenido:
+//  - software: capas (Datos → Lógica → Interfaz → Integraciones) que se organizan
+//    en una arquitectura común, con un pulso de datos que las recorre.
+//  - agentes: un núcleo recibe contexto, consulta herramientas y propone una acción
+//    con supervisión (límite).
+//  - automatización: sistemas independientes conectados por un flujo con evento,
+//    validación, reintento y registro (trazabilidad).
+// Sin WebGL. El estado base queda ensamblado (legible sin JS / reduced-motion); la
+// entrada y los pulsos se activan al entrar en viewport. Parallax al puntero.
 
 export type SpecialtyKind = "software" | "agentes" | "automatizacion";
 
 const ALT: Record<SpecialtyKind, string> = {
-  software: "Esquema de un sistema a medida: módulos y capas que se ensamblan en una estructura.",
-  agentes: "Esquema de un agente: una consulta usa herramientas y propone una acción que pasa por supervisión.",
-  automatizacion: "Esquema de una integración: un evento recorre validación, sincronización y registro, con reintento.",
+  software: "Arquitectura de un sistema a medida: capas de datos, lógica, interfaz e integraciones organizadas en una estructura común, con volumen y profundidad.",
+  agentes: "Un agente: recibe contexto, consulta herramientas (datos, API, reglas) y propone una acción que pasa por supervisión.",
+  automatizacion: "Una automatización: sistemas independientes conectados por un flujo con evento, validación, reintento y registro.",
 };
 
-function onMove(e: PointerEvent<HTMLElement>) {
-  const el = e.currentTarget;
-  const r = el.getBoundingClientRect();
-  el.style.setProperty("--tx", (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
-  el.style.setProperty("--ty", (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
-}
-function onLeave(e: PointerEvent<HTMLElement>) {
-  e.currentTarget.style.setProperty("--tx", "0");
-  e.currentTarget.style.setProperty("--ty", "0");
-}
-
 export function SpecialtyVisual({ kind }: { kind: SpecialtyKind }) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(
+      (es) => { for (const e of es) if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  function onMove(e: PointerEvent<HTMLElement>) {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--px", (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
+    el.style.setProperty("--py", (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
+  }
+  function onLeave(e: PointerEvent<HTMLElement>) {
+    e.currentTarget.style.setProperty("--px", "0");
+    e.currentTarget.style.setProperty("--py", "0");
+  }
+
   return (
-    <figure
-      className={`svc-visual sv-tilt sv-${kind}`}
-      role="img"
-      aria-label={ALT[kind]}
-      onPointerMove={onMove}
-      onPointerLeave={onLeave}
-    >
-      <span className="sv-stage" aria-hidden="true">
-        {kind === "software" && <SoftwareSvg />}
-        {kind === "agentes" && <AgentesSvg />}
-        {kind === "automatizacion" && <FlowSvg />}
+    <figure ref={ref} className={`svc-visual sv3 sv3-${kind}`} role="img" aria-label={ALT[kind]} onPointerMove={onMove} onPointerLeave={onLeave}>
+      <span className="sv3-scene" aria-hidden="true">
+        <span className="sv3-stage">
+          <span className="sv3-key" />
+          {kind === "software" && <Software />}
+          {kind === "agentes" && <Agentes />}
+          {kind === "automatizacion" && <Automatizacion />}
+        </span>
       </span>
-      <figcaption className="svc-visual-cap m-eyebrow" aria-hidden="true">
-        Concepto · Datos ficticios
-      </figcaption>
+      <figcaption className="svc-visual-cap m-eyebrow" aria-hidden="true">Concepto · Datos ficticios</figcaption>
     </figure>
   );
 }
 
-function SoftwareSvg() {
-  return (
-    <svg viewBox="0 0 400 250" fill="none" className="sv-svg">
-      <g className="sv-depth-3">
-        <rect className="sv-layer sv-l-back" x="120" y="54" width="200" height="40" rx="10" />
-        <text className="sv-tag" x="134" y="78">Datos</text>
-      </g>
-      <g className="sv-depth-2">
-        <rect className="sv-layer sv-l-mid" x="96" y="102" width="224" height="40" rx="10" />
-        <text className="sv-tag" x="110" y="126">Lógica de negocio</text>
-      </g>
-      <g className="sv-depth-1">
-        <rect className="sv-layer sv-l-front" x="72" y="150" width="248" height="40" rx="10" />
-        <text className="sv-tag sv-tag-on" x="86" y="174">Interfaz y roles</text>
-      </g>
-      <g className="sv-connectors">
-        <path d="M150 94 V102 M160 142 V150" />
-        <path d="M280 94 V102 M260 142 V150" />
-      </g>
-    </svg>
-  );
-}
-
-function AgentesSvg() {
-  return (
-    <svg viewBox="0 0 400 250" fill="none" className="sv-svg">
-      <g className="sv-edges">
-        <path d="M74 125 H150" />
-        <path d="M186 110 Q250 70 250 70 H250" />
-        <path d="M186 125 H250" />
-        <path d="M186 140 Q250 180 250 180" />
-        <path className="sv-edge-out" d="M196 125 H300" />
-        <path className="sv-edge-sup" d="M168 160 V196 H250" />
-      </g>
-      {/* consulta */}
-      <g className="sv-io">
-        <rect x="24" y="112" width="50" height="26" rx="7" />
-        <text className="sv-tag" x="30" y="129">Consulta</text>
-      </g>
-      {/* herramientas */}
-      <circle className="sv-tool" cx="250" cy="70" r="9" />
-      <circle className="sv-tool" cx="250" cy="125" r="9" />
-      <circle className="sv-tool" cx="250" cy="180" r="9" />
-      <text className="sv-tag sv-tag-dim" x="268" y="74">Herramientas</text>
-      {/* nodo agente */}
-      <circle className="sv-node" cx="168" cy="125" r="20" />
-      <circle className="sv-node-core" cx="168" cy="125" r="7" />
-      {/* acción */}
-      <g className="sv-io sv-io-out">
-        <rect x="300" y="112" width="52" height="26" rx="7" />
-        <text className="sv-tag sv-tag-on" x="307" y="129">Acción</text>
-      </g>
-      {/* supervisión */}
-      <g className="sv-sup">
-        <rect x="250" y="183" width="96" height="26" rx="7" />
-        <path className="sv-sup-check" d="M258 196 l4 4 l8 -9" />
-        <text className="sv-tag" x="272" y="200">Supervisión</text>
-      </g>
-      <circle className="sv-pulse sv-pulse-ag" r="4" />
-    </svg>
-  );
-}
-
-function FlowSvg() {
-  const steps = [
-    { x: 54, k: "Evento" },
-    { x: 164, k: "Validación" },
-    { x: 274, k: "Sincroniza" },
-    { x: 360, k: "Registro" },
+function Software() {
+  const LAYERS: [string, string][] = [
+    ["Integraciones", "sv3-p4"],
+    ["Interfaz", "sv3-p3"],
+    ["Lógica", "sv3-p2"],
+    ["Datos", "sv3-p1"],
   ];
   return (
-    <svg viewBox="0 0 400 250" fill="none" className="sv-svg">
-      <path className="sv-track" d="M54 110 H360" />
-      <path className="sv-retry" d="M274 110 q0 40 -55 40 q-55 0 -55 -40" />
-      <text className="sv-tag sv-tag-dim" x="190" y="176">reintento</text>
-      {steps.map((s, i) => (
-        <g key={s.k}>
-          <circle className={`sv-step${i === steps.length - 1 ? " sv-step-end" : ""}`} cx={s.x} cy={110} r={i === steps.length - 1 ? 9 : 11} />
-          <text className="sv-tag" x={s.x} y={88} textAnchor="middle">{s.k}</text>
-        </g>
+    <>
+      {LAYERS.map(([label, cls]) => (
+        <span key={label} className={`sv3-plane ${cls}`}>
+          <b>{label}</b>
+          <i /><i /><i />
+        </span>
       ))}
-      <rect className="sv-event" x="47" y="103" width="14" height="14" rx="4" />
-    </svg>
+      <span className="sv3-rise" />
+    </>
+  );
+}
+
+function Agentes() {
+  return (
+    <>
+      <span className="sv3-ctx">contexto</span>
+      <span className="sv3-tool sv3-t1"><b>Datos</b></span>
+      <span className="sv3-tool sv3-t2"><b>API</b></span>
+      <span className="sv3-tool sv3-t3"><b>Reglas</b></span>
+      <span className="sv3-core"><i /></span>
+      <span className="sv3-action"><b>Acción</b><em>con supervisión</em></span>
+      <span className="sv3-wire sv3-w1" /><span className="sv3-wire sv3-w2" /><span className="sv3-wire sv3-w3" />
+    </>
+  );
+}
+
+function Automatizacion() {
+  return (
+    <>
+      <span className="sv3-sys sv3-sa"><b>Sistema A</b></span>
+      <span className="sv3-step sv3-valid"><b>Validación</b></span>
+      <span className="sv3-sys sv3-sb"><b>Sistema B</b></span>
+      <span className="sv3-log"><b>Registro</b><i /><i /><i /></span>
+      <span className="sv3-pipe" />
+      <span className="sv3-packet" />
+      <span className="sv3-retry" />
+    </>
   );
 }

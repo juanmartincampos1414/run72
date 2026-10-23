@@ -285,10 +285,10 @@
   border: 1px solid var(--m-line);
   border-radius: 24px;
   background:
-    radial-gradient(90% 120% at 12% 0%, rgba(24, 172, 255, 0.22) 0%, rgba(24, 172, 255, 0) 55%),
-    radial-gradient(80% 100% at 100% 100%, rgba(137, 96, 255, 0.28) 0%, rgba(137, 96, 255, 0) 60%),
-    radial-gradient(60% 60% at 90% 0%, rgba(255, 216, 115, 0.1) 0%, rgba(255, 216, 115, 0) 60%),
-    var(--m-deep, #050508);
+    radial-gradient(90% 120% at 12% 0%, rgba(255, 138, 76, 0.18) 0%, rgba(255, 138, 76, 0) 55%),
+    radial-gradient(80% 100% at 100% 100%, rgba(255, 106, 42, 0.2) 0%, rgba(255, 106, 42, 0) 60%),
+    radial-gradient(60% 60% at 90% 0%, rgba(255, 210, 154, 0.1) 0%, rgba(255, 210, 154, 0) 60%),
+    var(--m-deep, #0c0703);
 }
 .marketing .svc-visual-glow {
   position: absolute;
@@ -748,72 +748,145 @@
 }
 
 /* ============================================================
- * Servicios — visual por especialidad (RUN-18): volumen por
- * inclinación 3D al puntero + movimiento del mecanismo.
+ * Servicios — visual por especialidad (RUN-18): composición 3D con
+ * volumen real (perspective + preserve-3d), iluminación cálida y un
+ * mecanismo propio de cada especialidad. Sin WebGL.
  * ============================================================ */
-.marketing .sv-tilt {
-  transition: transform 0.45s var(--m-ease);
-  transform: perspective(1000px) rotateX(calc(var(--ty, 0) * -4deg)) rotateY(calc(var(--tx, 0) * 5deg));
-  will-change: transform;
+.marketing .sv3 { --px: 0; --py: 0; }
+.marketing .sv3-scene { position: absolute; inset: 0; z-index: 1; perspective: 1200px; perspective-origin: 50% 42%; }
+.marketing .sv3-stage {
+  position: absolute; left: 50%; top: 50%; width: 78%; height: 74%;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(calc(15deg + var(--py) * -6deg)) rotateY(calc(var(--px) * 8deg));
+  transition: transform 0.5s var(--m-ease); will-change: transform;
 }
-.marketing .sv-stage { position: absolute; inset: 0; display: grid; place-items: center; z-index: 1; }
-.marketing .sv-svg { width: 88%; height: auto; overflow: visible; }
-.marketing .sv-tag {
-  fill: rgba(255, 237, 215, 0.6);
-  font-family: var(--font-run-mono), ui-monospace, monospace;
-  font-size: 11px; letter-spacing: 0.6px;
+.marketing .sv3-key {
+  position: absolute; inset: -22% -12% -32%;
+  background: radial-gradient(56% 52% at 38% 26%, rgba(255, 168, 98, 0.4), rgba(255, 106, 42, 0.12) 46%, transparent 72%);
+  filter: blur(18px); transform: translateZ(-160px);
 }
-.marketing .sv-tag-on { fill: #ffd29a; }
-.marketing .sv-tag-dim { fill: rgba(255, 237, 215, 0.4); }
+.marketing .sv3 b { font-family: var(--font-run-display), sans-serif; font-weight: 500; letter-spacing: -0.01em; color: #ffedd7; }
 
-/* --- Software: capas que se ensamblan --- */
-.marketing .sv-layer { stroke-width: 1.4; }
-.marketing .sv-l-back { fill: rgba(255, 237, 215, 0.07); stroke: rgba(255, 237, 215, 0.22); }
-.marketing .sv-l-mid { fill: rgba(255, 178, 122, 0.16); stroke: rgba(255, 178, 122, 0.55); }
-.marketing .sv-l-front { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; }
-.marketing .sv-connectors path { stroke: rgba(255, 237, 215, 0.25); stroke-width: 1.4; }
-.marketing .sv-software .sv-depth-1,
-.marketing .sv-software .sv-depth-2,
-.marketing .sv-software .sv-depth-3 { animation: sv-assemble 5s var(--m-ease) infinite; }
-.marketing .sv-software .sv-depth-2 { animation-delay: 0.2s; }
-.marketing .sv-software .sv-depth-1 { animation-delay: 0.4s; }
-@keyframes sv-assemble { 0%, 68%, 100% { transform: translateX(0); } 22%, 46% { transform: translateX(16px); } }
+/* Tarjeta/volumen base (grosor por ::before + canto ember). */
+.marketing .sv3 .sv3-plane,
+.marketing .sv3 .sv3-tool,
+.marketing .sv3 .sv3-ctx,
+.marketing .sv3 .sv3-action,
+.marketing .sv3 .sv3-sys,
+.marketing .sv3 .sv3-step,
+.marketing .sv3 .sv3-log {
+  position: absolute; left: 50%; top: 50%; transform-style: preserve-3d;
+  border-radius: 11px; padding: 8px 12px;
+  background: linear-gradient(148deg, rgba(45, 28, 17, 0.96), rgba(24, 16, 10, 0.96));
+  box-shadow: 0 16px 26px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 237, 215, 0.1);
+}
+.marketing .sv3 .sv3-plane::before,
+.marketing .sv3 .sv3-tool::before,
+.marketing .sv3 .sv3-sys::before,
+.marketing .sv3 .sv3-step::before,
+.marketing .sv3 .sv3-action::before {
+  content: ""; position: absolute; inset: 0; border-radius: 11px; transform: translateZ(-12px);
+  background: #120a05; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.24);
+}
+.marketing .sv3 b, .marketing .sv3 em { transform: translateZ(6px); }
+.marketing .sv3 em { display: block; font-style: normal; margin-top: 1px; font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(7px, 1cvw, 9px); color: #c8b49c; }
 
-/* --- Agentes: consulta → herramientas → acción, con supervisión --- */
-.marketing .sv-edges path { stroke: rgba(255, 237, 215, 0.26); stroke-width: 1.5; }
-.marketing .sv-edges .sv-edge-out { stroke: rgba(255, 106, 42, 0.6); }
-.marketing .sv-edges .sv-edge-sup { stroke: rgba(96, 216, 165, 0.5); stroke-dasharray: 3 5; }
-.marketing .sv-io rect { fill: rgba(255, 237, 215, 0.05); stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.4; }
-.marketing .sv-io-out rect { fill: rgba(255, 106, 42, 0.14); stroke: #ff6a2a; }
-.marketing .sv-tool { fill: rgba(255, 106, 42, 0.2); stroke: #ff8a4c; stroke-width: 1.4; }
-.marketing .sv-node { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.8; }
-.marketing .sv-node-core { fill: #ff8a4c; animation: scx-core 2.6s ease-in-out infinite; }
-.marketing .sv-sup rect { fill: rgba(96, 216, 165, 0.12); stroke: rgba(96, 216, 165, 0.6); stroke-width: 1.3; }
-.marketing .sv-sup-check { stroke: #60d8a5; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.marketing .sv-pulse-ag { fill: #ffd29a; offset-path: path("M50 125 L168 125 L326 125"); animation: scx-travel 3.4s var(--m-ease) infinite; opacity: 0; }
+/* --- Software: capas (datos → lógica → interfaz → integraciones) --- */
+.marketing .sv3-software .sv3-plane { width: 60%; display: flex; align-items: center; gap: 9px; }
+.marketing .sv3-software .sv3-plane b { font-size: clamp(11px, 1.7vw, 15px); flex: 0 0 auto; }
+.marketing .sv3-software .sv3-plane i { transform: translateZ(6px); height: 4px; flex: 1 1 auto; max-width: 42px; border-radius: 999px; background: rgba(255, 237, 215, 0.16); }
+.marketing .sv3-software .sv3-plane i:nth-child(3) { max-width: 26px; }
+.marketing .sv3-software .sv3-plane i:nth-child(4) { max-width: 18px; }
+.marketing .sv3-software .sv3-p1 { top: 78%; transform: translate(-50%, -50%) translateZ(16px); }
+.marketing .sv3-software .sv3-p2 { top: 59%; transform: translate(-50%, -50%) translateZ(42px); }
+.marketing .sv3-software .sv3-p3 { top: 40%; transform: translate(-50%, -50%) translateZ(68px); }
+.marketing .sv3-software .sv3-p4 { top: 21%; transform: translate(-50%, -50%) translateZ(94px); box-shadow: 0 16px 26px -14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,237,215,0.12), 0 0 0 1px rgba(255,138,76,0.55), 0 0 22px -6px rgba(255,106,42,0.45); }
+.marketing .sv3-rise { position: absolute; left: 50%; top: 78%; width: 9px; height: 9px; border-radius: 50%; background: #ffe0b8; box-shadow: 0 0 14px #ffb27a; transform: translate(-50%, -50%) translateZ(16px); opacity: 0; }
+.marketing .sv3-software.in .sv3-rise { animation: sv3-rise 3.4s var(--m-ease) infinite; }
+@keyframes sv3-rise {
+  0% { top: 78%; opacity: 0; transform: translate(-50%, -50%) translateZ(16px) scale(0.5); }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { top: 21%; opacity: 0; transform: translate(-50%, -50%) translateZ(94px) scale(1.1); }
+}
+/* Entrada: las capas se asientan una tras otra. */
+.marketing .sv3-software.in .sv3-plane { animation: sv3-settle 0.7s var(--m-ease) both; }
+.marketing .sv3-software.in .sv3-p2 { animation-delay: 0.1s; }
+.marketing .sv3-software.in .sv3-p3 { animation-delay: 0.2s; }
+.marketing .sv3-software.in .sv3-p4 { animation-delay: 0.3s; }
+@keyframes sv3-settle { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-/* --- Automatización: flujo con secuencia legible --- */
-.marketing .sv-track { stroke: rgba(255, 237, 215, 0.24); stroke-width: 2; stroke-dasharray: 4 6; }
-.marketing .sv-retry { stroke: rgba(255, 106, 42, 0.4); stroke-width: 1.5; stroke-dasharray: 3 5; fill: none; }
-.marketing .sv-step { fill: rgba(255, 106, 42, 0.18); stroke: #ff6a2a; stroke-width: 1.6; }
-.marketing .sv-step-end { fill: rgba(96, 216, 165, 0.2); stroke: #60d8a5; }
-.marketing .sv-event { fill: #ff6a2a; animation: sv-flow 3.6s var(--m-ease) infinite; }
-@keyframes sv-flow {
-  0% { transform: translateX(0); opacity: 0; }
+/* --- Agentes: contexto → núcleo → herramientas → acción con supervisión --- */
+.marketing .sv3-agentes .sv3-core {
+  position: absolute; left: 50%; top: 46%; width: 19%; aspect-ratio: 1; border-radius: 50%;
+  transform: translate(-50%, -50%) translateZ(66px); display: grid; place-items: center;
+  background: radial-gradient(circle at 36% 30%, #ffb27a, #ff6a2a 52%, #a3380f);
+  box-shadow: 0 0 40px -4px rgba(255, 106, 42, 0.7), inset 0 2px 7px rgba(255, 224, 184, 0.6), 0 14px 26px -12px rgba(0,0,0,0.6);
+}
+.marketing .sv3-agentes .sv3-core i { width: 36%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #fff, #ffd29a 70%); }
+.marketing .sv3-agentes.in .sv3-core i { animation: sv3-pulse 2.4s ease-in-out infinite; }
+@keyframes sv3-pulse { 0%, 100% { transform: scale(0.85); opacity: 0.85; } 50% { transform: scale(1.12); opacity: 1; } }
+.marketing .sv3-agentes .sv3-tool { padding: 5px 9px; }
+.marketing .sv3-agentes .sv3-tool b { font-size: clamp(9px, 1.3vw, 12px); }
+.marketing .sv3-agentes .sv3-tool { top: 46%; }
+.marketing .sv3-t1 { transform: translate(-212%, -150%) translateZ(30px); }
+.marketing .sv3-t2 { transform: translate(104%, -156%) translateZ(30px); }
+.marketing .sv3-t3 { transform: translate(150%, -4%) translateZ(30px); }
+.marketing .sv3-agentes .sv3-ctx {
+  padding: 5px 10px; border-radius: 999px; transform: translate(-230%, 44%) translateZ(26px);
+  background: rgba(255, 237, 215, 0.08); box-shadow: inset 0 0 0 1px rgba(255, 237, 215, 0.2);
+  font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(8px, 1.2vw, 11px); color: #c8b49c; white-space: nowrap;
+}
+.marketing .sv3-agentes .sv3-action {
+  transform: translate(40%, 108%) translateZ(52px); padding: 7px 12px;
+  background: linear-gradient(135deg, #ff6a2a, #ff8a4c); box-shadow: 0 14px 24px -10px rgba(255, 106, 42, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.marketing .sv3-agentes .sv3-action::before { background: #7a2e0c; }
+.marketing .sv3-agentes .sv3-action b { color: #1b1109; font-size: clamp(10px, 1.5vw, 13px); }
+.marketing .sv3-agentes .sv3-action em { color: #3a1a08; }
+/* Radios finos entre núcleo y herramientas (spokes). */
+.marketing .sv3-agentes .sv3-wire { position: absolute; left: 50%; top: 50%; height: 1.5px; transform-origin: left center; background: linear-gradient(90deg, rgba(255,138,76,0.6), rgba(255,138,76,0.05)); transform: translateZ(40px); }
+.marketing .sv3-w1 { width: 22%; transform: translate(0, 0) rotate(217deg) translateZ(40px); }
+.marketing .sv3-w2 { width: 22%; transform: rotate(312deg) translateZ(40px); }
+.marketing .sv3-w3 { width: 20%; transform: rotate(8deg) translateZ(40px); }
+
+/* --- Automatización: sistemas conectados, evento, validación, reintento, registro --- */
+.marketing .sv3-auto .sv3-sys { padding: 8px 12px; }
+.marketing .sv3-auto .sv3-sys b, .marketing .sv3-auto .sv3-step b { font-size: clamp(9px, 1.4vw, 13px); }
+.marketing .sv3-sa { transform: translate(-176%, -36%) translateZ(30px); }
+.marketing .sv3-sb { transform: translate(84%, -36%) translateZ(30px); }
+.marketing .sv3-auto .sv3-step { padding: 6px 10px; background: linear-gradient(148deg, rgba(60,34,16,0.96), rgba(32,20,10,0.96)); }
+.marketing .sv3-valid { transform: translate(-50%, -36%) translateZ(54px); }
+.marketing .sv3-auto .sv3-log { width: 64%; transform: translate(-50%, 78%) translateZ(18px); display: flex; align-items: center; gap: 8px; }
+.marketing .sv3-auto .sv3-log b { font-size: clamp(9px, 1.3vw, 12px); flex: 0 0 auto; }
+.marketing .sv3-auto .sv3-log i { transform: translateZ(6px); height: 4px; flex: 1 1 auto; border-radius: 999px; background: rgba(255, 237, 215, 0.14); }
+.marketing .sv3-auto .sv3-log i:nth-child(3) { max-width: 30px; }
+.marketing .sv3-auto .sv3-log i:nth-child(4) { max-width: 18px; }
+.marketing .sv3-pipe { position: absolute; left: 50%; top: 50%; width: 70%; height: 3px; border-radius: 999px; transform: translate(-50%, calc(-36% + 14px)) translateZ(22px); background: repeating-linear-gradient(90deg, rgba(255,237,215,0.28) 0 6px, transparent 6px 12px); }
+.marketing .sv3-packet { position: absolute; left: 50%; top: 50%; width: 9px; height: 9px; border-radius: 2px; background: #ff6a2a; box-shadow: 0 0 12px #ff8a4c; transform: translate(-176%, calc(-36% + 12px)) translateZ(24px); opacity: 0; }
+.marketing .sv3-auto.in .sv3-packet { animation: sv3-packet 3.8s var(--m-ease) infinite; }
+@keyframes sv3-packet {
+  0% { opacity: 0; transform: translate(-176%, calc(-36% + 12px)) translateZ(24px); }
   8% { opacity: 1; }
-  28% { transform: translateX(110px); }
-  56% { transform: translateX(220px); }
-  84%, 100% { transform: translateX(306px); opacity: 0; }
+  40% { transform: translate(-50%, calc(-36% + 12px)) translateZ(24px); }
+  60% { transform: translate(-50%, calc(-36% + 12px)) translateZ(24px); }
+  92%, 100% { opacity: 0; transform: translate(84%, calc(-36% + 12px)) translateZ(24px); }
+}
+/* Reintento: pequeño lazo punteado sobre la validación. */
+.marketing .sv3-retry { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed rgba(255, 106, 42, 0.55); border-bottom-color: transparent; transform: translate(-50%, calc(-36% - 30px)) translateZ(30px); }
+.marketing .sv3-auto.in .sv3-retry { animation: sv3-spin 2.6s linear infinite; }
+@keyframes sv3-spin { from { transform: translate(-50%, calc(-36% - 30px)) translateZ(30px) rotate(0); } to { transform: translate(-50%, calc(-36% - 30px)) translateZ(30px) rotate(360deg); } }
+
+/* Móvil: la figura 16/10 queda muy baja y los elementos laterales se recortaban;
+   se da más alto a la tarjeta y se escala el stage para que todo entre. */
+@media (max-width: 620px) {
+  .marketing .sv3 .svc-visual, .marketing figure.svc-visual.sv3 { aspect-ratio: 4 / 3; }
+  .marketing .sv3-stage { width: 86%; transform: translate(-50%, -50%) rotateX(calc(13deg + var(--py) * -4deg)) rotateY(calc(var(--px) * 5deg)) scale(0.82); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marketing .sv-tilt { transition: none; }
-  .marketing .sv-software .sv-depth-1,
-  .marketing .sv-software .sv-depth-2,
-  .marketing .sv-software .sv-depth-3,
-  .marketing .sv-node-core,
-  .marketing .sv-pulse-ag,
-  .marketing .sv-event { animation: none; }
-  .marketing .sv-pulse-ag { opacity: 0; }
-  .marketing .sv-event { transform: translateX(110px); opacity: 1; }
+  .marketing .sv3-stage { transition: none; }
+  .marketing .sv3-rise, .marketing .sv3-packet { opacity: 0 !important; animation: none !important; }
+  .marketing .sv3-core i, .marketing .sv3-retry, .marketing .sv3-plane { animation: none !important; }
+  .marketing .sv3-plane { opacity: 1 !important; }
 }
