@@ -449,6 +449,14 @@
 .marketing .lab-index-card:hover .lab-reveal,
 .marketing .lab-index-card:focus-visible .lab-reveal,
 .marketing .lab-index-card:focus-within .lab-reveal { opacity: 1; }
+/* Sin hover la info no debe quedar oculta: con foco de teclado se revela TODA
+   (sin el recorte circular del puntero), y en táctil (sin hover) se muestra en la
+   propia composición. El mouse conserva la linterna. */
+.marketing .lab-index-card:focus-visible .lab-reveal,
+.marketing .lab-index-card:focus-within .lab-reveal { -webkit-mask-image: none; mask-image: none; }
+@media (hover: none) {
+  .marketing .lab-reveal { opacity: 1; -webkit-mask-image: none; mask-image: none; }
+}
 .marketing .lab-reveal span {
   position: absolute; transform: translate(-50%, -50%);
   font-family: var(--font-run-mono), ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.2px;
