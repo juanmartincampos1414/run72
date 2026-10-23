@@ -681,70 +681,65 @@
  * software + agentes + integración conectados, con profundidad
  * (parallax al puntero) y un pulso que recorre los enlaces.
  * ============================================================ */
-.marketing .svc-connect {
-  --px: 0; --py: 0;
-  position: relative;
-  max-width: 720px;
-  margin: clamp(28px, 5vw, 56px) auto 0;
-  touch-action: pan-y;
+.marketing .svc3x { --px: 0; --py: 0; position: relative; max-width: 760px; margin: clamp(28px, 5vw, 56px) auto 0; touch-action: pan-y; }
+.marketing .svc3x-scene { position: relative; width: 100%; aspect-ratio: 16 / 6; perspective: 1200px; perspective-origin: 50% 40%; }
+.marketing .svc3x-stage {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(calc(16deg + var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg));
+  transition: transform 0.5s var(--m-ease); will-change: transform;
 }
-.marketing .svc-connect-svg { width: 100%; height: auto; display: block; overflow: visible; }
-.marketing .svc-connect .scx-group {
-  transition: transform 0.5s var(--m-ease);
+.marketing .svc3x-key { position: absolute; inset: -30% -8% -42%; background: radial-gradient(50% 60% at 50% 30%, rgba(255, 168, 98, 0.32), rgba(255, 106, 42, 0.1) 48%, transparent 74%); filter: blur(18px); transform: translateZ(-150px); }
+.marketing .svc3x-cap {
+  position: absolute; top: 50%; transform-style: preserve-3d;
+  width: 27%; padding: 12px 14px; border-radius: 14px;
+  display: flex; flex-direction: column; gap: 6px;
+  background: linear-gradient(148deg, rgba(45, 28, 17, 0.96), rgba(24, 16, 10, 0.96));
+  box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 237, 215, 0.1);
 }
-.marketing .svc-connect .scx-soft { transform: translate(calc(var(--px) * -14px), calc(var(--py) * -8px)); }
-.marketing .svc-connect .scx-ag { transform: translate(calc(var(--px) * 7px), calc(var(--py) * 5px)); }
-.marketing .svc-connect .scx-int { transform: translate(calc(var(--px) * 16px), calc(var(--py) * 10px)); }
-.marketing .svc-connect .scx-links { transform: translate(calc(var(--px) * 3px), calc(var(--py) * 2px)); transition: transform 0.5s var(--m-ease); }
+.marketing .svc3x-cap::before { content: ""; position: absolute; inset: 0; border-radius: 14px; transform: translateZ(-14px); background: #120a05; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.22); }
+.marketing .svc3x-cap b { transform: translateZ(6px); font-family: var(--font-run-display), sans-serif; font-weight: 500; font-size: clamp(12px, 1.7vw, 15px); color: #ffedd7; }
+.marketing .svc3x-cap em { transform: translateZ(6px); font-style: normal; font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(8px, 1.1vw, 10px); letter-spacing: 0.3px; color: #c8b49c; }
+.marketing .svc3x-c1 { left: 17%; transform: translate(-50%, -50%) translateZ(28px); }
+.marketing .svc3x-c2 { left: 50%; transform: translate(-50%, -50%) translateZ(72px); box-shadow: 0 18px 30px -14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,237,215,0.12), 0 0 0 1px rgba(255,138,76,0.5), 0 0 24px -6px rgba(255,106,42,0.4); }
+.marketing .svc3x-c3 { left: 83%; transform: translate(-50%, -50%) translateZ(28px); }
 
-/* Enlaces */
-.marketing .scx-link { stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.6; }
-.marketing .scx-link-dim { stroke: rgba(255, 237, 215, 0.12); stroke-dasharray: 3 7; }
+.marketing .svc3x-glyph { transform: translateZ(8px); display: flex; }
+.marketing .g-soft { flex-direction: column; gap: 3px; width: 30px; }
+.marketing .g-soft i { height: 4px; border-radius: 2px; background: linear-gradient(90deg, #ff8a4c, #ffd29a); }
+.marketing .g-soft i:nth-child(2) { width: 80%; opacity: 0.7; }
+.marketing .g-soft i:nth-child(3) { width: 60%; opacity: 0.5; }
+.marketing .g-core { width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center; background: radial-gradient(circle at 36% 30%, #ffb27a, #ff6a2a 55%, #a3380f); box-shadow: 0 0 16px -2px rgba(255, 106, 42, 0.7); }
+.marketing .g-core i { width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle, #fff, #ffd29a 70%); }
+.marketing .svc3x.in .g-core i { animation: svc3x-pulse 2.4s ease-in-out infinite; }
+@keyframes svc3x-pulse { 0%, 100% { transform: scale(0.8); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
+.marketing .g-flow { align-items: center; gap: 4px; }
+.marketing .g-flow i { width: 6px; height: 6px; border-radius: 50%; background: #ff8a4c; box-shadow: 0 0 8px rgba(255, 138, 76, 0.6); }
+.marketing .g-flow i:nth-child(2) { opacity: 0.7; }
+.marketing .g-flow i:nth-child(3) { opacity: 0.5; }
 
-/* Software: capas */
-.marketing .scx-layer-3 { fill: rgba(255, 237, 215, 0.12); }
-.marketing .scx-layer-2 { fill: rgba(255, 178, 122, 0.35); }
-.marketing .scx-layer-1 { fill: #ff6a2a; }
-.marketing .scx-soft .scx-layer { animation: scx-assemble 5s var(--m-ease) infinite; }
-.marketing .scx-soft .scx-layer-2 { animation-delay: 0.18s; }
-.marketing .scx-soft .scx-layer-1 { animation-delay: 0.36s; }
-@keyframes scx-assemble { 0%, 64%, 100% { transform: translateX(0); } 24%, 44% { transform: translateX(12px); } }
+.marketing .svc3x-link { position: absolute; top: 50%; left: 17%; width: 66%; height: 2px; border-radius: 999px; transform: translateY(-50%) translateZ(18px); background: repeating-linear-gradient(90deg, rgba(255, 237, 215, 0.26) 0 6px, transparent 6px 13px); }
+.marketing .svc3x-pulse { position: absolute; top: 50%; left: 17%; width: 8px; height: 8px; border-radius: 50%; background: #ffe0b8; box-shadow: 0 0 12px #ffb27a; transform: translate(-50%, -50%) translateZ(20px); opacity: 0; }
+.marketing .svc3x.in .svc3x-pulse { animation: svc3x-travel 3.6s var(--m-ease) infinite; }
+@keyframes svc3x-travel { 0% { left: 17%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 83%; opacity: 0; } }
 
-/* Agentes */
-.marketing .scx-tool { stroke: rgba(255, 237, 215, 0.3); stroke-width: 1.4; }
-.marketing .scx-tool-dot { fill: rgba(255, 237, 215, 0.4); }
-.marketing .scx-approve { fill: #60d8a5; }
-.marketing .scx-node { fill: rgba(255, 106, 42, 0.16); stroke: #ff6a2a; stroke-width: 1.8; }
-.marketing .scx-node-core { fill: #ff8a4c; animation: scx-core 2.6s ease-in-out infinite; }
-@keyframes scx-core { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.marketing .svc3x.in .svc3x-cap { animation: svc3x-in 0.7s var(--m-ease) both; }
+.marketing .svc3x.in .svc3x-c2 { animation-delay: 0.1s; }
+.marketing .svc3x.in .svc3x-c3 { animation-delay: 0.2s; }
+@keyframes svc3x-in { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-/* Integración */
-.marketing .scx-flow { stroke: rgba(255, 237, 215, 0.22); stroke-width: 1.6; }
-.marketing .scx-flow-node { fill: rgba(255, 106, 42, 0.22); stroke: #ff6a2a; stroke-width: 1.4; }
-.marketing .scx-flow-end { fill: rgba(255, 106, 42, 0.5); }
-
-/* Etiquetas */
-.marketing .scx-label {
-  fill: rgba(255, 237, 215, 0.55);
-  font-family: var(--font-run-mono), ui-monospace, monospace;
-  font-size: 11px;
-  letter-spacing: 1.4px;
-  text-anchor: middle;
+@media (max-width: 620px) {
+  .marketing .svc3x-scene { aspect-ratio: 16 / 9; perspective: 900px; }
+  .marketing .svc3x-stage { transform: rotateX(calc(13deg + var(--py) * -4deg)) rotateY(calc(var(--px) * 5deg)) scale(0.96); }
+  .marketing .svc3x-cap { width: 31%; padding: 9px 9px; }
+  .marketing .svc3x-c1 { left: 17%; }
+  .marketing .svc3x-c3 { left: 83%; }
 }
-
-/* Pulsos por los enlaces */
-.marketing .scx-pulse { fill: #ffd29a; opacity: 0; }
-.marketing .scx-pulse-1 { offset-path: path("M232 150 C300 150 300 118 372 118"); animation: scx-travel 3.4s var(--m-ease) infinite; }
-.marketing .scx-pulse-2 { offset-path: path("M452 118 C540 118 500 156 556 156"); animation: scx-travel 3.4s var(--m-ease) 1.2s infinite; }
-@keyframes scx-travel { 0% { offset-distance: 0%; opacity: 0; } 14% { opacity: 1; } 78% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .marketing .svc-connect .scx-group,
-  .marketing .svc-connect .scx-links { transition: none; }
-  .marketing .scx-soft .scx-layer,
-  .marketing .scx-node-core,
-  .marketing .scx-pulse { animation: none; }
-  .marketing .scx-pulse { opacity: 0; }
+  .marketing .svc3x-stage { transition: none; }
+  .marketing .svc3x-cap, .marketing .g-core i, .marketing .svc3x-pulse { animation: none !important; }
+  .marketing .svc3x-cap { opacity: 1 !important; }
+  .marketing .svc3x-pulse { opacity: 0 !important; }
 }
 
 /* ============================================================
