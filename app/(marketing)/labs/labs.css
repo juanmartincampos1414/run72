@@ -435,6 +435,27 @@
 .marketing .lab-index-card:focus-visible .lv,
 .marketing .lab-index-card:focus-within .lv { filter: brightness(1.35) saturate(1.15); }
 .marketing .lab-viz .lv * { vector-effect: non-scaling-stroke; }
+/* Más presencia: el visual lee como un panel iluminado con canto ember. */
+.marketing .lab-viz { border-radius: 12px; background: linear-gradient(162deg, rgba(43, 27, 17, 0.55), rgba(18, 10, 5, 0.55)); box-shadow: inset 0 0 0 1px rgba(255, 138, 76, 0.16), inset 0 1px 0 rgba(255, 237, 215, 0.08), 0 10px 22px -16px rgba(0, 0, 0, 0.7); overflow: hidden; }
+
+/* La linterna REVELA información: una capa de datos visible sólo bajo el foco,
+   enmascarada por la posición del puntero (--lx/--ly, relativos a la tarjeta). */
+.marketing .lab-reveal {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+  transition: opacity 0.3s var(--m-ease);
+  -webkit-mask-image: radial-gradient(circle 68px at var(--lx, 50%) var(--ly, 38%), #000 0 36%, transparent 76%);
+  mask-image: radial-gradient(circle 68px at var(--lx, 50%) var(--ly, 38%), #000 0 36%, transparent 76%);
+}
+.marketing .lab-index-card:hover .lab-reveal,
+.marketing .lab-index-card:focus-visible .lab-reveal,
+.marketing .lab-index-card:focus-within .lab-reveal { opacity: 1; }
+.marketing .lab-reveal span {
+  position: absolute; transform: translate(-50%, -50%);
+  font-family: var(--font-run-mono), ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.2px;
+  color: #ffe0b8; padding: 2px 7px; border-radius: 999px; white-space: nowrap;
+  background: rgba(18, 10, 5, 0.82); box-shadow: inset 0 0 0 1px rgba(255, 138, 76, 0.5), 0 0 12px -2px rgba(255, 106, 42, 0.5);
+}
+@media (prefers-reduced-motion: reduce) { .marketing .lab-reveal { transition: none; } }
 
 /* --- Sistema operativo: registros que se ordenan --- */
 .marketing .lv-op .lv-row { fill: rgba(255, 237, 215, 0.14); }

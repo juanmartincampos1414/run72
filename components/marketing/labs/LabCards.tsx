@@ -16,6 +16,24 @@ function onMove(e: PointerEvent<HTMLElement>) {
   el.style.setProperty("--ly", `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
 }
 
+// Datos que la linterna revela al pasar por el visual de cada categoría (ficticios).
+const REVEAL: Record<LabViz, { t: string; x: number; y: number }[]> = {
+  operacion: [{ t: "142 registros", x: 18, y: 22 }, { t: "3 pendientes", x: 58, y: 52 }, { t: "al día", x: 30, y: 78 }],
+  agente: [{ t: "consulta", x: 12, y: 50 }, { t: "fuente verificada", x: 44, y: 24 }, { t: "→ aprobación", x: 62, y: 74 }],
+  integraciones: [{ t: "evento", x: 12, y: 30 }, { t: "sync ✓", x: 46, y: 60 }, { t: "reintento", x: 70, y: 32 }],
+  mapa: [{ t: "4 fases", x: 16, y: 26 }, { t: "12 nodos", x: 54, y: 60 }, { t: "ejemplo", x: 36, y: 82 }],
+};
+
+function LabReveal({ kind }: { kind: LabViz }) {
+  return (
+    <span className="lab-reveal" aria-hidden="true">
+      {REVEAL[kind].map((r) => (
+        <span key={r.t} style={{ left: `${r.x}%`, top: `${r.y}px` }}>{r.t}</span>
+      ))}
+    </span>
+  );
+}
+
 type Item = { id: string; kind: string; title: string; text: string; href: string; cta: string; viz: LabViz; map?: boolean };
 
 export function LabCards() {
@@ -34,6 +52,7 @@ export function LabCards() {
             className={`lab-index-card m-arrow-host${c.map ? " lab-index-card--map" : ""}`}
           >
             <LabCardVisual kind={c.viz} />
+            <LabReveal kind={c.viz} />
             <span className="lab-index-inner">
               <span className="m-eyebrow">{c.kind}</span>
               <span className="lab-index-title">{c.title}</span>
