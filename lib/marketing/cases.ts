@@ -182,7 +182,7 @@ export const WORKS: Work[] = [
     subtitle: "ERP SaaS para finanzas personales, de pareja y de pequeñas empresas.",
     categories: ["software", "ia"],
     year: 2026,
-    poster: "#18ACFF",
+    poster: "#ffb27a",
     statusLabel: "Operativo",
     summary:
       "Plataforma de gestión financiera y administrativa impulsada por inteligencia artificial. Aikestar centraliza la información de personas, emprendedores y pequeñas empresas, automatiza la carga y conciliación de movimientos y convierte los datos operativos en información útil para decidir.",
@@ -257,7 +257,7 @@ export const WORKS: Work[] = [
     subtitle: "Sistema operativo de marketing con IA: tu Director de Crecimiento.",
     categories: ["ia", "automatizacion"],
     year: 2026,
-    poster: "#5583FF",
+    poster: "#ff6a2a",
     statusLabel: "Operativo",
     summary:
       "Sistema operativo de marketing impulsado por inteligencia artificial. Jota aprende la identidad de una marca, organiza su estrategia, produce contenidos y coordina campañas y canales desde un solo lugar, manteniendo la aprobación humana antes de ejecutar.",
@@ -370,7 +370,7 @@ export const WORKS: Work[] = [
       "Sistema privado para organizar la originación e investigación de oportunidades, en uso en un entorno controlado.",
     categories: ["software", "ia"],
     year: 2026,
-    poster: "#5583FF",
+    poster: "#ff6a2a",
     statusLabel: "MVP FUNCIONAL · EN USO PRIVADO",
     gallery: [
       {
@@ -431,7 +431,7 @@ export const WORKS: Work[] = [
     subtitle: "Inteligencia económica para restaurantes y hospitality.",
     categories: ["software", "ia"],
     year: 2026,
-    poster: "#8960FF",
+    poster: "#e0591f",
     statusLabel: MVP_STATUS,
     summary:
       "Plataforma de inteligencia económica para hospitality: convierte facturas, menús, recetas y cierres operativos en una lectura de márgenes y costos. No es un ERP, un POS ni un sistema contable.",
@@ -554,7 +554,7 @@ export const WORKS: Work[] = [
       label: "Evaluar un sistema para mi empresa",
       href: "/contacto?interes=software",
     },
-    media: { poster: "#18ACFF" },
+    media: { poster: "#ffb27a" },
     published: true,
   },
   {
@@ -579,7 +579,7 @@ export const WORKS: Work[] = [
       label: "Evaluar un agente para mi operación",
       href: "/contacto?interes=agentes",
     },
-    media: { poster: "#8960FF" },
+    media: { poster: "#e0591f" },
     published: true,
   },
   {

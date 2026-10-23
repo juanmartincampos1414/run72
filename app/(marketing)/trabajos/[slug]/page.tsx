@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { COVER_BLUR } from "@/lib/marketing/cover-blur";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -152,7 +153,10 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
                 alt={cover.alt}
                 fill
                 priority
+                fetchPriority="high"
                 sizes="(min-width: 1200px) 1200px, 100vw"
+                placeholder={COVER_BLUR[cover.src] ? "blur" : "empty"}
+                blurDataURL={COVER_BLUR[cover.src]}
                 style={{ objectFit: "cover", objectPosition: "top left" }}
               />
             </div>

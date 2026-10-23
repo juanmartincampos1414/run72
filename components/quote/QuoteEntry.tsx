@@ -36,7 +36,7 @@ export function QuoteEntry({ initialServices, initialMicros }: { initialServices
 
       <main className="container-x py-16 md:py-24">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease }}
           className="mx-auto max-w-5xl text-center"
