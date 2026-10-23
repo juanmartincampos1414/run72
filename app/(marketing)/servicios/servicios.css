@@ -665,7 +665,8 @@
 }
 
 /* Índice de servicios: intro centrada con más aire (auditoría comparativa) */
-.marketing .svc-hero--index { text-align: center; padding-bottom: 24px; }
+.marketing .svc-hero--index { text-align: center; padding-top: 128px; padding-bottom: 20px; }
+@media (min-width: 768px) { .marketing .svc-hero--index { padding-top: 148px; } }
 .marketing .svc-hero--index .svc-hero-eyebrow { justify-content: center; }
 .marketing .svc-hero--index .svc-h1 { margin-inline: auto; max-width: 18ch; }
 .marketing .svc-hero--index .svc-bajada { margin-inline: auto; max-width: 60ch; }
@@ -681,24 +682,24 @@
  * software + agentes + integración conectados, con profundidad
  * (parallax al puntero) y un pulso que recorre los enlaces.
  * ============================================================ */
-.marketing .svc3x { --px: 0; --py: 0; position: relative; max-width: 760px; margin: clamp(28px, 5vw, 56px) auto 0; touch-action: pan-y; }
+.marketing .svc3x { --px: 0; --py: 0; position: relative; max-width: 780px; margin: clamp(12px, 2.5vw, 26px) auto 0; touch-action: pan-y; }
 .marketing .svc3x-scene { position: relative; width: 100%; aspect-ratio: 16 / 6; perspective: 1200px; perspective-origin: 50% 40%; }
 .marketing .svc3x-stage {
   position: absolute; inset: 0; transform-style: preserve-3d;
   transform: rotateX(calc(16deg + var(--py) * -5deg)) rotateY(calc(var(--px) * 7deg));
   transition: transform 0.5s var(--m-ease); will-change: transform;
 }
-.marketing .svc3x-key { position: absolute; inset: -30% -8% -42%; background: radial-gradient(50% 60% at 50% 30%, rgba(255, 168, 98, 0.32), rgba(255, 106, 42, 0.1) 48%, transparent 74%); filter: blur(18px); transform: translateZ(-150px); }
+.marketing .svc3x-key { position: absolute; inset: -30% -8% -42%; background: radial-gradient(50% 60% at 50% 30%, rgba(255, 168, 98, 0.44), rgba(255, 106, 42, 0.1) 48%, transparent 74%); filter: blur(18px); transform: translateZ(-150px); }
 .marketing .svc3x-cap {
   position: absolute; top: 50%; transform-style: preserve-3d;
   width: 27%; padding: 12px 14px; border-radius: 14px;
   display: flex; flex-direction: column; gap: 6px;
-  background: linear-gradient(148deg, rgba(45, 28, 17, 0.96), rgba(24, 16, 10, 0.96));
-  box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 237, 215, 0.1);
+  background: linear-gradient(148deg, rgba(62, 40, 24, 0.97), rgba(34, 22, 13, 0.97));
+  box-shadow: 0 18px 30px -14px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 237, 215, 0.14), 0 0 0 1px rgba(255, 138, 76, 0.3);
 }
-.marketing .svc3x-cap::before { content: ""; position: absolute; inset: 0; border-radius: 14px; transform: translateZ(-14px); background: #120a05; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.22); }
+.marketing .svc3x-cap::before { content: ""; position: absolute; inset: 0; border-radius: 14px; transform: translateZ(-14px); background: #160d06; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.32); }
 .marketing .svc3x-cap b { transform: translateZ(6px); font-family: var(--font-run-display), sans-serif; font-weight: 500; font-size: clamp(12px, 1.7vw, 15px); color: #ffedd7; }
-.marketing .svc3x-cap em { transform: translateZ(6px); font-style: normal; font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(8px, 1.1vw, 10px); letter-spacing: 0.3px; color: #c8b49c; }
+.marketing .svc3x-cap em { transform: translateZ(6px); font-style: normal; font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(8px, 1.1vw, 10px); letter-spacing: 0.3px; color: #dcc8af; }
 .marketing .svc3x-c1 { left: 17%; transform: translate(-50%, -50%) translateZ(28px); }
 .marketing .svc3x-c2 { left: 50%; transform: translate(-50%, -50%) translateZ(72px); box-shadow: 0 18px 30px -14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,237,215,0.12), 0 0 0 1px rgba(255,138,76,0.5), 0 0 24px -6px rgba(255,106,42,0.4); }
 .marketing .svc3x-c3 { left: 83%; transform: translate(-50%, -50%) translateZ(28px); }
@@ -717,7 +718,7 @@
 .marketing .g-flow i:nth-child(2) { opacity: 0.7; }
 .marketing .g-flow i:nth-child(3) { opacity: 0.5; }
 
-.marketing .svc3x-link { position: absolute; top: 50%; left: 17%; width: 66%; height: 2px; border-radius: 999px; transform: translateY(-50%) translateZ(18px); background: repeating-linear-gradient(90deg, rgba(255, 237, 215, 0.26) 0 6px, transparent 6px 13px); }
+.marketing .svc3x-link { position: absolute; top: 50%; left: 17%; width: 66%; height: 2px; border-radius: 999px; transform: translateY(-50%) translateZ(18px); background: repeating-linear-gradient(90deg, rgba(255, 237, 215, 0.4) 0 6px, transparent 6px 13px); }
 .marketing .svc3x-pulse { position: absolute; top: 50%; left: 17%; width: 8px; height: 8px; border-radius: 50%; background: #ffe0b8; box-shadow: 0 0 12px #ffb27a; transform: translate(-50%, -50%) translateZ(20px); opacity: 0; }
 .marketing .svc3x.in .svc3x-pulse { animation: svc3x-travel 3.6s var(--m-ease) infinite; }
 @keyframes svc3x-travel { 0% { left: 17%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 83%; opacity: 0; } }
@@ -772,16 +773,16 @@
 .marketing .sv3 .sv3-log {
   position: absolute; left: 50%; top: 50%; transform-style: preserve-3d;
   border-radius: 11px; padding: 8px 12px;
-  background: linear-gradient(148deg, rgba(45, 28, 17, 0.96), rgba(24, 16, 10, 0.96));
-  box-shadow: 0 16px 26px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 237, 215, 0.1);
+  background: linear-gradient(148deg, rgba(62, 40, 23, 0.97), rgba(30, 19, 11, 0.97));
+  box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 237, 215, 0.15), 0 0 0 1px rgba(255, 138, 76, 0.28);
 }
 .marketing .sv3 .sv3-plane::before,
 .marketing .sv3 .sv3-tool::before,
 .marketing .sv3 .sv3-sys::before,
 .marketing .sv3 .sv3-step::before,
 .marketing .sv3 .sv3-action::before {
-  content: ""; position: absolute; inset: 0; border-radius: 11px; transform: translateZ(-12px);
-  background: #120a05; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.24);
+  content: ""; position: absolute; inset: 0; border-radius: 11px; transform: translateZ(-16px);
+  background: #160d06; box-shadow: 0 0 0 1px rgba(255, 106, 42, 0.36);
 }
 .marketing .sv3 b, .marketing .sv3 em { transform: translateZ(6px); }
 .marketing .sv3 em { display: block; font-style: normal; margin-top: 1px; font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(7px, 1cvw, 9px); color: #c8b49c; }
@@ -789,13 +790,13 @@
 /* --- Software: capas (datos → lógica → interfaz → integraciones) --- */
 .marketing .sv3-software .sv3-plane { width: 60%; display: flex; align-items: center; gap: 9px; }
 .marketing .sv3-software .sv3-plane b { font-size: clamp(11px, 1.7vw, 15px); flex: 0 0 auto; }
-.marketing .sv3-software .sv3-plane i { transform: translateZ(6px); height: 4px; flex: 1 1 auto; max-width: 42px; border-radius: 999px; background: rgba(255, 237, 215, 0.16); }
+.marketing .sv3-software .sv3-plane i { transform: translateZ(6px); height: 4px; flex: 1 1 auto; max-width: 42px; border-radius: 999px; background: rgba(255, 237, 215, 0.26); }
 .marketing .sv3-software .sv3-plane i:nth-child(3) { max-width: 26px; }
 .marketing .sv3-software .sv3-plane i:nth-child(4) { max-width: 18px; }
-.marketing .sv3-software .sv3-p1 { top: 78%; transform: translate(-50%, -50%) translateZ(16px); }
-.marketing .sv3-software .sv3-p2 { top: 59%; transform: translate(-50%, -50%) translateZ(42px); }
-.marketing .sv3-software .sv3-p3 { top: 40%; transform: translate(-50%, -50%) translateZ(68px); }
-.marketing .sv3-software .sv3-p4 { top: 21%; transform: translate(-50%, -50%) translateZ(94px); box-shadow: 0 16px 26px -14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,237,215,0.12), 0 0 0 1px rgba(255,138,76,0.55), 0 0 22px -6px rgba(255,106,42,0.45); }
+.marketing .sv3-software .sv3-p1 { top: 78%; transform: translate(-50%, -50%) translateZ(12px); }
+.marketing .sv3-software .sv3-p2 { top: 59%; transform: translate(-50%, -50%) translateZ(50px); }
+.marketing .sv3-software .sv3-p3 { top: 40%; transform: translate(-50%, -50%) translateZ(88px); }
+.marketing .sv3-software .sv3-p4 { top: 21%; transform: translate(-50%, -50%) translateZ(126px); box-shadow: 0 16px 26px -14px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,237,215,0.12), 0 0 0 1px rgba(255,138,76,0.55), 0 0 22px -6px rgba(255,106,42,0.45); }
 .marketing .sv3-rise { position: absolute; left: 50%; top: 78%; width: 9px; height: 9px; border-radius: 50%; background: #ffe0b8; box-shadow: 0 0 14px #ffb27a; transform: translate(-50%, -50%) translateZ(16px); opacity: 0; }
 .marketing .sv3-software.in .sv3-rise { animation: sv3-rise 3.4s var(--m-ease) infinite; }
 @keyframes sv3-rise {
