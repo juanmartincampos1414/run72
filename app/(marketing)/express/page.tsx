@@ -30,16 +30,18 @@ export default function ExpressPage() {
   return (
     <>
       <section className="m-section ex-hero">
-        <div className="m-container">
-          <p className="m-eyebrow">UNA MODALIDAD DE RUN</p>
-          <h1 className="ex-h1">RUN Express</h1>
-          <p className="ex-lead">
-            Webs, ecommerce e identidad digital con alcance y precio definidos, mediante un proceso
-            simplificado.
-          </p>
-          <div className="ex-ctas">
-            <GradientButton href="/cotizar">Cotizar mi proyecto</GradientButton>
-            <Link href="/contacto" className="m-btn-ghost">Necesito una solución a medida</Link>
+        <div className="m-container ex-hero-grid">
+          <div className="ex-hero-copy">
+            <p className="m-eyebrow">UNA MODALIDAD DE RUN</p>
+            <h1 className="ex-h1">RUN Express</h1>
+            <p className="ex-lead">
+              Webs, ecommerce e identidad digital con alcance y precio definidos, mediante un proceso
+              simplificado.
+            </p>
+            <div className="ex-ctas">
+              <GradientButton href="/cotizar">Cotizar mi proyecto</GradientButton>
+              <Link href="/contacto" className="m-btn-ghost">Necesito una solución a medida</Link>
+            </div>
           </div>
           <ExpressModulesVisual />
         </div>

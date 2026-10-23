@@ -1,7 +1,13 @@
 /* RUN Express landing — prefijo ex- */
-.marketing .ex-hero { padding-top: 140px; }
+.marketing .ex-hero { padding-top: clamp(116px, 14vw, 140px); }
+/* Hero como una sola composición: copy + CTAs a la izquierda, objeto 3D a la
+   derecha (llena el vacío). En pantallas angostas se apila (copy, luego objeto). */
+.marketing .ex-hero-grid { display: grid; gap: clamp(26px, 5vw, 44px); align-items: center; }
+@media (min-width: 880px) {
+  .marketing .ex-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr); gap: 56px; }
+}
 .marketing .ex-h1 { margin-top: 10px; font-size: clamp(2.5rem, 8vw, 5rem); line-height: 1; letter-spacing: -0.03em; font-weight: 500; color: var(--m-text); }
-.marketing .ex-lead { margin-top: 18px; max-width: 48ch; font-size: 18px; line-height: 28px; color: var(--m-muted); }
+.marketing .ex-lead { margin-top: 18px; max-width: 46ch; font-size: 18px; line-height: 28px; color: var(--m-muted); }
 .marketing .ex-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .marketing .ex-block { padding-block: 48px; }
 .marketing .ex-grid { display: grid; gap: 40px; }
@@ -32,8 +38,13 @@
  * ============================================================ */
 .marketing .ex3d {
   --px: 0; --py: 0;
-  max-width: 600px;
-  margin: clamp(30px, 5vw, 58px) 0 0;
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
+}
+@media (min-width: 880px) {
+  /* En dos columnas el objeto llena su columna (sin tope) y gana protagonismo. */
+  .marketing .ex3d { max-width: none; margin-inline: 0; }
 }
 .marketing .ex3d-scene { perspective: 1150px; perspective-origin: 50% 40%; }
 .marketing .ex3d-stage {
