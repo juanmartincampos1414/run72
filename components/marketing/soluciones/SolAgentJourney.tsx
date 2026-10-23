@@ -1,71 +1,73 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { PointerEvent } from "react";
 
-// Recorrido operativo del agente por industria: consulta → agente (contexto) →
-// acción → resultado, con derivación a una persona. Estructura común (sistema
-// RUN) y etiquetas propias de cada industria. Volumen por inclinación 3D al
-// puntero + pulso que recorre el flujo. SVG + CSS; reduced-motion lo deja quieto.
+// Recorrido operativo del agente por industria, con volumen (perspective +
+// preserve-3d) e iluminación cálida: las entidades propias de la operación entran,
+// el AGENTE las procesa (contexto + reglas) y produce un RESULTADO, con derivación
+// a una persona. Estructura común (sistema RUN) y entidades propias de cada rubro.
+// Sin WebGL; entrada al entrar en viewport, parallax, fallback y reduced-motion.
 
 export type VerticalSlug = "restaurantes" | "hoteles" | "real-estate";
 
-const JOURNEY: Record<VerticalSlug, { steps: [string, string, string, string]; branch: string }> = {
-  restaurantes: { steps: ["Reserva / grupo", "Reglas del local", "Toma la reserva", "Confirma y avisa"], branch: "Deriva a una persona" },
-  hoteles: { steps: ["Disponibilidad", "Tarifas e info", "Registra pedido", "Atiende y deriva"], branch: "Deriva al equipo" },
-  "real-estate": { steps: ["Lead entrante", "Califica interés", "Coordina visita", "Registra en CRM"], branch: "Deriva al asesor" },
+const DATA: Record<VerticalSlug, { inputs: [string, string, string]; result: string; branch: string }> = {
+  restaurantes: { inputs: ["Reservas", "Pedidos", "Clientes"], result: "Costos y seguimiento", branch: "Deriva a una persona" },
+  hoteles: { inputs: ["Huéspedes", "Estadías", "Atención"], result: "Operación y reputación", branch: "Deriva al equipo" },
+  "real-estate": { inputs: ["Propiedades", "Consultas", "Calificación"], result: "Visitas y seguimiento", branch: "Deriva al asesor" },
 };
 
-const STAGES = ["CONSULTA", "AGENTE", "ACCIÓN", "RESULTADO"] as const;
-
-function onMove(e: PointerEvent<HTMLElement>) {
-  const el = e.currentTarget;
-  const r = el.getBoundingClientRect();
-  el.style.setProperty("--tx", (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
-  el.style.setProperty("--ty", (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
-}
-function onLeave(e: PointerEvent<HTMLElement>) {
-  e.currentTarget.style.setProperty("--tx", "0");
-  e.currentTarget.style.setProperty("--ty", "0");
-}
-
 export function SolAgentJourney({ slug }: { slug: VerticalSlug }) {
-  const j = JOURNEY[slug];
-  const xs = [70, 210, 350, 470];
+  const ref = useRef<HTMLElement>(null);
+  const d = DATA[slug];
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(
+      (es) => { for (const e of es) if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  function onMove(e: PointerEvent<HTMLElement>) {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--px", (((e.clientX - r.left) / r.width - 0.5) * 2).toFixed(3));
+    el.style.setProperty("--py", (((e.clientY - r.top) / r.height - 0.5) * 2).toFixed(3));
+  }
+  function onLeave(e: PointerEvent<HTMLElement>) {
+    e.currentTarget.style.setProperty("--px", "0");
+    e.currentTarget.style.setProperty("--py", "0");
+  }
+
   return (
     <figure
-      className="sol-journey sv-tilt"
+      ref={ref}
+      className="sol-j3"
       role="img"
-      aria-label={`Recorrido del agente para ${slug.replace("-", " ")}: ${STAGES.map((s, i) => `${s.toLowerCase()} (${j.steps[i]})`).join(", ")}, con ${j.branch.toLowerCase()}.`}
+      aria-label={`Recorrido del agente para ${slug.replace("-", " ")}: entra la operación (${d.inputs.join(", ")}), el agente la procesa y produce ${d.result.toLowerCase()}, con ${d.branch.toLowerCase()}.`}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
     >
-      <span className="sol-journey-stage" aria-hidden="true">
-        <svg viewBox="0 0 540 234" fill="none" className="sv-svg">
-          <path className="sj-track" d="M70 118 H470" />
-          {/* derivación a persona */}
-          <path className="sj-branch" d="M210 139 V192 H320" />
-          <g className="sj-person">
-            <circle cx="332" cy="192" r="6" />
-            <text className="sv-tag sv-tag-dim" x="346" y="196">{j.branch}</text>
-          </g>
-
-          {xs.map((x, i) => (
-            <g key={i}>
-              <text className="sv-tag sj-stage" x={x} y={66} textAnchor="middle">{STAGES[i]}</text>
-              {i === 1 ? (
-                <>
-                  <circle className="sj-node sj-agent" cx={x} cy={118} r="20" />
-                  <circle className="sj-core" cx={x} cy={118} r="7" />
-                </>
-              ) : (
-                <circle className={`sj-node${i === 3 ? " sj-node-end" : ""}`} cx={x} cy={118} r={i === 3 ? 9 : 11} />
-              )}
-              <text className="sv-tag sj-label" x={x} y={156} textAnchor="middle">{j.steps[i]}</text>
-            </g>
-          ))}
-
-          <rect className="sv-event sj-event" x="63" y="111" width="13" height="13" rx="4" />
-        </svg>
+      <span className="sol-j3-scene" aria-hidden="true">
+        <span className="sol-j3-stage">
+          <span className="sol-j3-key" />
+          <span className="sol-j3-link" />
+          <span className="sol-j3-pulse" />
+          <span className="sol-j3-lab sol-j3-lab-in">OPERACIÓN</span>
+          <span className="sol-j3-lab sol-j3-lab-ag">AGENTE</span>
+          <span className="sol-j3-lab sol-j3-lab-res">RESULTADO</span>
+          <span className="sol-j3-inputs">
+            {d.inputs.map((t) => <span key={t} className="sol-j3-chip">{t}</span>)}
+          </span>
+          <span className="sol-j3-core"><i /></span>
+          <span className="sol-j3-result"><b>{d.result}</b></span>
+          <span className="sol-j3-person">{d.branch}</span>
+        </span>
       </span>
       <figcaption className="sol-journey-cap m-eyebrow" aria-hidden="true">Recorrido conceptual · Datos ficticios</figcaption>
     </figure>

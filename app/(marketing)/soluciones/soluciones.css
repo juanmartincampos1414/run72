@@ -354,54 +354,63 @@
  * Estructura común (consulta→agente→acción→resultado) + etiquetas propias.
  * Volumen por inclinación 3D al puntero + pulso; reduced-motion quieto.
  * ============================================================ */
-.marketing .sol-journey {
-  position: relative;
-  margin: clamp(24px, 4vw, 44px) 0 0;
-  padding: clamp(16px, 3vw, 28px);
-  border: 1px solid var(--m-line);
-  border-radius: 20px;
-  background:
-    radial-gradient(90% 120% at 18% 0%, rgba(255, 106, 42, 0.12) 0%, rgba(255, 106, 42, 0) 60%),
-    var(--m-deep, #0c0703);
-  overflow: hidden;
+/* Recorrido del agente por industria (RUN-18): composición 3D con volumen,
+   iluminación cálida y entidades propias de la operación. Sin WebGL. */
+.marketing .sol-j3 {
+  --px: 0; --py: 0;
+  position: relative; margin: clamp(24px, 4vw, 44px) 0 0;
+  padding: clamp(16px, 3vw, 26px);
+  border: 1px solid var(--m-line); border-radius: 20px; overflow: hidden;
+  background: radial-gradient(90% 120% at 18% 0%, rgba(255, 106, 42, 0.12) 0%, rgba(255, 106, 42, 0) 60%), var(--m-deep, #0c0703);
 }
-.marketing .sol-journey.sv-tilt {
-  transition: transform 0.45s var(--m-ease);
-  transform: perspective(1100px) rotateX(calc(var(--ty, 0) * -3deg)) rotateY(calc(var(--tx, 0) * 4deg));
-  will-change: transform;
+.marketing .sol-j3-scene { display: block; position: relative; width: 100%; aspect-ratio: 16 / 7; perspective: 1150px; perspective-origin: 50% 42%; }
+.marketing .sol-j3-stage {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transform: rotateX(calc(14deg + var(--py) * -5deg)) rotateY(calc(var(--px) * 6deg));
+  transition: transform 0.5s var(--m-ease); will-change: transform;
 }
-.marketing .sol-journey .sv-svg { width: 100%; height: auto; display: block; overflow: visible; }
-.marketing .sol-journey .sv-tag {
-  fill: rgba(255, 237, 215, 0.62);
-  font-family: var(--font-run-mono), ui-monospace, monospace;
-  font-size: 10px; letter-spacing: 0.3px;
+.marketing .sol-j3-key { position: absolute; inset: -30% -8% -42%; background: radial-gradient(50% 60% at 50% 34%, rgba(255, 168, 98, 0.3), rgba(255, 106, 42, 0.1) 48%, transparent 74%); filter: blur(16px); transform: translateZ(-150px); }
+.marketing .sol-j3-lab { position: absolute; top: 4%; transform: translate(-50%, 0) translateZ(20px); font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(7px, 1vw, 9px); letter-spacing: 1.4px; color: rgba(255, 237, 215, 0.45); white-space: nowrap; }
+.marketing .sol-j3-lab-in { left: 18%; }
+.marketing .sol-j3-lab-ag { left: 50%; }
+.marketing .sol-j3-lab-res { left: 82%; }
+.marketing .sol-j3-inputs { position: absolute; left: 18%; top: 54%; transform: translate(-50%, -50%) translateZ(34px); transform-style: preserve-3d; display: flex; flex-direction: column; gap: 6px; }
+.marketing .sol-j3-chip {
+  position: relative; padding: 5px 10px; border-radius: 9px;
+  background: linear-gradient(148deg, rgba(45, 28, 17, 0.97), rgba(22, 14, 9, 0.97));
+  box-shadow: 0 12px 20px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 237, 215, 0.1), 0 0 0 1px rgba(255, 138, 76, 0.32);
+  font-family: var(--font-run-display), sans-serif; font-size: clamp(9px, 1.3vw, 12px); color: #ffedd7; white-space: nowrap;
 }
-.marketing .sol-journey .sj-stage { fill: rgba(255, 237, 215, 0.4); font-size: 9px; letter-spacing: 1.2px; }
-.marketing .sol-journey .sv-tag-dim { fill: rgba(255, 237, 215, 0.4); }
-.marketing .sol-journey .sj-label { fill: #ffdcb6; }
-.marketing .sol-journey .sj-track { stroke: rgba(255, 237, 215, 0.24); stroke-width: 2; stroke-dasharray: 4 6; }
-.marketing .sol-journey .sj-branch { stroke: rgba(96, 216, 165, 0.45); stroke-width: 1.5; stroke-dasharray: 3 5; fill: none; }
-.marketing .sol-journey .sj-person circle { fill: rgba(96, 216, 165, 0.25); stroke: #60d8a5; stroke-width: 1.3; }
-.marketing .sol-journey .sj-node { fill: rgba(255, 106, 42, 0.18); stroke: #ff6a2a; stroke-width: 1.6; }
-.marketing .sol-journey .sj-agent { fill: rgba(255, 106, 42, 0.16); stroke-width: 1.9; }
-.marketing .sol-journey .sj-core { fill: #ff8a4c; animation: sj-core 2.6s ease-in-out infinite; }
-.marketing .sol-journey .sj-node-end { fill: rgba(96, 216, 165, 0.22); stroke: #60d8a5; }
-.marketing .sol-journey .sv-event { fill: #ffd29a; animation: sj-flow 3.8s var(--m-ease) infinite; }
-@keyframes sj-core { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
-@keyframes sj-flow {
-  0% { transform: translateX(0); opacity: 0; }
-  8% { opacity: 1; }
-  30% { transform: translateX(140px); }
-  58% { transform: translateX(280px); }
-  84%, 100% { transform: translateX(400px); opacity: 0; }
-}
+.marketing .sol-j3-core { position: absolute; left: 50%; top: 54%; width: 15%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%) translateZ(66px); display: grid; place-items: center; background: radial-gradient(circle at 36% 30%, #ffb27a, #ff6a2a 52%, #a3380f); box-shadow: 0 0 36px -4px rgba(255, 106, 42, 0.7), inset 0 2px 6px rgba(255, 224, 184, 0.6), 0 14px 24px -12px rgba(0, 0, 0, 0.6); }
+.marketing .sol-j3-core i { width: 34%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #fff, #ffd29a 70%); }
+.marketing .sol-j3.in .sol-j3-core i { animation: sol-j3-pulse 2.4s ease-in-out infinite; }
+@keyframes sol-j3-pulse { 0%, 100% { transform: scale(0.8); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
+.marketing .sol-j3-result { position: absolute; left: 82%; top: 54%; width: 22%; padding: 8px 11px; border-radius: 11px; transform: translate(-50%, -50%) translateZ(40px); transform-style: preserve-3d; background: linear-gradient(135deg, #ff6a2a, #ff8a4c); box-shadow: 0 14px 24px -10px rgba(255, 106, 42, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.marketing .sol-j3-result::before { content: ""; position: absolute; inset: 0; border-radius: 11px; transform: translateZ(-10px); background: #7a2e0c; }
+.marketing .sol-j3-result b { transform: translateZ(6px); display: block; font-family: var(--font-run-display), sans-serif; font-weight: 500; font-size: clamp(9px, 1.3vw, 12px); color: #1b1109; }
+.marketing .sol-j3-person { position: absolute; left: 50%; top: 93%; transform: translate(-50%, -50%) translateZ(24px); padding: 4px 10px; border-radius: 999px; background: rgba(255, 237, 215, 0.1); box-shadow: inset 0 0 0 1px rgba(255, 237, 215, 0.3); font-family: var(--font-run-mono), ui-monospace, monospace; font-size: clamp(7px, 1vw, 10px); color: #ffedd7; white-space: nowrap; }
+.marketing .sol-j3-person::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 1.5px; height: 16px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, rgba(255, 237, 215, 0.4) 0 4px, transparent 4px 8px); }
+.marketing .sol-j3-link { position: absolute; top: 54%; left: 18%; width: 64%; height: 2px; border-radius: 999px; transform: translateY(-50%) translateZ(16px); background: repeating-linear-gradient(90deg, rgba(255, 237, 215, 0.24) 0 6px, transparent 6px 13px); }
+.marketing .sol-j3-pulse { position: absolute; top: 54%; left: 18%; width: 8px; height: 8px; border-radius: 2px; background: #ff6a2a; box-shadow: 0 0 12px #ff8a4c; transform: translate(-50%, -50%) translateZ(18px); opacity: 0; }
+.marketing .sol-j3.in .sol-j3-pulse { animation: sol-j3-travel 3.8s var(--m-ease) infinite; }
+@keyframes sol-j3-travel { 0% { left: 18%; opacity: 0; } 10% { opacity: 1; } 48% { left: 50%; } 60% { left: 50%; } 90% { opacity: 1; } 100% { left: 82%; opacity: 0; } }
+.marketing .sol-j3.in .sol-j3-chip, .marketing .sol-j3.in .sol-j3-result { animation: sol-j3-in 0.6s var(--m-ease) both; }
+.marketing .sol-j3.in .sol-j3-result { animation-delay: 0.25s; }
+@keyframes sol-j3-in { 0% { opacity: 0; } 100% { opacity: 1; } }
 .marketing .sol-journey-cap { position: absolute; left: clamp(16px, 3vw, 28px); bottom: 10px; color: var(--m-faint); }
+@keyframes sj-core { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+@media (max-width: 620px) {
+  .marketing .sol-j3-scene { aspect-ratio: 16 / 9; perspective: 900px; }
+  .marketing .sol-j3-stage { transform: rotateX(calc(12deg + var(--py) * -4deg)) rotateY(calc(var(--px) * 4deg)) scale(0.92); }
+  .marketing .sol-j3-result { width: 27%; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .marketing .sol-journey.sv-tilt { transition: none; }
-  .marketing .sol-journey .sj-core,
-  .marketing .sol-journey .sv-event { animation: none; }
-  .marketing .sol-journey .sv-event { transform: translateX(140px); opacity: 1; }
+  .marketing .sol-j3-stage { transition: none; }
+  .marketing .sol-j3-chip, .marketing .sol-j3-result, .marketing .sol-j3-core i, .marketing .sol-j3-pulse { animation: none !important; }
+  .marketing .sol-j3-chip, .marketing .sol-j3-result { opacity: 1 !important; }
+  .marketing .sol-j3-pulse { opacity: 0 !important; }
 }
 
 /* Mini-recorrido en las tarjetas del índice de Soluciones. */
@@ -411,7 +420,7 @@
 .marketing .sol-cg-dot { fill: rgba(255, 106, 42, 0.2); stroke: #ff6a2a; stroke-width: 1.4; }
 .marketing .sol-cg-agent { fill: rgba(255, 106, 42, 0.16); stroke-width: 1.7; }
 .marketing .sol-cg-core { fill: #ff8a4c; animation: sj-core 2.6s ease-in-out infinite; }
-.marketing .sol-cg-end { fill: rgba(96, 216, 165, 0.22); stroke: #60d8a5; }
+.marketing .sol-cg-end { fill: rgba(255, 210, 154, 0.22); stroke: #ffd29a; }
 .marketing .sol-cg-event { fill: #ffd29a; animation: sol-cg-flow 3.6s var(--m-ease) infinite; }
 @keyframes sol-cg-flow {
   0% { transform: translateX(0); opacity: 0; }
