@@ -3,6 +3,7 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { buildLineItems, computeComplexity, computeScore, computeTotals } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
 import { logEvent } from "@/lib/audit";
+import { deployEnv } from "@/lib/commerce-guard";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { extractPath } from "@/lib/storage";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
@@ -196,7 +197,7 @@ export async function POST(req: Request) {
     );
   }
 
-  await logEvent(supabase, "lead_created", lead.id, { total, projectLabel, source: sourceType });
+  await logEvent(supabase, "lead_created", lead.id, { total, projectLabel, source: sourceType, env: deployEnv() });
   if (sourceType === "chat") {
     await logEvent(supabase, "lead_created_from_chat", lead.id, { total });
   }

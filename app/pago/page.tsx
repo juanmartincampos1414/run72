@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { RunWordmarkSvg } from "@/components/marketing/RunWordmarkSvg";
 import { CheckIcon, BoltIcon } from "@/components/icons";
+import { CommerceEnvBadge } from "@/components/commerce/CommerceEnvBadge";
 
 export const metadata: Metadata = {
   title: "Estado del pago",
@@ -39,6 +40,7 @@ export default async function PagoPage({
 
   return (
     <div className="run-cotizar min-h-screen">
+      <CommerceEnvBadge />
       <header className="border-b border-line">
         <div className="container-x flex items-center justify-between py-4">
           <Link href="/" aria-label="RUN — inicio">

@@ -4,6 +4,7 @@ import { getConfig } from "@/lib/config";
 import { getPayment, exigirFirmaDeMP } from "@/lib/mercadopago";
 import { activateProduction } from "@/lib/activation";
 import { logEvent } from "@/lib/audit";
+import { resolveMpToken, deployEnv } from "@/lib/commerce-guard";
 import { clientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -58,21 +59,37 @@ export async function POST(req: Request) {
     }
 
     const config = await getConfig();
-    if (!config.mp_access_token) return NextResponse.json({ ok: true });
+    // Guarda por entorno: fuera de producción sólo sandbox. Sin sandbox no se
+    // procesa nada (evita que un Preview active pagos productivos de MercadoPago).
+    const mp = resolveMpToken(config.mp_access_token);
+    if ("error" in mp) {
+      await logEvent(getSupabaseAdmin(), "webhook_skipped_env", null, { reason: mp.error, env: deployEnv(), payment_id: `${paymentId}` });
+      return NextResponse.json({ ok: true });
+    }
 
-    const payment = await getPayment(config.mp_access_token, `${paymentId}`);
+    const payment = await getPayment(mp.token, `${paymentId}`);
     const leadId = payment.external_reference;
     if (!leadId) return NextResponse.json({ ok: true });
 
     const supabase = getSupabaseAdmin();
+    // Idempotencia: si el lead ya quedó aprobado con este mismo pago, no se
+    // reprocesa (evita doble activación / doble email ante reintentos de MP).
+    const { data: existing } = await supabase
+      .from("leads")
+      .select("payment_id, payment_status")
+      .eq("id", leadId)
+      .maybeSingle();
+    const alreadyApproved = existing?.payment_status === "approved" && `${existing?.payment_id}` === `${payment.id}`;
+
     await supabase
       .from("leads")
       .update({ payment_id: `${payment.id}`, payment_status: payment.status })
       .eq("id", leadId);
 
-    // Pago aprobado → activar producción (estado + email automático)
-    if (payment.status === "approved") {
+    // Pago aprobado (y no reprocesado) → activar producción (estado + email automático)
+    if (payment.status === "approved" && !alreadyApproved) {
       await activateProduction(supabase, leadId);
+      await logEvent(supabase, "payment_approved", leadId, { env: mp.env, payment_id: `${payment.id}` });
     }
 
     return NextResponse.json({ ok: true });

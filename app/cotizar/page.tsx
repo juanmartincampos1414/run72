@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { QuoteEntry } from "@/components/quote/QuoteEntry";
+import { CommerceEnvBadge } from "@/components/commerce/CommerceEnvBadge";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import type { Service, Microservice } from "@/lib/types";
 
@@ -39,6 +40,7 @@ export default async function CotizarPage() {
   return (
     <div className="run-cotizar">
       <QuoteEntry initialServices={services} initialMicros={microservices} />
+      <CommerceEnvBadge />
     </div>
   );
 }

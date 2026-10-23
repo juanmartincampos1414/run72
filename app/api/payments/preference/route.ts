@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
 import { baseUrlFrom, createPreference } from "@/lib/mercadopago";
+import { resolveMpToken } from "@/lib/commerce-guard";
+import { logEvent } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -39,16 +41,15 @@ export async function POST(req: Request) {
   }
 
   const config = await getConfig();
-  if (!config.mp_access_token) {
-    return NextResponse.json(
-      { error: "MercadoPago no está configurado." },
-      { status: 503 },
-    );
+  // Guarda por entorno: fuera de producción sólo sandbox, nunca el token prod de config.
+  const mp = resolveMpToken(config.mp_access_token);
+  if ("error" in mp) {
+    return NextResponse.json({ error: mp.error }, { status: 503 });
   }
 
   try {
     const pref = await createPreference({
-      accessToken: config.mp_access_token,
+      accessToken: mp.token,
       title: `Adelanto 30% — ${lead.project_label ?? "Proyecto RUN"}`,
       amount: lead.deposit_ars,
       externalReference: lead.id,
@@ -60,6 +61,8 @@ export async function POST(req: Request) {
       .from("leads")
       .update({ preference_id: pref.id })
       .eq("id", lead.id);
+    // Registra el entorno que procesó el pago.
+    await logEvent(supabase, "payment_preference_created", lead.id, { env: mp.env, preference_id: pref.id });
 
     return NextResponse.json({ init_point: pref.init_point, preference_id: pref.id });
   } catch (e) {
