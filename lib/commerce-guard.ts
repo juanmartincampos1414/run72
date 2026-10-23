@@ -16,6 +16,35 @@ export function deployEnv(): DeployEnv {
 
 export const isProductionEnv = (): boolean => deployEnv() === "production";
 
+// Ref(s) del proyecto Supabase PRODUCTIVO. No es un secreto (va en la URL), pero
+// se usa como guarda: fuera de producción NUNCA se escribe en esta base.
+const PROD_SUPABASE_REFS = ["kdstjcckbnypzxuwhgvn"];
+
+/** ¿La base configurada es la productiva? (por ref del proyecto en la URL). */
+export function pointsToProductionDb(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  return PROD_SUPABASE_REFS.some((ref) => url.includes(ref));
+}
+
+/**
+ * Guarda de escritura por ambiente (fail-closed). En cualquier entorno que no sea
+ * Production, si la base configurada es la productiva, se bloquean TODAS las
+ * escrituras (leads, pagos, webhooks, activaciones, auditoría de prueba). Evita
+ * que un Preview/local escriba en producción por apuntar a la base equivocada.
+ */
+export function writeGuard(): { ok: true } | { ok: false; error: string; env: DeployEnv } {
+  const env = deployEnv();
+  if (env === "production") return { ok: true };
+  if (pointsToProductionDb()) {
+    return {
+      ok: false,
+      env,
+      error: `Escrituras bloqueadas en entorno "${env}": la base Supabase configurada es la productiva. Apuntá Preview/local a un proyecto de test antes de escribir.`,
+    };
+  }
+  return { ok: true };
+}
+
 /** Token productivo de MercadoPago (credencial de aplicación). Los de prueba empiezan con TEST-. */
 export function isProdMpToken(token: string | null | undefined): boolean {
   return !!token && token.startsWith("APP_USR-");

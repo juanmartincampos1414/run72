@@ -4,7 +4,7 @@ import { getConfig } from "@/lib/config";
 import { getPayment, exigirFirmaDeMP } from "@/lib/mercadopago";
 import { activateProduction } from "@/lib/activation";
 import { logEvent } from "@/lib/audit";
-import { resolveMpToken, deployEnv } from "@/lib/commerce-guard";
+import { resolveMpToken, deployEnv, writeGuard } from "@/lib/commerce-guard";
 import { clientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +18,13 @@ export async function POST(req: Request) {
   const ip = clientIp(req);
   try {
     if (!isSupabaseConfigured()) return NextResponse.json({ ok: true });
+    // Fail-closed: si Preview/local apunta a la base productiva, no se procesa ni
+    // se escribe nada (ni siquiera auditoría, que también sería una escritura prod).
+    const wg = writeGuard();
+    if (!wg.ok) {
+      console.warn(`[webhook] ${wg.error}`);
+      return NextResponse.json({ ok: true });
+    }
 
     const url = new URL(req.url);
     const dataIdParam = url.searchParams.get("data.id"); // el que firma MercadoPago
@@ -72,24 +79,29 @@ export async function POST(req: Request) {
     if (!leadId) return NextResponse.json({ ok: true });
 
     const supabase = getSupabaseAdmin();
-    // Idempotencia: si el lead ya quedó aprobado con este mismo pago, no se
-    // reprocesa (evita doble activación / doble email ante reintentos de MP).
-    const { data: existing } = await supabase
-      .from("leads")
-      .select("payment_id, payment_status")
-      .eq("id", leadId)
-      .maybeSingle();
-    const alreadyApproved = existing?.payment_status === "approved" && `${existing?.payment_id}` === `${payment.id}`;
 
-    await supabase
-      .from("leads")
-      .update({ payment_id: `${payment.id}`, payment_status: payment.status })
-      .eq("id", leadId);
-
-    // Pago aprobado (y no reprocesado) → activar producción (estado + email automático)
-    if (payment.status === "approved" && !alreadyApproved) {
-      await activateProduction(supabase, leadId);
-      await logEvent(supabase, "payment_approved", leadId, { env: mp.env, payment_id: `${payment.id}` });
+    if (payment.status === "approved") {
+      // Idempotencia a prueba de carrera: transición atómica a "approved" sólo si
+      // todavía NO estaba aprobado. Ante dos webhooks concurrentes con el mismo
+      // pago, una sola llamada actualiza la fila (devuelve id) y activa; la otra
+      // no matchea (payment_status ya = approved) y no reprocesa. Sin doble
+      // activación ni segundo correo.
+      const { data: won } = await supabase
+        .from("leads")
+        .update({ payment_id: `${payment.id}`, payment_status: "approved" })
+        .eq("id", leadId)
+        .neq("payment_status", "approved")
+        .select("id");
+      if (won && won.length > 0) {
+        await activateProduction(supabase, leadId);
+        await logEvent(supabase, "payment_approved", leadId, { env: mp.env, payment_id: `${payment.id}` });
+      }
+    } else {
+      // Estados no terminales (pending/rejected): se reflejan, sin activar.
+      await supabase
+        .from("leads")
+        .update({ payment_id: `${payment.id}`, payment_status: payment.status })
+        .eq("id", leadId);
     }
 
     return NextResponse.json({ ok: true });

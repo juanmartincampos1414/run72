@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { getConfig } from "@/lib/config";
 import { baseUrlFrom, createPreference } from "@/lib/mercadopago";
-import { resolveMpToken } from "@/lib/commerce-guard";
+import { resolveMpToken, writeGuard } from "@/lib/commerce-guard";
 import { logEvent } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +12,8 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase no configurado." }, { status: 503 });
   }
+  const wg = writeGuard();
+  if (!wg.ok) return NextResponse.json({ error: wg.error }, { status: 503 });
 
   let leadId: string | undefined;
   try {

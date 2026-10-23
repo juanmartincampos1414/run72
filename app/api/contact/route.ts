@@ -3,6 +3,7 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { logEvent } from "@/lib/audit";
 import { sendEmail } from "@/lib/email";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { writeGuard } from "@/lib/commerce-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -170,6 +171,9 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "El servicio no está disponible temporalmente." }, { status: 503 });
   }
+  // Fail-closed: fuera de producción no se escribe en la base productiva.
+  const wg = writeGuard();
+  if (!wg.ok) return NextResponse.json({ error: wg.error }, { status: 503 });
 
   const supabase = getSupabaseAdmin();
 

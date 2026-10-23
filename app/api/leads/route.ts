@@ -3,7 +3,7 @@ import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { buildLineItems, computeComplexity, computeScore, computeTotals } from "@/lib/pricing";
 import { BRAND_STATUS, OBJECTIVES, UNSURE_PROJECT, labelFor } from "@/lib/quote-options";
 import { logEvent } from "@/lib/audit";
-import { deployEnv } from "@/lib/commerce-guard";
+import { deployEnv, writeGuard } from "@/lib/commerce-guard";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { extractPath } from "@/lib/storage";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
@@ -16,6 +16,9 @@ export async function POST(req: Request) {
   if (!isSupabaseConfigured()) {
     return NextResponse.json({ error: "Supabase no configurado." }, { status: 503 });
   }
+  // Fail-closed: fuera de producción no se escribe en la base productiva.
+  const wg = writeGuard();
+  if (!wg.ok) return NextResponse.json({ error: wg.error }, { status: 503 });
 
   const limited = await enforceRateLimit({
     req,
