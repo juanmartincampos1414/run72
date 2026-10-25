@@ -68,6 +68,10 @@ export type Work = {
   demoHref?: string;
   labDataHref?: string;
   ctaDemoLabel?: string;
+  /** Encuadre de la portada: "contain" muestra la landing completa (sin recorte),
+      sobre un fondo neutro `coverBg`. Por defecto "cover". */
+  coverFit?: "cover" | "contain";
+  coverBg?: string;
   ctaContacto: WorkLink;
   media: WorkMedia;
   published: boolean;
@@ -126,6 +130,8 @@ type ProductInput = {
   /** Acceso oficial del producto (botón primario de la ficha), p. ej. RELEVO. */
   demoHref?: string;
   ctaDemoLabel?: string;
+  coverFit?: "cover" | "contain";
+  coverBg?: string;
 };
 
 /** Ficha de producto real: solo datos verificados en el repositorio. */
@@ -149,6 +155,8 @@ function product(p: ProductInput): Work {
     media: { poster: p.poster, logo: p.logo, gallery: p.gallery },
     demoHref: p.demoHref,
     ctaDemoLabel: p.ctaDemoLabel,
+    coverFit: p.coverFit,
+    coverBg: p.coverBg,
     published: true,
     context: p.context,
     userType: p.userType,
@@ -188,6 +196,8 @@ export const WORKS: Work[] = [
     categories: ["software", "ia"],
     year: 2026,
     poster: "#ffb27a",
+    coverFit: "contain",
+    coverBg: "#f5f4f9",
     statusLabel: "Operativo",
     summary:
       "Plataforma de gestión financiera y administrativa impulsada por inteligencia artificial. Aikestar centraliza la información de personas, emprendedores y pequeñas empresas, automatiza la carga y conciliación de movimientos y convierte los datos operativos en información útil para decidir.",
@@ -377,6 +387,8 @@ export const WORKS: Work[] = [
     year: 2026,
     poster: "#ff6a2a",
     statusLabel: "MVP FUNCIONAL · EN USO PRIVADO",
+    coverFit: "contain",
+    coverBg: "#f4efe7",
     gallery: [
       {
         src: "/work/relevo/portada.jpg",

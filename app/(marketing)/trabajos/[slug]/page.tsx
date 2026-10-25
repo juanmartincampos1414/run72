@@ -147,7 +147,10 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
       <div className="m-container">
         <figure className="work-cover">
           {cover ? (
-            <div className="work-poster work-poster-wide" style={{ aspectRatio: "16 / 9" }}>
+            <div
+              className={`work-poster work-poster-wide${work.coverFit === "contain" ? " work-poster--contain" : ""}`}
+              style={{ aspectRatio: "16 / 9", ...(work.coverFit === "contain" && work.coverBg ? { background: work.coverBg } : {}) }}
+            >
               <Image
                 src={cover.src}
                 alt={cover.alt}
@@ -157,7 +160,10 @@ export default async function TrabajoPage({ params }: { params: Promise<Params> 
                 sizes="(min-width: 1200px) 1200px, 100vw"
                 placeholder={COVER_BLUR[cover.src] ? "blur" : "empty"}
                 blurDataURL={COVER_BLUR[cover.src]}
-                style={{ objectFit: "cover", objectPosition: "top left" }}
+                style={{
+                  objectFit: work.coverFit === "contain" ? "contain" : "cover",
+                  objectPosition: work.coverFit === "contain" ? "center" : "top left",
+                }}
               />
             </div>
           ) : (

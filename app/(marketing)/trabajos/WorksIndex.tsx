@@ -52,7 +52,11 @@ function WorkCard({ work: w, index }: { work: Work; index: number }) {
         className="work-card work-row"
         style={{ "--work-accent": w.media.poster } as CSSProperties}
       >
-        <span className="work-poster" aria-hidden="true">
+        <span
+          className={`work-poster${w.coverFit === "contain" ? " work-poster--contain" : ""}`}
+          style={w.coverFit === "contain" && w.coverBg ? ({ background: w.coverBg } as CSSProperties) : undefined}
+          aria-hidden="true"
+        >
           {w.media.gallery?.[0] ? (
             <Image
               src={w.media.gallery[0].src}
@@ -60,6 +64,7 @@ function WorkCard({ work: w, index }: { work: Work; index: number }) {
               fill
               sizes="(min-width: 768px) 42vw, 100vw"
               className="work-poster-img"
+              style={{ objectFit: w.coverFit === "contain" ? "contain" : "cover" }}
             />
           ) : (
             <span className="work-poster-ui">
