@@ -123,6 +123,9 @@ type ProductInput = {
   gallery?: WorkShot[];
   galleryNote?: string;
   ctaContacto?: WorkLink;
+  /** Acceso oficial del producto (botón primario de la ficha), p. ej. RELEVO. */
+  demoHref?: string;
+  ctaDemoLabel?: string;
 };
 
 /** Ficha de producto real: solo datos verificados en el repositorio. */
@@ -144,6 +147,8 @@ function product(p: ProductInput): Work {
       href: `/contacto?interes=${p.categories.includes("ia") ? "agentes" : "software"}`,
     },
     media: { poster: p.poster, logo: p.logo, gallery: p.gallery },
+    demoHref: p.demoHref,
+    ctaDemoLabel: p.ctaDemoLabel,
     published: true,
     context: p.context,
     userType: p.userType,
@@ -420,6 +425,9 @@ export const WORKS: Work[] = [
       "MVP funcional en uso privado. La aplicación no cuenta actualmente con una landing comercial pública.",
     evidence: [],
     teamRole: OWN_PRODUCT_ROLE,
+    // RELEVO dentro de RUN enlaza siempre a su acceso oficial (login de la app).
+    demoHref: "https://www.relevo.site/login?next=%2F",
+    ctaDemoLabel: "Entrar a RELEVO",
     ctaContacto: { label: "Hablar de un proyecto así", href: "/contacto?interes=software" },
   }),
 
