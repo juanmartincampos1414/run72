@@ -379,6 +379,11 @@ export const WORKS: Work[] = [
     statusLabel: "MVP FUNCIONAL · EN USO PRIVADO",
     gallery: [
       {
+        src: "/work/relevo/portada.jpg",
+        alt: "Portada pública de RELEVO OS (relevo.site): «Inteligencia de campo — de la primera visita a la decisión, con cada dato respaldado» y el acceso al sistema.",
+        caption: "Portada pública de RELEVO OS (relevo.site).",
+      },
+      {
         src: "/work/relevo/agenda.jpg",
         alt: "Pantalla de inicio (Agenda) de Relevo: el día con cada conversación, su estado (reprogramada, realizada), el objetivo, las notas y el próximo paso, sobre un espacio de trabajo demostrativo.",
         caption: "Inicio (Agenda): el día con cada conversación, su estado y su próximo paso. Datos demostrativos.",
