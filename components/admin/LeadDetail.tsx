@@ -593,12 +593,27 @@ function DiscoveryGuide({ leadId, initial }: { leadId: string; initial: Record<s
   );
 }
 
+type GenScenario = {
+  key: string;
+  name: string;
+  tagline: string;
+  includes: string[];
+  total: number;
+  deposit: number;
+  recommended?: boolean;
+};
 type GenProposal = {
+  positioning?: string;
   summary?: string;
-  detectedNeeds?: string[];
-  draft?: string;
+  opportunities?: { title: string; build: string; revenue: string; read: string }[];
+  recommendation?: string;
+  phase1?: { title: string; why: string; scope: string[] };
+  nextPhases?: { title: string; detail: string }[];
+  scenarios?: GenScenario[];
+  options?: { slug: string; name: string; detail: string; price_ars: number }[];
   missing?: string[];
-  pricing?: { total: number; deposit: number; lineItems: { name: string; price_ars: number }[] };
+  // compat viejo
+  draft?: string;
 };
 
 function TranscriptProposal({
@@ -705,9 +720,28 @@ function TranscriptProposal({
   }
 
   async function copyDraft() {
-    if (!proposal?.draft) return;
+    if (!proposal) return;
+    const txt = proposal.draft
+      ? proposal.draft
+      : [
+          proposal.positioning,
+          proposal.summary,
+          "",
+          "OPORTUNIDADES:",
+          ...(proposal.opportunities ?? []).map((o) => `• ${o.title} — ${o.build} (${o.read})`),
+          "",
+          `RECOMENDACIÓN: ${proposal.recommendation ?? ""}`,
+          "",
+          proposal.phase1 ? `${proposal.phase1.title}: ${proposal.phase1.why}` : "",
+          ...(proposal.phase1?.scope ?? []).map((s) => `  - ${s}`),
+          "",
+          "ESCENARIOS:",
+          ...(proposal.scenarios ?? []).map((s) => `• ${s.name} — ${formatARS(s.total)} — ${s.tagline}`),
+        ]
+          .filter((l) => l !== undefined)
+          .join("\n");
     try {
-      await navigator.clipboard.writeText(proposal.draft);
+      await navigator.clipboard.writeText(txt);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -780,49 +814,91 @@ function TranscriptProposal({
 
       {proposal && (
         <div className="mt-5 space-y-5">
-          {proposal.summary && (
-            <div>
-              <p className="text-sm font-medium">Necesidad interpretada</p>
-              <p className="mt-1 text-sm leading-relaxed text-muted">{proposal.summary}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-fg">Propuesta generada</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={copyDraft}
+                className="rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-brand-violet hover:text-fg"
+              >
+                {copied ? "¡Copiado!" : "Copiar"}
+              </button>
+              <ClientLinkInline leadId={leadId} />
             </div>
+          </div>
+
+          {proposal.positioning && (
+            <p className="font-display text-lg font-semibold tracking-tight">{proposal.positioning}</p>
           )}
-          {proposal.pricing && proposal.pricing.lineItems.length > 0 && (
+          {proposal.summary && <p className="text-sm leading-relaxed text-muted">{proposal.summary}</p>}
+
+          {/* Compat viejo */}
+          {proposal.draft && (
+            <pre className="whitespace-pre-wrap rounded-xl border border-line bg-surface/40 p-3 font-sans text-sm leading-relaxed text-fg">
+              {proposal.draft}
+            </pre>
+          )}
+
+          {proposal.opportunities && proposal.opportunities.length > 0 && (
             <div>
-              <p className="text-sm font-medium">Presupuesto estimado</p>
-              <div className="mt-2 overflow-hidden rounded-xl border border-line">
-                <table className="w-full text-sm">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">Oportunidades</p>
+              <div className="overflow-hidden rounded-xl border border-line">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-line bg-ink/40 text-left text-faint">
+                      <th className="px-3 py-2 font-medium">Oportunidad</th>
+                      <th className="px-3 py-2 font-medium">Qué construir</th>
+                      <th className="px-3 py-2 font-medium">Ingresos</th>
+                      <th className="px-3 py-2 font-medium">Lectura</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {proposal.pricing.lineItems.map((li, i) => (
-                      <tr key={i} className="border-b border-line/60">
-                        <td className="px-3 py-2 text-fg">{li.name}</td>
-                        <td className="px-3 py-2 text-right font-mono text-muted">{formatARS(li.price_ars)}</td>
+                    {proposal.opportunities.map((o, i) => (
+                      <tr key={i} className="border-b border-line/50 align-top last:border-0">
+                        <td className="px-3 py-2 font-medium text-fg">{o.title}</td>
+                        <td className="px-3 py-2 text-muted">{o.build}</td>
+                        <td className="px-3 py-2 text-muted">{o.revenue}</td>
+                        <td className="px-3 py-2 text-fg/80">{o.read}</td>
                       </tr>
                     ))}
-                    <tr>
-                      <td className="px-3 py-2 font-semibold text-fg">Total</td>
-                      <td className="px-3 py-2 text-right font-mono font-semibold text-fg">{formatARS(proposal.pricing.total)}</td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           )}
-          {proposal.draft && (
-            <div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Borrador de propuesta</p>
-                <button
-                  onClick={copyDraft}
-                  className="rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-brand-violet hover:text-fg"
-                >
-                  {copied ? "¡Copiado!" : "Copiar"}
-                </button>
-              </div>
-              <pre className="mt-2 whitespace-pre-wrap rounded-xl border border-line bg-surface/40 p-3 font-sans text-sm leading-relaxed text-fg">
-                {proposal.draft}
-              </pre>
+
+          {proposal.recommendation && (
+            <div className="rounded-xl border border-brand-violet/30 bg-brand-violet/[0.06] p-4">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wide text-brand-violet">Recomendación</p>
+              <p className="text-sm leading-relaxed text-fg/90">{proposal.recommendation}</p>
             </div>
           )}
+
+          {proposal.scenarios && proposal.scenarios.length > 0 && (
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">Escenarios</p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {proposal.scenarios.map((s) => (
+                  <div
+                    key={s.key}
+                    className={`rounded-xl border p-3 ${s.recommended ? "border-brand-violet/50 bg-brand-violet/[0.06]" : "border-line bg-ink/30"}`}
+                  >
+                    {s.recommended && <span className="text-[10px] font-semibold uppercase text-brand-violet">Recomendado</span>}
+                    <p className="text-sm font-medium text-fg">{s.name}</p>
+                    <p className="font-mono text-sm font-semibold text-fg">{formatARS(s.total)}</p>
+                    <p className="mt-1 text-[11px] text-muted">{s.tagline}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {proposal.options && proposal.options.length > 0 && (
+            <p className="text-xs text-faint">
+              Módulos opcionales que el cliente puede sumar: {proposal.options.map((o) => o.name).join(", ")}.
+            </p>
+          )}
+
           {proposal.missing && proposal.missing.length > 0 && (
             <div>
               <p className="text-sm font-medium">Datos que faltan para cerrar</p>
@@ -836,6 +912,20 @@ function TranscriptProposal({
         </div>
       )}
     </div>
+  );
+}
+
+/** Link compacto al proyecto del cliente (reusa dentro de la propuesta). */
+function ClientLinkInline({ leadId }: { leadId: string }) {
+  return (
+    <a
+      href={`/proyecto/${leadId}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-3 py-1 text-xs font-medium text-white"
+    >
+      Ver como cliente →
+    </a>
   );
 }
 
