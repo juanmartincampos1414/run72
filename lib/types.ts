@@ -103,7 +103,42 @@ export type Lead = {
   transcript: string | null;
   proposal: Record<string, unknown> | null;
   focus: string | null;
+  // CRM comercial
+  source: string | null;
+  pipeline_stage: string | null;
+  outcome_reason: string | null;
+  meeting_notes: string | null;
+  acquisition_cost: number | null;
+  project_value: number | null;
+  project_cost: number | null;
+  vertical: string | null;
 };
+
+/** Etapas del pipeline comercial de RUN. */
+export const PIPELINE_STAGES: { key: string; label: string; tone: "neutral" | "active" | "won" | "lost" }[] = [
+  { key: "nuevo", label: "Nuevo", tone: "neutral" },
+  { key: "contactado", label: "Contactado", tone: "active" },
+  { key: "reunion_agendada", label: "Reunión agendada", tone: "active" },
+  { key: "reunion_no_show", label: "No se presentó", tone: "lost" },
+  { key: "reunion_hecha", label: "Reunión hecha", tone: "active" },
+  { key: "propuesta_enviada", label: "Propuesta enviada", tone: "active" },
+  { key: "negociacion", label: "Negociación", tone: "active" },
+  { key: "ganado", label: "Ganado", tone: "won" },
+  { key: "perdido", label: "Perdido", tone: "lost" },
+  { key: "descartado", label: "Descartado", tone: "lost" },
+];
+
+/** Canales de adquisición. */
+export const LEAD_SOURCES: { key: string; label: string }[] = [
+  { key: "meta_ads", label: "Meta Ads" },
+  { key: "google_ads", label: "Google Ads" },
+  { key: "referido", label: "Referido" },
+  { key: "organico", label: "Orgánico / web" },
+  { key: "linkedin", label: "LinkedIn" },
+  { key: "evento", label: "Evento / networking" },
+  { key: "manual", label: "Carga manual" },
+  { key: "otro", label: "Otro" },
+];
 
 export type PreviewMockup = { title: string; description: string; html: string };
 

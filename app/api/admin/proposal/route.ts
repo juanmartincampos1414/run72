@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { computeTotals } from "@/lib/pricing";
 import { buildCatalog } from "@/lib/concierge";
+import { getPlaybook, playbookToPrompt } from "@/lib/playbooks";
 import type { Service, Microservice, LineItem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,7 @@ const SCHEMA = {
         "Frase de posicionamiento para el hero: la transformación que propone RUN, filosa y concreta (ej: 'De recibir pedidos por WhatsApp a un ecommerce que vende solo').",
     },
     summary: { type: "string", description: "1-2 frases: qué entendimos de la necesidad real." },
+    vertical: { type: "string", description: "Rubro del cliente en una palabra, lowercase (ej: 'arquitectura', 'ferreteria', 'gastronomia'). Para que el Motor agrupe aprendizajes por rubro." },
     opportunities: {
       type: "array",
       description: "Lectura de oportunidades del negocio (tabla). 3-5 filas.",
@@ -144,6 +146,7 @@ type Option = { kind: "addon" | "micro"; slug: string; name: string; detail: str
 type Output = {
   positioning: string;
   summary: string;
+  vertical?: string;
   opportunities: { title: string; build: string; revenue: string; read: string }[];
   recommendation: string;
   phase1: { title: string; why: string; scope: string[] };
@@ -163,10 +166,12 @@ export async function POST(req: Request) {
 
   let transcript = "";
   let notes = "";
+  let leadId = "";
   try {
     const body = await req.json();
     transcript = String(body.transcript ?? "").slice(0, 60000).trim();
     notes = String(body.notes ?? "").slice(0, 4000).trim();
+    leadId = String(body.leadId ?? "").trim();
   } catch {
     return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
@@ -186,6 +191,15 @@ export async function POST(req: Request) {
     .eq("active", true);
   const micros = (mic ?? []) as Microservice[];
 
+  // Motor: si el lead ya tiene rubro, inyectamos el playbook de ese rubro.
+  let leadVertical = "";
+  if (leadId) {
+    const { data: lead } = await supabase.from("leads").select("vertical").eq("id", leadId).maybeSingle();
+    leadVertical = String(lead?.vertical ?? "").trim();
+  }
+  const playbook = await getPlaybook(supabase, leadVertical);
+  const playbookBlock = playbookToPrompt(playbook);
+
   const system = `Sos el estratega de RUN, que desarrolla software a medida, agentes de IA e integraciones. Pensás con PRIMEROS PRINCIPIOS, como un buen asesor (estilo Elon Musk): directo, sin relleno, enfocado en la oportunidad real de negocio y en qué conviene construir primero para generar impacto y que el cliente pague.
 
 Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvés una PROPUESTA ESTRUCTURADA (NO un texto largo) con:
@@ -203,7 +217,7 @@ Reglas:
 - Español rioplatense. Nada de relleno ni marketing vacío: lectura honesta y concreta.
 
 Catálogo disponible (usá solo estos slugs/claves):
-${buildCatalog(services, micros)}`;
+${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`;
 
   let parsed: Output;
   try {
@@ -269,9 +283,19 @@ ${buildCatalog(services, micros)}`;
     })
     .filter((o): o is { slug: string; name: string; detail: string; price_ars: number } => o !== null);
 
+  // Guardar el rubro clasificado en el lead (si no tenía) para el Motor.
+  if (leadId && !leadVertical && parsed.vertical) {
+    await supabase
+      .from("leads")
+      .update({ vertical: String(parsed.vertical).trim().toLowerCase() })
+      .eq("id", leadId)
+      .then(() => {}, () => {});
+  }
+
   return NextResponse.json({
     positioning: parsed.positioning,
     summary: parsed.summary,
+    vertical: parsed.vertical ?? leadVertical ?? null,
     opportunities: parsed.opportunities ?? [],
     recommendation: parsed.recommendation,
     phase1: parsed.phase1,

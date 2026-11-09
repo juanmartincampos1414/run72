@@ -10,7 +10,24 @@ import {
   saldoState,
 } from "@/lib/sla";
 import { SlaBar } from "@/components/admin/SlaBar";
-import type { Lead, LeadStatus } from "@/lib/types";
+import { PIPELINE_STAGES, LEAD_SOURCES, type Lead, type LeadStatus } from "@/lib/types";
+
+function sourceLabel(key: string) {
+  return LEAD_SOURCES.find((s) => s.key === key)?.label ?? key;
+}
+
+function StageBadge({ stage }: { stage: string | null }) {
+  const s = PIPELINE_STAGES.find((x) => x.key === (stage ?? "nuevo")) ?? PIPELINE_STAGES[0];
+  const cls =
+    s.tone === "won"
+      ? "bg-emerald-500/15 text-emerald-300"
+      : s.tone === "lost"
+        ? "bg-red-500/15 text-red-300"
+        : s.tone === "active"
+          ? "bg-brand-violet/15 text-brand-violet"
+          : "bg-white/[0.06] text-faint";
+  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${cls}`}>{s.label}</span>;
+}
 
 const STATUS: { value: LeadStatus; label: string }[] = [
   { value: "nuevo", label: "Nuevo" },
@@ -127,11 +144,19 @@ export default function LeadsPage() {
 
   const metrics = useMemo(() => {
     const list = leads ?? [];
+    const won = list.filter((l) => l.pipeline_stage === "ganado");
+    const invertido = list.reduce((s, l) => s + (Number(l.acquisition_cost) || 0), 0);
+    const ingresos = won.reduce((s, l) => s + (Number(l.project_value) || 0), 0);
+    const costos = won.reduce((s, l) => s + (Number(l.project_cost) || 0), 0);
     return {
       total: list.length,
+      won: won.length,
+      invertido,
+      cac: won.length ? Math.round(invertido / won.length) : 0,
+      ticket: won.length ? Math.round(ingresos / won.length) : 0,
+      conversion: list.length ? Math.round((won.length / list.length) * 100) : 0,
+      margen: ingresos - costos,
       hot: list.filter((l) => l.hot).length,
-      paid: list.filter((l) => l.status === "adelanto_pagado").length,
-      pipeline: list.reduce((s, l) => s + (l.total_ars || 0), 0),
     };
   }, [leads]);
 
@@ -205,12 +230,16 @@ export default function LeadsPage() {
         </div>
       )}
 
-      {/* Métricas */}
+      {/* Métricas comerciales */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Metric label="Total leads" value={String(metrics.total)} />
+        <Metric label="Ganados" value={String(metrics.won)} />
+        <Metric label="Conversión" value={`${metrics.conversion}%`} />
         <Metric label="🔥 Hot leads" value={String(metrics.hot)} />
-        <Metric label="Adelantos pagados" value={String(metrics.paid)} />
-        <Metric label="Pipeline" value={formatARS(metrics.pipeline)} />
+        <Metric label="Invertido (pauta)" value={formatARS(metrics.invertido)} />
+        <Metric label="CAC" value={metrics.won ? formatARS(metrics.cac) : "—"} />
+        <Metric label="Ticket promedio" value={metrics.won ? formatARS(metrics.ticket) : "—"} />
+        <Metric label="Margen (ganados)" value={formatARS(metrics.margen)} />
       </div>
 
       {error && <p className="mt-6 text-sm text-red-300">{error}</p>}
@@ -257,7 +286,11 @@ export default function LeadsPage() {
                   <Link href={`/admin/leads/${l.id}`} className="font-medium text-fg hover:text-brand-cyan">
                     {l.name}
                   </Link>
-                  {l.company && <div className="text-xs text-faint">{l.company}</div>}
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <StageBadge stage={l.pipeline_stage} />
+                    {l.source && <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-faint">{sourceLabel(l.source)}</span>}
+                  </div>
+                  {l.company && <div className="mt-0.5 text-xs text-faint">{l.company}</div>}
                   <div className="text-xs text-muted">{l.email}</div>
                   {l.whatsapp && (
                     <div className="text-xs text-faint">WhatsApp: {l.whatsapp}</div>

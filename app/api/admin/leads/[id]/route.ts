@@ -112,6 +112,34 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   }
 
+  // Guardar campos del CRM comercial (fuente, etapa, costos, notas…)
+  if (body.crm && typeof body.crm === "object") {
+    const allowed = [
+      "source",
+      "pipeline_stage",
+      "outcome_reason",
+      "meeting_notes",
+      "acquisition_cost",
+      "project_value",
+      "project_cost",
+      "vertical",
+    ];
+    const patch: Record<string, unknown> = {};
+    for (const k of allowed) {
+      if (k in body.crm) {
+        const v = (body.crm as Record<string, unknown>)[k];
+        patch[k] = ["acquisition_cost", "project_value", "project_cost"].includes(k)
+          ? Number(v) || 0
+          : v;
+      }
+    }
+    if (Object.keys(patch).length === 0) return NextResponse.json({ ok: true });
+    const { error } = await supabase.from("leads").update(patch).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (patch.pipeline_stage) await logEvent(supabase, "pipeline_changed", id, { actor, stage: patch.pipeline_stage });
+    return NextResponse.json({ ok: true });
+  }
+
   if (body.action) {
     if (body.action === "approve_payment") {
       await supabase

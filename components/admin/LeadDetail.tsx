@@ -11,7 +11,7 @@ import {
 } from "@/lib/sla";
 import { SlaBar } from "./SlaBar";
 import { DELIVERY_FIELDS, resolveDeliveryDoc, type DeliveryDoc } from "@/lib/delivery";
-import type { Lead, ProjectPreview } from "@/lib/types";
+import { PIPELINE_STAGES, LEAD_SOURCES, type Lead, type ProjectPreview } from "@/lib/types";
 
 type Version = {
   id: string;
@@ -42,7 +42,7 @@ const EVENT_LABEL: Record<string, string> = {
   lead_created_from_chat: "Lead creado desde chat",
 };
 
-type TabId = "propuesta" | "preview" | "descubrimiento" | "pago" | "entrega" | "actividad";
+type TabId = "crm" | "propuesta" | "preview" | "descubrimiento" | "pago" | "entrega" | "actividad";
 
 export function LeadDetail({ leadId }: { leadId: string }) {
   const [lead, setLead] = useState<Lead | null>(null);
@@ -110,6 +110,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
   const hasComprobante = lead.comprobante_status === "recibido";
 
   const tabs: { id: TabId; label: string; badge?: React.ReactNode }[] = [
+    { id: "crm", label: "CRM", badge: lead.pipeline_stage && lead.pipeline_stage !== "nuevo" ? <Dot /> : undefined },
     { id: "propuesta", label: "Propuesta", badge: hasProposal ? <Dot /> : undefined },
     { id: "preview", label: "Preview", badge: versions.length > 0 ? <Dot /> : undefined },
     {
@@ -190,6 +191,13 @@ export function LeadDetail({ leadId }: { leadId: string }) {
       </div>
 
       <div className="mt-5">
+        {/* CRM */}
+        {tab === "crm" && (
+          <Panel title="CRM comercial" hint="Fuente, etapa de la venta, costos y notas. Todo queda asentado y alimenta las métricas.">
+            <CrmPanel lead={lead} leadId={leadId} onSaved={load} />
+          </Panel>
+        )}
+
         {/* PROPUESTA */}
         {tab === "propuesta" && (
           <div className="space-y-6">
@@ -728,7 +736,7 @@ function TranscriptProposal({
       const r = await fetch("/api/admin/proposal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: effective, notes: disc }),
+        body: JSON.stringify({ transcript: effective, notes: disc, leadId }),
       });
       const data = await r.json();
       if (!r.ok) {
@@ -986,6 +994,258 @@ function TranscriptProposal({
         </div>
       )}
     </div>
+  );
+}
+
+/** Panel CRM: fuente, etapa, costos, notas. Auto-guarda cada campo. */
+function CrmPanel({ lead, leadId, onSaved }: { lead: Lead; leadId: string; onSaved: () => void }) {
+  const [f, setF] = useState({
+    source: lead.source ?? "",
+    vertical: lead.vertical ?? "",
+    pipeline_stage: lead.pipeline_stage ?? "nuevo",
+    outcome_reason: lead.outcome_reason ?? "",
+    meeting_notes: lead.meeting_notes ?? "",
+    acquisition_cost: lead.acquisition_cost ?? 0,
+    project_value: lead.project_value ?? 0,
+    project_cost: lead.project_cost ?? 0,
+  });
+  const [saved, setSaved] = useState(false);
+
+  async function save(patch: Partial<typeof f>) {
+    try {
+      await fetch(`/api/admin/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ crm: patch }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1200);
+      onSaved();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const stage = PIPELINE_STAGES.find((s) => s.key === f.pipeline_stage);
+  const showReason = stage?.tone === "lost";
+  const margin = (Number(f.project_value) || 0) - (Number(f.project_cost) || 0);
+  const inputCls = "w-full rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet";
+
+  return (
+    <div className="space-y-5">
+      {saved && <p className="text-xs text-emerald-400">Guardado ✓</p>}
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Fuente del lead</span>
+          <select
+            value={f.source}
+            onChange={(e) => { const v = e.target.value; setF((p) => ({ ...p, source: v })); void save({ source: v }); }}
+            className={inputCls}
+          >
+            <option value="">— sin definir —</option>
+            {LEAD_SOURCES.map((s) => (
+              <option key={s.key} value={s.key}>{s.label}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Rubro / vertical</span>
+          <input
+            value={f.vertical}
+            onChange={(e) => setF((p) => ({ ...p, vertical: e.target.value }))}
+            onBlur={() => save({ vertical: f.vertical.trim().toLowerCase() })}
+            placeholder="arquitectura, ferretería, gastronomía…"
+            className={inputCls}
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs text-muted">Etapa de la venta</span>
+          <select
+            value={f.pipeline_stage}
+            onChange={(e) => { const v = e.target.value; setF((p) => ({ ...p, pipeline_stage: v })); void save({ pipeline_stage: v }); }}
+            className={inputCls}
+          >
+            {PIPELINE_STAGES.map((s) => (
+              <option key={s.key} value={s.key}>{s.label}</option>
+            ))}
+          </select>
+        </label>
+        {showReason && (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-xs text-muted">Motivo</span>
+            <input
+              value={f.outcome_reason}
+              onChange={(e) => setF((p) => ({ ...p, outcome_reason: e.target.value }))}
+              onBlur={() => save({ outcome_reason: f.outcome_reason })}
+              placeholder="No se presentó, no quiere alianza ahora…"
+              className={inputCls}
+            />
+          </label>
+        )}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <MoneyField label="Costo de adquisición (pauta)" value={f.acquisition_cost} onChange={(v) => setF((p) => ({ ...p, acquisition_cost: v }))} onBlur={() => save({ acquisition_cost: f.acquisition_cost })} />
+        <MoneyField label="Valor del proyecto" value={f.project_value} onChange={(v) => setF((p) => ({ ...p, project_value: v }))} onBlur={() => save({ project_value: f.project_value })} />
+        <MoneyField label="Costo de producción" value={f.project_cost} onChange={(v) => setF((p) => ({ ...p, project_cost: v }))} onBlur={() => save({ project_cost: f.project_cost })} />
+      </div>
+
+      {(f.project_value > 0 || f.project_cost > 0) && (
+        <p className="text-sm text-muted">
+          Margen estimado:{" "}
+          <span className={margin >= 0 ? "font-medium text-emerald-400" : "font-medium text-red-300"}>{formatARS(margin)}</span>
+        </p>
+      )}
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs text-muted">Notas de la reunión / seguimiento</span>
+        <textarea
+          value={f.meeting_notes}
+          onChange={(e) => setF((p) => ({ ...p, meeting_notes: e.target.value }))}
+          onBlur={() => save({ meeting_notes: f.meeting_notes })}
+          rows={4}
+          placeholder="Qué se habló, acuerdos, próximos pasos…"
+          className={`${inputCls} resize-y`}
+        />
+      </label>
+
+      <PlaybookEditor leadId={leadId} vertical={f.vertical.trim().toLowerCase()} />
+    </div>
+  );
+}
+
+/** Playbook del rubro: el Motor que recuerda y mejora. */
+function PlaybookEditor({ leadId, vertical }: { leadId: string; vertical: string }) {
+  const [text, setText] = useState<string>("");
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    if (!vertical) {
+      setText("");
+      setCount(0);
+      return;
+    }
+    (async () => {
+      const r = await fetch(`/api/admin/playbook?vertical=${encodeURIComponent(vertical)}`);
+      const d = await r.json().catch(() => ({}));
+      if (alive && d.playbook) {
+        setText(d.playbook.playbook ?? "");
+        setCount(d.playbook.projects_count ?? 0);
+      } else if (alive) {
+        setText("");
+        setCount(0);
+      }
+    })();
+    return () => { alive = false; };
+  }, [vertical]);
+
+  async function savePlaybook() {
+    if (!vertical) return;
+    setLoading(true);
+    await fetch("/api/admin/playbook", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ vertical, playbook: text }),
+    });
+    setLoading(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
+  async function capture() {
+    setMsg("");
+    setCapturing(true);
+    try {
+      const r = await fetch("/api/admin/playbook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leadId }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) setMsg(d.error || "No se pudo capturar.");
+      else if (d.playbook) {
+        setText(d.playbook.playbook ?? "");
+        setCount(d.playbook.projects_count ?? 0);
+        setMsg("Aprendizaje capturado ✓");
+        setTimeout(() => setMsg(""), 2500);
+      }
+    } catch {
+      setMsg("No se pudo capturar.");
+    }
+    setCapturing(false);
+  }
+
+  return (
+    <div className="rounded-2xl border border-brand-violet/30 bg-brand-violet/[0.05] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-medium text-fg">🧠 Playbook del rubro {vertical ? `· ${vertical}` : ""}</p>
+          <p className="text-[11px] text-faint">
+            {vertical
+              ? `El Motor usa esto para que el próximo cliente de ${vertical} salga mejor. ${count} proyecto(s) aprendidos.`
+              : "Cargá el rubro arriba para activar el Motor por rubro."}
+          </p>
+        </div>
+        {vertical && (
+          <button
+            onClick={capture}
+            disabled={capturing}
+            className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+          >
+            {capturing ? "Capturando…" : "Capturar aprendizaje de este proyecto"}
+          </button>
+        )}
+      </div>
+      {vertical && (
+        <>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={6}
+            placeholder="Todavía sin aprendizajes de este rubro. Generá una propuesta y usá 'Capturar aprendizaje', o escribí notas acá."
+            className="mt-3 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+          />
+          <div className="mt-2 flex items-center gap-3">
+            <button
+              onClick={savePlaybook}
+              disabled={loading}
+              className="rounded-full border border-line px-4 py-1.5 text-xs text-fg transition hover:border-brand-violet disabled:opacity-50"
+            >
+              {loading ? "Guardando…" : "Guardar playbook"}
+            </button>
+            {saved && <span className="text-xs text-emerald-400">Guardado ✓</span>}
+            {msg && <span className="text-xs text-brand-cyan">{msg}</span>}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function MoneyField({ label, value, onChange, onBlur }: { label: string; value: number; onChange: (v: number) => void; onBlur: () => void }) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-xs text-muted">{label}</span>
+      <div className="flex items-center gap-1 rounded-xl border border-line bg-ink/40 px-3 focus-within:border-brand-violet">
+        <span className="text-xs text-faint">$</span>
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value) || 0)}
+          onBlur={onBlur}
+          className="w-full bg-transparent py-2 font-mono text-sm text-fg outline-none"
+        />
+      </div>
+    </label>
   );
 }
 

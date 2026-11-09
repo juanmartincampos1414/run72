@@ -5,6 +5,7 @@ import { logEvent } from "./audit";
 import { DISCOVERY_QUESTIONS } from "./discovery";
 import { PREVIEW_ART_DIRECTION } from "./preview-design";
 import { getReferences, fetchReferenceImage, referencesToPrompt } from "./refero";
+import { getPlaybook, playbookToPrompt } from "./playbooks";
 
 // Pass 1 (director): planea las pantallas clave. SIN el HTML (que es lo pesado),
 // así este JSON es chico y NUNCA se trunca.
@@ -94,7 +95,9 @@ export async function generateLeadPreview(
   const files = Array.isArray(lead.files) ? lead.files : [];
   const images = files.filter((f) => (f.type ?? "").startsWith("image/")).slice(0, 4);
   const docs = files.filter((f) => !(f.type ?? "").startsWith("image/"));
-  const prompt = buildPrompt(lead, docs);
+  // Motor: inyectamos el playbook del rubro (aprendizajes de proyectos previos).
+  const pbText = playbookToPrompt(await getPlaybook(supabase, lead.vertical as string | null));
+  const prompt = buildPrompt(lead, docs) + (pbText ? `\n\n${pbText}` : "");
   const refImages = images.map(
     (f) => ({ type: "image", source: { type: "url", url: f.url } }) as Anthropic.ContentBlockParam,
   );
