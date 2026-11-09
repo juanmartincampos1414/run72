@@ -99,6 +99,7 @@ export type Lead = {
   delivery_doc: Record<string, unknown> | null;
   source_type: string; // "form" | "chat"
   conversation_summary: string | null;
+  discovery: Record<string, string> | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };

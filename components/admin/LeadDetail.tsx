@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatARS } from "@/lib/pricing";
+import { DISCOVERY_QUESTIONS, DISCOVERY_SECTIONS } from "@/lib/discovery";
 import {
   ANTICIPO_LABEL,
   anticipoState,
@@ -135,6 +136,11 @@ export function LeadDetail({ leadId }: { leadId: string }) {
           <p className="text-sm leading-relaxed text-muted">{lead.conversation_summary}</p>
         </Section>
       )}
+
+      {/* Guía de descubrimiento (primera meet) */}
+      <Section title="Descubrimiento (primera meet)">
+        <DiscoveryGuide leadId={leadId} initial={lead.discovery} />
+      </Section>
 
       {/* Pago + comprobante */}
       <Section title="Pago">
@@ -352,6 +358,82 @@ function DeliveryDocEditor({ lead, leadId }: { lead: Lead; leadId: string }) {
           {saving ? "Guardando…" : "Guardar documento"}
         </button>
         {saved && <span className="text-sm text-emerald-400">Guardado ✓</span>}
+      </div>
+    </div>
+  );
+}
+
+function DiscoveryGuide({ leadId, initial }: { leadId: string; initial: Record<string, string> | null }) {
+  const [answers, setAnswers] = useState<Record<string, string>>(initial ?? {});
+  const [saved, setSaved] = useState(false);
+
+  async function save(data: Record<string, string>) {
+    try {
+      await fetch(`/api/admin/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discovery: data }),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const answered = DISCOVERY_QUESTIONS.filter((q) => (answers[q.id] ?? "").trim()).length;
+  const total = DISCOVERY_QUESTIONS.length;
+  const pending = total - answered;
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-muted">
+          Respondidas {answered}/{total}
+        </span>
+        {pending > 0 ? (
+          <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-amber-300">Sin responder: {pending}</span>
+        ) : (
+          <span className="rounded-full bg-emerald-500/15 px-2.5 py-1 text-emerald-300">Completo ✓</span>
+        )}
+        {saved && <span className="text-emerald-400">Guardado ✓</span>}
+      </div>
+      <div className="space-y-6">
+        {DISCOVERY_SECTIONS.map((sec) => (
+          <div key={sec}>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">{sec}</p>
+            <div className="space-y-2.5">
+              {DISCOVERY_QUESTIONS.filter((q) => q.section === sec).map((q) => {
+                const done = (answers[q.id] ?? "").trim().length > 0;
+                return (
+                  <div
+                    key={q.id}
+                    className={`rounded-xl border bg-surface/40 p-3 ${done ? "border-emerald-500/30" : "border-amber-500/25"}`}
+                  >
+                    <div className="flex items-start gap-2 text-sm text-fg">
+                      <span className={done ? "text-emerald-400" : "text-amber-400"}>{done ? "✓" : "•"}</span>
+                      <span>{q.q}</span>
+                    </div>
+                    <textarea
+                      value={answers[q.id] ?? ""}
+                      onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                      onBlur={() => setAnswers((a) => { void save(a); return a; })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          (e.target as HTMLTextAreaElement).blur();
+                        }
+                      }}
+                      rows={1}
+                      placeholder="Escribí la respuesta…  (Enter guarda · Shift+Enter = nueva línea)"
+                      className="mt-2 w-full resize-y rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

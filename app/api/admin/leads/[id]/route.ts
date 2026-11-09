@@ -84,6 +84,13 @@ export async function PATCH(
     return NextResponse.json({ lead: data });
   }
 
+  // Guardar respuestas de la guía de descubrimiento (primera meet)
+  if (body.discovery && typeof body.discovery === "object") {
+    const { error } = await supabase.from("leads").update({ discovery: body.discovery }).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   if (body.action) {
     if (body.action === "approve_payment") {
       await supabase
