@@ -76,13 +76,13 @@ export async function POST(req: Request) {
     if (!msg.from && !msg.contextId) continue;
     const estado = msg.text ? interpretar(msg.text) : null;
 
-    // Buscar el recordatorio: primero por el mensaje citado (context.id == nuestro wamid),
-    // si no, el último recordatorio enviado a ese teléfono que siga pendiente.
+    // Buscar la fila: primero por el mensaje citado (context.id == alguno de nuestros wamid),
+    // si no, la última enviada a ese teléfono.
     let query = supabase.from("meeting_reminders").select("id,confirmation_status").limit(1);
     if (msg.contextId) {
-      query = query.eq("reminder_wamid", msg.contextId);
+      query = query.or(`booking_confirm_wamid.eq.${msg.contextId},reminder30_wamid.eq.${msg.contextId}`);
     } else {
-      query = query.eq("phone", msg.from as string).order("reminder_sent_at", { ascending: false });
+      query = query.eq("phone", msg.from as string).order("updated_at", { ascending: false });
     }
     const { data } = await query.maybeSingle();
     if (!data) continue;

@@ -6,12 +6,19 @@ usando la **WhatsApp Cloud API** de Meta. El número puede seguir en el celular
 
 ## Cómo funciona
 
+Dos momentos, los dos con botones **Confirmar / Reprogramar**:
+
 ```
 Centrilize → Google Calendar (evento con el WhatsApp del invitado)
-        → cron diario en RUN lee los meets de las próximas horas
-        → envía la plantilla "recordatorio_meet" (con botones Confirmar / Reprogramar)
-        → el webhook de RUN capta la respuesta y marca confirmado / reprogramar
+        → cron de RUN cada 15 min:
+            ① ~10-20 min después de agendar  → plantilla "confirmacion_reserva"
+            ② ~30 min antes de la meet        → plantilla "recordatorio_meet"
+        → el webhook de RUN capta la respuesta (fase 2)
 ```
+
+> ⚠️ **Frecuencia del cron:** corre cada 15 min (`*/15 * * * *`). En Vercel plan **Hobby los
+> crons corren solo 1 vez por día** → para que corra cada 15 min necesitás plan **Pro**, o un
+> disparador externo que haga `GET /api/whatsapp/cron` con el header del `CRON_SECRET` cada 15 min.
 
 Código en RUN (ya creado en esta rama, **no** desplegado a producción):
 - `lib/whatsapp.ts` — cliente Cloud API (enviar plantilla, verificar firma del webhook).
@@ -92,31 +99,37 @@ El **tracking automático** de confirmaciones (webhook + App Secret + App dedica
 | `GOOGLE_SERVICE_ACCOUNT_JSON` | JSON completo de la clave del service account | sí |
 | `GOOGLE_CALENDAR_ID` | ID del calendario (tu email de Google) | sí |
 | `CRON_SECRET` | String propio; protege el endpoint del cron | sí |
-| `WHATSAPP_TEMPLATE_REMINDER` | Nombre de la plantilla (default `recordatorio_meet`) | no |
-| `WHATSAPP_TEMPLATE_LANG` | Idioma de la plantilla (default `es`) | no |
-| `WHATSAPP_REMINDER_LEAD_HOURS` | Horas de anticipación de la ventana (default `24`) | no |
+| `WHATSAPP_TEMPLATE_CONFIRM` | Plantilla de confirmación (default `confirmacion_reserva`) | no |
+| `WHATSAPP_TEMPLATE_REMINDER` | Plantilla de recordatorio (default `recordatorio_meet`) | no |
+| `WHATSAPP_TEMPLATE_LANG` | Idioma de las plantillas (default `es`) | no |
+| `BOOKING_CONFIRM_MIN_MIN` | Min. minutos tras agendar antes de confirmar (default `10`) | no |
+| `BOOKING_CONFIRM_MAX_MIN` | Máx. minutos tras agendar para confirmar (default `120`) | no |
+| `REMINDER_MINUTES_BEFORE` | Minutos antes de la meet para recordar (default `30`) | no |
 
 ---
 
-## Plantillas a crear en WhatsApp Manager
+## Plantillas en WhatsApp Manager (ya creadas)
 
-### `recordatorio_meet` (UTILITY · es) — obligatoria
-- **Cuerpo:**
-  ```
-  Hola {{1}} 👋 Te recordamos tu reunión con RUN: {{2}}.
+Las dos están creadas en la WABA de RUN y enviadas a revisión de Meta (UTILITY · Español),
+con botones de respuesta rápida **`Confirmar` · `Reprogramar`** y ejemplos
+{{1}} = `Juan`, {{2}} = `jueves 13 de noviembre, 10:00`.
 
-  ¿Confirmás tu asistencia?
-  ```
-- **Botones (respuesta rápida):** `Confirmar` · `Reprogramar`
-- **Ejemplos para aprobación:** {{1}} = `Juan` · {{2}} = `jueves 13 de noviembre, 10:00`
+### `confirmacion_reserva` — ① ~10-20 min después de agendar
+```
+Hola {{1}} 👋 ¡Recibimos tu reserva! Tu reunión con RUN quedó para {{2}}.
 
-El cron envía exactamente dos variables: `{{1}}` = nombre, `{{2}}` = fecha/hora legible.
-El webhook interpreta el botón **Confirmar** → `confirmed` y **Reprogramar** → `reschedule`
-(también entiende respuestas de texto como "sí", "confirmo", "reprogramar").
+¿Confirmás tu asistencia?
+```
 
-### `recordatorio_meet_2h` (opcional)
-Un segundo aviso el mismo día ("tu reunión es en 2 horas"). Si lo querés, se agrega una
-segunda corrida de cron con una ventana más corta. No es necesario para arrancar.
+### `recordatorio_meet` — ② ~30 min antes de la meet
+```
+Hola {{1}} 👋 Te recordamos tu reunión con RUN: {{2}}.
+
+¿Confirmás tu asistencia?
+```
+
+El cron envía dos variables: `{{1}}` = nombre, `{{2}}` = fecha/hora legible.
+El webhook (fase 2) interpreta **Confirmar** → `confirmed` y **Reprogramar** → `reschedule`.
 
 ---
 

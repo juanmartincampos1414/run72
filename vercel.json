@@ -1,5 +1,5 @@
 {
   "crons": [
-    { "path": "/api/whatsapp/cron", "schedule": "0 13 * * *" }
+    { "path": "/api/whatsapp/cron", "schedule": "*/15 * * * *" }
   ]
 }

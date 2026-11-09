@@ -57,31 +57,48 @@ async function accessToken(): Promise<string> {
 
 export type CalendarEvent = {
   id: string;
+  status?: string;
   summary?: string;
   description?: string;
   location?: string;
+  created?: string;
+  updated?: string;
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
   attendees?: { email?: string; displayName?: string; comment?: string }[];
 };
 
-/** Eventos del calendario entre dos instantes (ISO). Solo instancias concretas, ordenados por inicio. */
-export async function eventosEntre(desde: Date, hasta: Date): Promise<CalendarEvent[]> {
+async function listar(params: Record<string, string>): Promise<CalendarEvent[]> {
   const token = await accessToken();
   const calId = encodeURIComponent(process.env.GOOGLE_CALENDAR_ID as string);
-  const qs = new URLSearchParams({
-    timeMin: desde.toISOString(),
-    timeMax: hasta.toISOString(),
-    singleEvents: "true",
-    orderBy: "startTime",
-    maxResults: "250",
-  });
+  const qs = new URLSearchParams({ singleEvents: "true", maxResults: "250", ...params });
   const r = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calId}/events?${qs}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const j = (await r.json().catch(() => ({}))) as { items?: CalendarEvent[]; error?: { message?: string } };
   if (!r.ok || j.error) throw new Error(`Google Calendar: ${j.error?.message || r.status}`);
-  return j.items ?? [];
+  return (j.items ?? []).filter((e) => e.status !== "cancelled");
+}
+
+/** Eventos cuyo inicio cae entre dos instantes. Para el recordatorio "30 min antes". */
+export async function eventosEntre(desde: Date, hasta: Date): Promise<CalendarEvent[]> {
+  return listar({ timeMin: desde.toISOString(), timeMax: hasta.toISOString(), orderBy: "startTime" });
+}
+
+/**
+ * Eventos creados/actualizados desde un instante (para detectar reservas nuevas).
+ * Mira hasta `mesesAdelante` hacia adelante por si la meet se agenda con mucha anticipación.
+ */
+export async function eventosNuevosDesde(desde: Date, mesesAdelante = 6): Promise<CalendarEvent[]> {
+  const hasta = new Date();
+  hasta.setMonth(hasta.getMonth() + mesesAdelante);
+  return listar({ updatedMin: desde.toISOString(), timeMax: hasta.toISOString(), orderBy: "updated" });
+}
+
+export function creacionDelEvento(ev: CalendarEvent): Date | null {
+  if (!ev.created) return null;
+  const d = new Date(ev.created);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 function textoDelEvento(ev: CalendarEvent): string {
