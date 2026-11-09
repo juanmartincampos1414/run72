@@ -62,6 +62,8 @@ export default function LeadsPage() {
   const [form, setForm] = useState({ name: "", whatsapp: "", email: "", idea: "", budget: "" });
   const [creating, setCreating] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [fSource, setFSource] = useState("all");
+  const [fVertical, setFVertical] = useState("all");
 
   async function load() {
     const r = await fetch("/api/admin/leads");
@@ -128,10 +130,30 @@ export default function LeadsPage() {
     setCreating(false);
   }
 
+  // Opciones de filtro presentes en los datos
+  const filterOptions = useMemo(() => {
+    const sources = new Set<string>();
+    const verticals = new Set<string>();
+    for (const l of leads ?? []) {
+      if (l.source) sources.add(l.source);
+      if (l.vertical) verticals.add(l.vertical);
+    }
+    return { sources: [...sources], verticals: [...verticals].sort() };
+  }, [leads]);
+
+  // Leads que pasan los filtros activos
+  const filtered = useMemo(() => {
+    return (leads ?? []).filter(
+      (l) =>
+        (fSource === "all" || l.source === fSource) &&
+        (fVertical === "all" || (l.vertical ?? "") === fVertical),
+    );
+  }, [leads, fSource, fVertical]);
+
   // Orden inteligente: SLA vencido → menos tiempo restante → más reciente
   const sortedLeads = useMemo(() => {
     if (!leads) return null;
-    return leads
+    return filtered
       .map((l) => ({ l, sla: computeSla(l.production_started_at, l.estimated_delivery_at) }))
       .sort((a, b) => {
         if (a.sla.active && b.sla.active) return a.sla.remainingH - b.sla.remainingH;
@@ -140,10 +162,10 @@ export default function LeadsPage() {
         return new Date(b.l.created_at).getTime() - new Date(a.l.created_at).getTime();
       })
       .map((x) => x.l);
-  }, [leads]);
+  }, [leads, filtered]);
 
   const metrics = useMemo(() => {
-    const list = leads ?? [];
+    const list = filtered;
     const won = list.filter((l) => l.pipeline_stage === "ganado");
     const invertido = list.reduce((s, l) => s + (Number(l.acquisition_cost) || 0), 0);
     const ingresos = won.reduce((s, l) => s + (Number(l.project_value) || 0), 0);
@@ -158,7 +180,7 @@ export default function LeadsPage() {
       margen: ingresos - costos,
       hot: list.filter((l) => l.hot).length,
     };
-  }, [leads]);
+  }, [filtered]);
 
   return (
     <div>
@@ -230,8 +252,44 @@ export default function LeadsPage() {
         </div>
       )}
 
+      {/* Filtros */}
+      {(filterOptions.sources.length > 0 || filterOptions.verticals.length > 0) && (
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-faint">Filtrar:</span>
+          <select
+            value={fSource}
+            onChange={(e) => setFSource(e.target.value)}
+            className="rounded-full border border-line bg-ink/40 px-3 py-1.5 text-xs text-fg outline-none focus:border-brand-violet"
+          >
+            <option value="all">Todas las fuentes</option>
+            {filterOptions.sources.map((s) => (
+              <option key={s} value={s}>{sourceLabel(s)}</option>
+            ))}
+          </select>
+          <select
+            value={fVertical}
+            onChange={(e) => setFVertical(e.target.value)}
+            className="rounded-full border border-line bg-ink/40 px-3 py-1.5 text-xs text-fg outline-none focus:border-brand-violet"
+          >
+            <option value="all">Todos los rubros</option>
+            {filterOptions.verticals.map((v) => (
+              <option key={v} value={v}>{v}</option>
+            ))}
+          </select>
+          {(fSource !== "all" || fVertical !== "all") && (
+            <button
+              onClick={() => { setFSource("all"); setFVertical("all"); }}
+              className="rounded-full px-2 py-1 text-xs text-muted hover:text-fg"
+            >
+              Limpiar ✕
+            </button>
+          )}
+          <span className="text-xs text-faint">· {filtered.length} lead(s)</span>
+        </div>
+      )}
+
       {/* Métricas comerciales */}
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Metric label="Total leads" value={String(metrics.total)} />
         <Metric label="Ganados" value={String(metrics.won)} />
         <Metric label="Conversión" value={`${metrics.conversion}%`} />
