@@ -4,6 +4,7 @@ import type { ProjectPreview, PreviewMockup } from "./types";
 import { logEvent } from "./audit";
 import { DISCOVERY_QUESTIONS } from "./discovery";
 import { PREVIEW_ART_DIRECTION } from "./preview-design";
+import { getReferences, fetchReferenceImage, referencesToPrompt } from "./refero";
 
 // Pass 1 (director): planea las pantallas clave. SIN el HTML (que es lo pesado),
 // así este JSON es chico y NUNCA se trunca.
@@ -116,9 +117,33 @@ export async function generateLeadPreview(
   // --- Pase 2: builders (HTML de cada pantalla, EN PARALELO, texto plano) ---
   const builderSystem = `${PREVIEW_ART_DIRECTION}\n\nSos el diseñador de UI de RUN. Te paso el contexto del negocio y el brief de UNA pantalla. Devolvés EXCLUSIVAMENTE el documento HTML completo de esa pantalla (empezá en <!doctype html>), sin ningún texto antes o después, sin backticks. Español rioplatense, datos realistas del negocio real.`;
 
+  // Pista de rubro para buscar referencias relevantes en Refero.
+  const rubroHint = [
+    typeof lead.project_label === "string" ? lead.project_label : "",
+    plan.interpretation?.split(/[.·]/)[0] ?? "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 120);
+
   const built = await Promise.all(
     planned.map(async (m): Promise<PreviewMockup | null> => {
       try {
+        // Feed de referencias reales de Refero para ESTA pantalla (resiliente: [] si falla).
+        const refs = await getReferences(`${m.title} ${rubroHint}`.trim(), 3);
+        const refText = referencesToPrompt(refs);
+        const refImgData = refs.length
+          ? await fetchReferenceImage(refs.find((x) => x.imageUrl)?.imageUrl ?? "")
+          : null;
+        const referenceBlocks: Anthropic.ContentBlockParam[] = refImgData
+          ? [
+              {
+                type: "image",
+                source: { type: "base64", media_type: refImgData.mediaType as "image/jpeg", data: refImgData.base64 },
+              } as Anthropic.ContentBlockParam,
+            ]
+          : [];
+
         const r = await client.messages.create({
           model: "claude-opus-4-8",
           max_tokens: 16000,
@@ -130,8 +155,9 @@ export async function generateLeadPreview(
               content: [
                 {
                   type: "text",
-                  text: `${prompt}\n\n=== DISEÑÁ ÚNICAMENTE ESTA PANTALLA ===\nTítulo: ${m.title}\nBrief: ${m.brief}\n\nDevolvé solo el HTML completo de esta pantalla, premium y que deslumbre.`,
+                  text: `${prompt}\n\n=== DISEÑÁ ÚNICAMENTE ESTA PANTALLA ===\nTítulo: ${m.title}\nBrief: ${m.brief}\n${refText ? `\n${refText}\n` : ""}\nDevolvé solo el HTML completo de esta pantalla, premium y que deslumbre.`,
                 },
+                ...referenceBlocks,
                 ...refImages,
               ],
             },
