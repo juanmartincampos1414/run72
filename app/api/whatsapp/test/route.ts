@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { enviarPlantilla, normalizarTelefono, whatsappConfigurado } from "@/lib/whatsapp";
+import { enviarPlantilla, estadoNumero, normalizarTelefono, whatsappConfigurado } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,7 +22,21 @@ export async function GET(req: Request) {
   }
 
   const url = new URL(req.url);
-  const to = normalizarTelefono(url.searchParams.get("to"));
+
+  // Diagnóstico: ?status=1 devuelve el estado del número (calidad, límites, etc.)
+  if (url.searchParams.get("status")) {
+    try {
+      return NextResponse.json({ ok: true, numero: await estadoNumero() });
+    } catch (e) {
+      return NextResponse.json({ ok: false, error: String(e) }, { status: 502 });
+    }
+  }
+
+  // ?raw=1 envía al número tal cual (solo dígitos), sin agregar el "9" argentino.
+  const rawTo = url.searchParams.get("to");
+  const to = url.searchParams.get("raw")
+    ? (rawTo || "").replace(/[^\d]/g, "") || null
+    : normalizarTelefono(rawTo);
   if (!to) return NextResponse.json({ error: "falta ?to= con un número válido" }, { status: 400 });
 
   const template = url.searchParams.get("template") || "hello_world";
