@@ -609,6 +609,7 @@ type GenProposal = {
   recommendation?: string;
   phase1?: { title: string; why: string; scope: string[] };
   nextPhases?: { title: string; detail: string }[];
+  roadmap?: { unit: string; steps: { period: string; title: string; milestone: string }[] } | null;
   scenarios?: GenScenario[];
   options?: { slug: string; name: string; detail: string; price_ars: number }[];
   missing?: string[];
@@ -871,6 +872,24 @@ function TranscriptProposal({
             <div className="rounded-xl border border-brand-violet/30 bg-brand-violet/[0.06] p-4">
               <p className="mb-1 text-xs font-medium uppercase tracking-wide text-brand-violet">Recomendación</p>
               <p className="text-sm leading-relaxed text-fg/90">{proposal.recommendation}</p>
+            </div>
+          )}
+
+          {proposal.roadmap && proposal.roadmap.steps.length > 0 && (
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">
+                Roadmap ({proposal.roadmap.unit})
+              </p>
+              <ol className="space-y-1.5">
+                {proposal.roadmap.steps.map((s, i) => (
+                  <li key={i} className="flex gap-2 text-sm">
+                    <span className="shrink-0 font-medium text-brand-violet">{s.period}</span>
+                    <span className="text-muted">
+                      {s.title} — <span className="text-fg/70">ve: {s.milestone}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
             </div>
           )}
 

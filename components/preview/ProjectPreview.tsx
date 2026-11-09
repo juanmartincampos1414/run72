@@ -25,6 +25,8 @@ type Scenario = {
   recommended?: boolean;
 };
 type Option = { slug: string; name: string; detail: string; price_ars: number }; // sin IVA
+type RoadmapStep = { period: string; title: string; detail?: string; milestone: string };
+type Roadmap = { unit: string; steps: RoadmapStep[] };
 type Proposal = {
   positioning?: string;
   summary?: string;
@@ -32,6 +34,7 @@ type Proposal = {
   recommendation?: string;
   phase1?: { title: string; why: string; scope: string[] };
   nextPhases?: { title: string; detail: string }[];
+  roadmap?: Roadmap | null;
   scenarios?: Scenario[];
   options?: Option[];
   depositPercent?: number;
@@ -88,10 +91,12 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
 
   const structured = Array.isArray(proposal?.scenarios) && proposal!.scenarios!.length > 0;
   const hasMockups = !!preview && preview.mockups.length > 0;
+  const hasRoadmap = !!proposal?.roadmap && (proposal.roadmap.steps?.length ?? 0) > 0;
 
   const nav = [
     proposal?.opportunities?.length ? { id: "oportunidad", label: "Oportunidad" } : null,
     proposal?.phase1 ? { id: "propuesta", label: "Propuesta" } : null,
+    hasRoadmap ? { id: "roadmap", label: "Roadmap" } : null,
     structured ? { id: "inversion", label: "Inversión" } : null,
     hasMockups ? { id: "preview", label: "Cómo se vería" } : null,
   ].filter(Boolean) as { id: string; label: string }[];
@@ -215,9 +220,21 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
               </Section>
             )}
 
-            {/* 03 · INVERSIÓN (interactivo) */}
+            {/* 03 · ROADMAP */}
+            {hasRoadmap && (
+              <Section
+                id="roadmap"
+                index="03"
+                title="El plan, etapa por etapa"
+                kicker={`Cronograma de la Fase 1 · por ${proposal.roadmap!.unit}`}
+              >
+                <Timeline steps={proposal.roadmap!.steps} />
+              </Section>
+            )}
+
+            {/* 04 · INVERSIÓN (interactivo) */}
             {structured && (
-              <Section id="inversion" index="03" title="La inversión" kicker="Armá tu plan y mirá el número en vivo">
+              <Section id="inversion" index={hasRoadmap ? "04" : "03"} title="La inversión" kicker="Armá tu plan y mirá el número en vivo">
                 <InvestmentBuilder
                   scenarios={proposal.scenarios!}
                   options={proposal.options ?? []}
@@ -226,9 +243,14 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
               </Section>
             )}
 
-            {/* 04 · CÓMO SE VERÍA */}
+            {/* 05 · CÓMO SE VERÍA */}
             {hasMockups && (
-              <Section id="preview" index="04" title="Cómo se vería" kicker="Una primera visión navegable">
+              <Section
+                id="preview"
+                index={String((hasRoadmap ? 4 : 3) + (structured ? 1 : 0)).padStart(2, "0")}
+                title="Cómo se vería"
+                kicker="Una primera visión navegable"
+              >
                 {preview!.interpretation && (
                   <p className="mb-6 max-w-2xl text-muted">{preview!.interpretation}</p>
                 )}
@@ -354,6 +376,36 @@ function Row({ label, value }: { label: string; value: string }) {
       <dt className="text-xs uppercase tracking-wide text-faint">{label}</dt>
       <dd className="text-muted">{value}</dd>
     </div>
+  );
+}
+
+/** Timeline del roadmap: línea con etapas, cada una con su hito para el cliente. */
+function Timeline({ steps }: { steps: RoadmapStep[] }) {
+  return (
+    <ol className="relative space-y-6 border-l border-line pl-6 sm:space-y-8">
+      {steps.map((s, i) => (
+        <motion.li
+          key={i}
+          initial={{ opacity: 0, x: -12 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.4, ease, delay: i * 0.05 }}
+          className="relative"
+        >
+          <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-brand-cyan to-brand-violet ring-4 ring-ink" />
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-cyan">{s.period}</p>
+          <h3 className="mt-1 font-display text-lg font-semibold tracking-tight">{s.title}</h3>
+          {s.detail && <p className="mt-1 text-sm text-muted">{s.detail}</p>}
+          <div className="mt-2 inline-flex items-start gap-2 rounded-xl border border-line bg-surface/40 px-3 py-2 text-sm">
+            <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-cyan" />
+            <span className="text-fg/90">
+              <span className="text-faint">Ves: </span>
+              {s.milestone}
+            </span>
+          </div>
+        </motion.li>
+      ))}
+    </ol>
   );
 }
 

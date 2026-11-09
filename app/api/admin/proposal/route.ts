@@ -66,6 +66,30 @@ const SCHEMA = {
         additionalProperties: false,
       },
     },
+    roadmap: {
+      type: "object",
+      description: "Cronograma realista de la Fase 1, por semanas o meses, con el hito que ve el cliente.",
+      properties: {
+        unit: { type: "string", enum: ["semanas", "meses"] },
+        steps: {
+          type: "array",
+          description: "3-6 etapas en orden.",
+          items: {
+            type: "object",
+            properties: {
+              period: { type: "string", description: "Ej: 'Semana 1-2' o 'Mes 1'." },
+              title: { type: "string", description: "Foco de la etapa (ej: 'Diseño y catálogo')." },
+              detail: { type: "string", description: "Qué se hace en esta etapa (1 frase)." },
+              milestone: { type: "string", description: "Qué ve o recibe el cliente al final de esta etapa." },
+            },
+            required: ["period", "title", "milestone"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["unit", "steps"],
+      additionalProperties: false,
+    },
     scenarios: {
       type: "array",
       description:
@@ -124,6 +148,7 @@ type Output = {
   recommendation: string;
   phase1: { title: string; why: string; scope: string[] };
   nextPhases?: { title: string; detail: string }[];
+  roadmap?: { unit: string; steps: { period: string; title: string; detail?: string; milestone: string }[] };
   scenarios: Scenario[];
   options?: Option[];
   missing?: string[];
@@ -168,8 +193,9 @@ Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvé
 2) "opportunities": lectura de 3-5 oportunidades del negocio (qué construir, cómo genera ingresos, tu lectura honesta de cada una).
 3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio comercial (qué deja facturar y aprender ya, qué validar antes de invertir).
 4) "phase1": la Fase 1 recomendada para arrancar con impacto.
-5) "scenarios": 3 escenarios de inversión (esencial / recomendado / completo) armados con slugs del catálogo. El recomendado es el del medio.
-6) "options": módulos opcionales (slugs del catálogo) para que el cliente sume/saque y vea el precio moverse.
+5) "roadmap": cronograma realista de la Fase 1 (por semanas o meses según el tamaño), 3-6 etapas, cada una con el hito concreto que ve o recibe el cliente. Sé realista con los plazos de un desarrollo a medida.
+6) "scenarios": 3 escenarios de inversión (esencial / recomendado / completo) armados con slugs del catálogo. El recomendado es el del medio.
+7) "options": módulos opcionales (slugs del catálogo) para que el cliente sume/saque y vea el precio moverse.
 
 Reglas:
 - Para scenarios y options usá EXCLUSIVAMENTE slugs/claves del catálogo de abajo. No inventes servicios ni precios: los calcula el sistema.
@@ -184,7 +210,7 @@ ${buildCatalog(services, micros)}`;
     const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: "claude-opus-4-8",
-      max_tokens: 4000,
+      max_tokens: 5500,
       output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "medium" },
       system,
       messages: [
@@ -250,6 +276,7 @@ ${buildCatalog(services, micros)}`;
     recommendation: parsed.recommendation,
     phase1: parsed.phase1,
     nextPhases: parsed.nextPhases ?? [],
+    roadmap: parsed.roadmap ?? null,
     scenarios,
     options,
     depositPercent,
