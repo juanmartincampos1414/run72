@@ -12,7 +12,7 @@ const SCHEMA = {
     includedDeliverables: { type: "array", items: { type: "string" } },
     mockups: {
       type: "array",
-      description: "Entre 3 y 4 mockups conceptuales.",
+      description: "Entre 2 y 3 mockups conceptuales (los más importantes de la Fase 1).",
       items: {
         type: "object",
         properties: {
@@ -78,7 +78,7 @@ export async function generateLeadPreview(
 
   const response = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 14000,
+    max_tokens: 11000,
     output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "low" },
     system:
       "Sos el director de producto y diseño de RUN. Generás una vista previa conceptual con mockups de UI en HTML autocontenido (inline CSS, sin scripts ni recursos externos salvo el logo si se provee). Diseño premium, coherente con la marca del cliente (paleta/estilo de las imágenes adjuntas). Español rioplatense.",
@@ -179,13 +179,13 @@ function buildPrompt(lead: Record<string, unknown>, docs: Array<{ name?: string 
     transcript ? `Transcripción de la videollamada:\n${transcript.slice(0, 20000)}` : "",
     docs.length ? `Archivos adjuntos (no imágenes): ${docs.map((d) => d.name).join(", ")}.` : "",
     "",
-    "Reglas (generá SOLO mockups relevantes a lo hablado / a la Fase 1, MÁXIMO 4, priorizando el desarrollo principal; HTML conciso):",
-    "- Landing → Hero, CTA, Formulario, Vista completa.",
-    "- Sitio Web → Home, Vista mobile (~390px), Sección destacada.",
-    "- Ecommerce → Home, Listado, Ficha de producto, Checkout.",
-    "- Plataforma/CRM → Dashboard, Clientes, Reportes, Navegación.",
-    "- Si hay 'Redes sociales' → sumá 1-2: grid de Instagram (9 posts) / perfil / portada.",
-    "Cada mockup: documento HTML completo autocontenido con <style> inline, sin scripts ni imágenes externas. Datos realistas y en español, del rubro del cliente. Respetá colores/estilo de las referencias adjuntas.",
+    "Reglas (generá SOLO los mockups MÁS IMPORTANTES de la Fase 1, MÁXIMO 3, priorizando las pantallas que mejor venden la idea; HTML conciso para no exceder tiempo):",
+    "- Landing → Hero + CTA, Formulario.",
+    "- Sitio Web → Home, Sección destacada.",
+    "- Ecommerce → Home (con catálogo), Ficha de producto, Checkout.",
+    "- Plataforma/CRM → Dashboard, Vista de detalle (clientes/reportes).",
+    "- Si hay 'Redes sociales' → podés sumar 1 grid de Instagram (9 posts).",
+    "Cada mockup: documento HTML completo autocontenido con <style> inline, sin scripts ni imágenes externas. Mantené el HTML compacto pero prolijo. Datos realistas y en español, del rubro del cliente. Respetá colores/estilo de las referencias adjuntas.",
   ]
     .filter(Boolean)
     .join("\n");

@@ -4,7 +4,8 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { generateLeadPreview } from "@/lib/preview-gen";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// Generar 3-4 mockups HTML con Opus tarda más de 60s: usamos el máximo de Vercel Pro.
+export const maxDuration = 300;
 
 /** Regenera el preview IA (mantiene historial, no sobrescribe versiones). */
 export async function POST(
