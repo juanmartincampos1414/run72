@@ -22,6 +22,21 @@ export async function GET(req: Request) {
   }
 
   const url = new URL(req.url);
+  const GRAPH = "https://graph.facebook.com/v23.0";
+
+  // ¿A qué App pertenece el token de envío?
+  if (url.searchParams.get("whoami")) {
+    const t = process.env.WHATSAPP_TOKEN;
+    const r = await fetch(`${GRAPH}/debug_token?input_token=${t}&access_token=${t}`);
+    return NextResponse.json(await r.json().catch(() => ({})));
+  }
+  // ¿Qué Apps están suscritas a la WABA real (reciben sus webhooks)?
+  if (url.searchParams.get("subapps")) {
+    const t = process.env.WHATSAPP_TOKEN;
+    const waba = process.env.WHATSAPP_WABA_ID;
+    const r = await fetch(`${GRAPH}/${waba}/subscribed_apps`, { headers: { Authorization: `Bearer ${t}` } });
+    return NextResponse.json(await r.json().catch(() => ({})));
+  }
 
   // ── Lecturas de diagnóstico (no envían nada) ──
   if (url.searchParams.get("rows")) {
