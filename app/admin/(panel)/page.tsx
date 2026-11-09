@@ -41,6 +41,10 @@ const STATUS_COLOR: Record<LeadStatus, string> = {
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: "", whatsapp: "", email: "", idea: "", budget: "" });
+  const [creating, setCreating] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   async function load() {
     const r = await fetch("/api/admin/leads");
@@ -84,6 +88,29 @@ export default function LeadsPage() {
     }
   }
 
+  async function createLead() {
+    setCreating(true);
+    setFormError(null);
+    try {
+      const r = await fetch("/api/admin/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        setFormError(data.error || "No se pudo crear el lead.");
+      } else {
+        setForm({ name: "", whatsapp: "", email: "", idea: "", budget: "" });
+        setShowForm(false);
+        await load();
+      }
+    } catch {
+      setFormError("No se pudo crear el lead.");
+    }
+    setCreating(false);
+  }
+
   // Orden inteligente: SLA vencido → menos tiempo restante → más reciente
   const sortedLeads = useMemo(() => {
     if (!leads) return null;
@@ -110,10 +137,73 @@ export default function LeadsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold tracking-tight">Leads</h1>
-      <p className="mt-1 text-sm text-muted">
-        Cada finalización del cotizador entra acá automáticamente.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Leads</h1>
+          <p className="mt-1 text-sm text-muted">
+            Los leads de pauta (Centralize) y del cotizador entran acá automáticamente.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowForm((s) => !s)}
+          className="shrink-0 rounded-full border border-line px-4 py-2 text-sm text-fg transition hover:border-brand-violet"
+        >
+          {showForm ? "Cerrar" : "+ Agregar lead"}
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="mt-4 rounded-2xl border border-line bg-surface/40 p-4">
+          <p className="mb-3 text-xs text-faint">Carga manual (por si la integración con Centralize no lo tomó).</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <input
+              placeholder="Nombre *"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+            />
+            <input
+              placeholder="WhatsApp (ej: +54 9 11 5555-5555)"
+              value={form.whatsapp}
+              onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+              className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+            />
+            <input
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+            />
+            <select
+              value={form.budget}
+              onChange={(e) => setForm({ ...form, budget: e.target.value })}
+              className="rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm text-fg outline-none focus:border-brand-violet"
+            >
+              <option value="">Presupuesto (opcional)</option>
+              <option value="3.000USD-5.000USD">3.000USD-5.000USD</option>
+              <option value="5.000USD-8.000USD">5.000USD-8.000USD</option>
+              <option value="Más de 8.000">Más de 8.000</option>
+            </select>
+            <textarea
+              placeholder="Idea / nota (opcional)"
+              value={form.idea}
+              onChange={(e) => setForm({ ...form, idea: e.target.value })}
+              rows={2}
+              className="resize-y rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet sm:col-span-2"
+            />
+          </div>
+          <div className="mt-3 flex items-center gap-3">
+            <button
+              onClick={createLead}
+              disabled={creating || (!form.name.trim() && !form.email.trim() && !form.whatsapp.trim())}
+              className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+            >
+              {creating ? "Creando…" : "Crear lead"}
+            </button>
+            {formError && <span className="text-sm text-red-300">{formError}</span>}
+          </div>
+        </div>
+      )}
 
       {/* Métricas */}
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
