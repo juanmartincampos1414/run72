@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
-import { generateLeadPreview } from "@/lib/preview-gen";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import type { ProjectPreview } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -36,19 +36,25 @@ export async function POST(req: Request) {
   if (!lead) return NextResponse.json({ error: "Proyecto no encontrado." }, { status: 404 });
 
   // La propuesta es visible SIN pago: es la página que el cliente ve para
-  // decidir. Devolvemos la propuesta (narrativa) + el preview visual.
+  // decidir. Devolvemos SIEMPRE la propuesta (narrativa) al instante, y el
+  // preview visual SOLO si ya está cacheado (lo genera el admin desde el panel).
+  // No generamos en caliente acá: es un endpoint público, la generación con
+  // Claude tarda ~1 min (riesgo de timeout) y cuesta plata por cada visita.
   const meta = {
     proposal: (lead.proposal as Record<string, unknown>) ?? null,
     name: (lead.name as string) ?? null,
     projectLabel: (lead.project_label as string) ?? null,
   };
-  try {
-    const { preview } = await generateLeadPreview(supabase, lead);
-    return NextResponse.json({ preview, ...meta });
-  } catch (e) {
-    return NextResponse.json(
-      { preview: null, ...meta, error: e instanceof Error ? e.message : "error" },
-      { status: 200 },
-    );
+
+  let preview: ProjectPreview | null = null;
+  if (typeof lead.preview_text === "string" && lead.preview_text) {
+    try {
+      const cached = JSON.parse(lead.preview_text) as ProjectPreview;
+      if (Array.isArray(cached.mockups) && cached.mockups.length > 0) preview = cached;
+    } catch {
+      /* formato viejo; lo regenera el admin */
+    }
   }
+
+  return NextResponse.json({ preview, ...meta });
 }
