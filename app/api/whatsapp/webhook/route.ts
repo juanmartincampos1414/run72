@@ -45,10 +45,11 @@ export async function POST(req: Request) {
 
   // Estructura: entry[].changes[].value.messages[]
   const entries = (payload as { entry?: unknown[] }).entry ?? [];
-  const mensajes: { from?: string; text?: string; contextId?: string }[] = [];
+  const mensajes: { from?: string; text?: string; contextId?: string; numero?: string }[] = [];
   for (const e of entries as Record<string, unknown>[]) {
     for (const ch of (e.changes as Record<string, unknown>[]) ?? []) {
       const value = (ch.value as Record<string, unknown>) ?? {};
+      const numero = (value.metadata as { display_phone_number?: string } | undefined)?.display_phone_number;
       for (const m of (value.messages as Record<string, unknown>[]) ?? []) {
         const from = m.from as string | undefined;
         const contextId = (m.context as { id?: string } | undefined)?.id;
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
             (it.button_reply as { title?: string })?.title ||
             (it.list_reply as { title?: string })?.title;
         }
-        mensajes.push({ from, text, contextId });
+        mensajes.push({ from, text, contextId, numero });
       }
     }
   }
@@ -85,21 +86,26 @@ export async function POST(req: Request) {
       query = query.eq("phone", msg.from as string).order("updated_at", { ascending: false });
     }
     const { data } = await query.maybeSingle();
-    if (!data) continue;
 
-    await supabase
-      .from("meeting_reminders")
-      .update({
-        confirmation_status: estado ?? data.confirmation_status,
-        confirmed_at: estado ? new Date().toISOString() : null,
-        last_reply: msg.text ?? null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", data.id);
+    if (data) {
+      await supabase
+        .from("meeting_reminders")
+        .update({
+          confirmation_status: estado ?? data.confirmation_status,
+          confirmed_at: estado ? new Date().toISOString() : null,
+          last_reply: msg.text ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", data.id);
+    }
 
+    // Se registra TODA respuesta recibida (matchee o no), con el número de RUN que la recibió.
     await logEvent(supabase, "meeting_reminder_reply", null, {
       status: estado ?? "sin_interpretar",
       reply: msg.text ?? null,
+      from: msg.from ?? null,
+      numero_run: msg.numero ?? null,
+      matched: Boolean(data),
     });
   }
 
