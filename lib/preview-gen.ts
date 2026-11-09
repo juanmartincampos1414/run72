@@ -1,11 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ProjectPreview } from "./types";
+import type { ProjectPreview, PreviewMockup } from "./types";
 import { logEvent } from "./audit";
 import { DISCOVERY_QUESTIONS } from "./discovery";
 import { PREVIEW_ART_DIRECTION } from "./preview-design";
 
-const SCHEMA = {
+// Pass 1 (director): planea las pantallas clave. SIN el HTML (que es lo pesado),
+// así este JSON es chico y NUNCA se trunca.
+const PLAN_SCHEMA = {
   type: "object",
   properties: {
     interpretation: { type: "string", description: "Interpretación del proyecto (3-4 frases)." },
@@ -13,19 +15,19 @@ const SCHEMA = {
     includedDeliverables: { type: "array", items: { type: "string" } },
     mockups: {
       type: "array",
-      description: "Entre 2 y 3 mockups conceptuales (los más importantes de la Fase 1).",
+      description: "Entre 2 y 3 pantallas CLAVE de la Fase 1 (las que mejor venden la idea).",
       items: {
         type: "object",
         properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-          html: {
+          title: { type: "string", description: "Nombre de la pantalla (ej: 'Home del e-commerce')." },
+          description: { type: "string", description: "1 frase de qué muestra, para el cliente." },
+          brief: {
             type: "string",
             description:
-              "Documento HTML completo autocontenido (<!doctype html> + <style> inline). Permitido <link> a fonts.googleapis.com y <img>. SIN <script>. Diseño premium que deslumbra, nunca cajas grises.",
+              "Brief de diseño para esta pantalla: qué secciones, componentes y datos concretos tiene que incluir (header, hero, grilla de productos con nombres/precios reales, filtros, checkout, etc.).",
           },
         },
-        required: ["title", "description", "html"],
+        required: ["title", "description", "brief"],
         additionalProperties: false,
       },
     },
@@ -33,6 +35,14 @@ const SCHEMA = {
   required: ["interpretation", "detectedFunctionalities", "includedDeliverables", "mockups"],
   additionalProperties: false,
 } as const;
+
+type MockupPlan = { title: string; description: string; brief: string };
+type Plan = {
+  interpretation: string;
+  detectedFunctionalities: string[];
+  includedDeliverables: string[];
+  mockups: MockupPlan[];
+};
 
 type LeadLike = Record<string, unknown> & {
   id: string;
@@ -42,7 +52,22 @@ type LeadLike = Record<string, unknown> & {
 
 export type GenerateResult = { preview: ProjectPreview; fromCache: boolean };
 
-/** Genera (o devuelve cacheado) el preview del lead. Guarda versión + audita. */
+/** Saca el HTML de la respuesta del builder (quita fences y prosa previa). */
+function extractHtml(text: string): string {
+  let t = text.trim();
+  const fence = t.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  if (fence) t = fence[1].trim();
+  const idx = t.search(/<!doctype html|<html/i);
+  if (idx > 0) t = t.slice(idx);
+  return t.trim();
+}
+
+/** Genera (o devuelve cacheado) el preview del lead. Guarda versión + audita.
+ *
+ *  Arquitectura: 1 pase "director" (plan de pantallas, JSON chico) + N pases
+ *  "builder" EN PARALELO (cada uno devuelve el HTML de UNA pantalla como texto
+ *  plano). Así ninguna respuesta es gigante (no se trunca el JSON) y el tiempo
+ *  total es el de la pantalla más lenta, no la suma. */
 export async function generateLeadPreview(
   supabase: SupabaseClient,
   lead: LeadLike,
@@ -69,26 +94,68 @@ export async function generateLeadPreview(
   const images = files.filter((f) => (f.type ?? "").startsWith("image/")).slice(0, 4);
   const docs = files.filter((f) => !(f.type ?? "").startsWith("image/"));
   const prompt = buildPrompt(lead, docs);
+  const refImages = images.map(
+    (f) => ({ type: "image", source: { type: "url", url: f.url } }) as Anthropic.ContentBlockParam,
+  );
 
   const client = new Anthropic({ apiKey });
-  const content: Anthropic.ContentBlockParam[] = [
-    { type: "text", text: prompt },
-    ...images.map(
-      (f) => ({ type: "image", source: { type: "url", url: f.url } }) as Anthropic.ContentBlockParam,
-    ),
-  ];
 
-  const response = await client.messages.create({
+  // --- Pase 1: director (plan de pantallas) ---
+  const planResp = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 12000,
-    output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "medium" },
-    system: `${PREVIEW_ART_DIRECTION}\n\nSos el director de producto y diseño de RUN. Devolvés mockups de UI en HTML autocontenido. Español rioplatense, datos realistas del negocio real del cliente.`,
-    messages: [{ role: "user", content }],
+    max_tokens: 3000,
+    output_config: { format: { type: "json_schema", schema: PLAN_SCHEMA }, effort: "low" },
+    system: `${PREVIEW_ART_DIRECTION}\n\nSos el director de producto de RUN. Tu trabajo en este paso es PLANIFICAR: elegí las 2-3 pantallas clave de la Fase 1 y escribí un brief claro de cada una (todavía NO el HTML). Español rioplatense, datos realistas del negocio real del cliente.`,
+    messages: [{ role: "user", content: [{ type: "text", text: prompt }, ...refImages] }],
   });
+  const planBlock = planResp.content.find((b) => b.type === "text");
+  const plan = JSON.parse(planBlock && "text" in planBlock ? planBlock.text : "{}") as Plan;
+  const planned = (plan.mockups ?? []).slice(0, 3);
+  if (planned.length === 0) throw new Error("El plan no devolvió pantallas.");
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  const raw = textBlock && "text" in textBlock ? textBlock.text : "{}";
-  const preview = JSON.parse(raw) as ProjectPreview;
+  // --- Pase 2: builders (HTML de cada pantalla, EN PARALELO, texto plano) ---
+  const builderSystem = `${PREVIEW_ART_DIRECTION}\n\nSos el diseñador de UI de RUN. Te paso el contexto del negocio y el brief de UNA pantalla. Devolvés EXCLUSIVAMENTE el documento HTML completo de esa pantalla (empezá en <!doctype html>), sin ningún texto antes o después, sin backticks. Español rioplatense, datos realistas del negocio real.`;
+
+  const built = await Promise.all(
+    planned.map(async (m): Promise<PreviewMockup | null> => {
+      try {
+        const r = await client.messages.create({
+          model: "claude-opus-4-8",
+          max_tokens: 16000,
+          output_config: { effort: "medium" },
+          system: builderSystem,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `${prompt}\n\n=== DISEÑÁ ÚNICAMENTE ESTA PANTALLA ===\nTítulo: ${m.title}\nBrief: ${m.brief}\n\nDevolvé solo el HTML completo de esta pantalla, premium y que deslumbre.`,
+                },
+                ...refImages,
+              ],
+            },
+          ],
+        });
+        const b = r.content.find((x) => x.type === "text");
+        const html = extractHtml(b && "text" in b ? b.text : "");
+        if (html.length < 200) return null;
+        return { title: m.title, description: m.description, html };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  const mockups = built.filter((m): m is PreviewMockup => m !== null);
+  if (mockups.length === 0) throw new Error("No se pudo generar ninguna pantalla. Probá de nuevo.");
+
+  const preview: ProjectPreview = {
+    interpretation: plan.interpretation ?? "",
+    detectedFunctionalities: plan.detectedFunctionalities ?? [],
+    includedDeliverables: plan.includedDeliverables ?? [],
+    mockups,
+  };
   preview.generatedAt = new Date().toISOString();
 
   // Persistir como última versión en el lead
