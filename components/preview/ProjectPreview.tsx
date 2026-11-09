@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Logo } from "../Logo";
@@ -11,15 +11,24 @@ import type { ProjectPreview as Preview } from "@/lib/types";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-type State = "loading" | "not_paid" | "ready" | "error";
+type State = "loading" | "ready" | "error";
+
+/** Propuesta guardada por el admin (lib: /api/admin/proposal). */
+type Proposal = {
+  summary?: string;
+  detectedNeeds?: string[];
+  draft?: string;
+  missing?: string[];
+};
 
 export function ProjectPreview({ leadId }: { leadId: string }) {
   const [state, setState] = useState<State>("loading");
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [clientName, setClientName] = useState<string | null>(null);
   const [rating, setRating] = useState<number | null>(null);
   const [comments, setComments] = useState("");
   const [saved, setSaved] = useState(false);
-  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -33,17 +42,13 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
         });
         const data = await res.json();
         if (!alive) return;
-        if (data.paid === false) {
-          setState("not_paid");
-          pollRef.current = setTimeout(load, 8000); // reintenta hasta que se acredite
-          return;
-        }
-        if (data.preview) {
-          setPreview(data.preview as Preview);
-          setState("ready");
-        } else {
-          setState("error");
-        }
+        if (data.proposal) setProposal(data.proposal as Proposal);
+        if (data.name) setClientName(data.name as string);
+        if (data.preview) setPreview(data.preview as Preview);
+        // La propuesta se ve aunque no haya pago. Con que haya narrativa O
+        // preview visual, mostramos la página; solo es error si no hay nada.
+        if (data.proposal || data.preview) setState("ready");
+        else setState("error");
       } catch {
         if (alive) setState("error");
       }
@@ -52,7 +57,6 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
     load();
     return () => {
       alive = false;
-      if (pollRef.current) clearTimeout(pollRef.current);
     };
   }, [leadId]);
 
@@ -68,6 +72,8 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
     setTimeout(() => setSaved(false), 2000);
   }
 
+  const intro = proposal?.summary || preview?.interpretation || "";
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-line">
@@ -82,18 +88,10 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
       </header>
 
       <main className="container-x py-10 md:py-14">
-        {state === "not_paid" && (
-          <Centered
-            title="Estamos confirmando tu pago"
-            text="En cuanto se acredite, vas a ver acá la vista previa de tu proyecto. Esta pantalla se actualiza sola."
-            spinner
-          />
-        )}
-
         {state === "loading" && (
           <Centered
-            title="Generando la vista previa de tu proyecto"
-            text="Estamos analizando todo lo que nos pasaste para imaginar cómo va a verse. Puede tardar un minuto."
+            title="Preparando tu propuesta"
+            text="Estamos ordenando todo lo que hablamos para mostrártelo acá. Puede tardar un minuto."
             spinner
           />
         )}
@@ -101,14 +99,14 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
         {state === "error" && (
           <div className="mx-auto max-w-3xl">
             <Centered
-              title="Tu proyecto ya está en marcha"
-              text="Estamos terminando de preparar tu vista previa. Si no aparece en un rato, podés recargar la página."
+              title="Estamos preparando tu propuesta"
+              text="En un momento vas a ver acá todo lo que conversamos y la primera visión de tu proyecto. Si no aparece en un rato, recargá la página o escribinos."
             />
-            <Reassurance />
+            <Contact />
           </div>
         )}
 
-        {state === "ready" && preview && (
+        {state === "ready" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,75 +118,123 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
                 <CheckIcon className="h-7 w-7" strokeWidth={2.5} />
               </span>
               <h1 className="mt-6 text-balance font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Vista previa de tu proyecto
+                {clientName ? `${clientName}, esta es tu propuesta` : "Tu propuesta de RUN"}
               </h1>
-              <p className="mt-3 max-w-xl text-pretty text-muted">{preview.interpretation}</p>
+              {intro && <p className="mt-3 max-w-xl text-pretty text-muted">{intro}</p>}
             </div>
 
-            <Reassurance />
+            {/* Narrativa de la propuesta: qué entendimos, qué proponemos, próximos pasos */}
+            {proposal?.draft && (
+              <section className="mt-8 rounded-3xl border border-line bg-surface/40 p-6 sm:p-8">
+                <p className="mb-4 flex items-center gap-2 text-sm font-medium text-brand-cyan">
+                  <BoltIcon className="h-4 w-4" /> La propuesta
+                </p>
+                <div className="prose-proposal whitespace-pre-wrap font-sans text-[15px] leading-relaxed text-fg/90">
+                  {proposal.draft}
+                </div>
+              </section>
+            )}
 
-            {/* Detectado / incluido */}
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {preview.detectedFunctionalities.length > 0 && (
-                <div className="rounded-3xl border border-line bg-surface/40 p-5">
-                  <p className="mb-3 flex items-center gap-2 text-sm font-medium">
-                    <BoltIcon className="h-4 w-4 text-brand-cyan" /> Funcionalidades detectadas
+            {/* Lo que detectamos */}
+            {proposal?.detectedNeeds && proposal.detectedNeeds.length > 0 && (
+              <div className="mt-6 rounded-3xl border border-line bg-surface/40 p-5">
+                <p className="mb-3 text-sm font-medium">Lo que entendimos que necesitás</p>
+                <ul className="flex flex-col gap-2">
+                  {proposal.detectedNeeds.map((n) => (
+                    <li key={n} className="flex items-start gap-2 text-sm text-muted">
+                      <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-blue" /> {n}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Preview visual */}
+            {preview && (
+              <>
+                {(preview.detectedFunctionalities.length > 0 ||
+                  preview.includedDeliverables.length > 0) && (
+                  <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                    {preview.detectedFunctionalities.length > 0 && (
+                      <div className="rounded-3xl border border-line bg-surface/40 p-5">
+                        <p className="mb-3 flex items-center gap-2 text-sm font-medium">
+                          <BoltIcon className="h-4 w-4 text-brand-cyan" /> Funcionalidades
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {preview.detectedFunctionalities.map((f) => (
+                            <span
+                              key={f}
+                              className="rounded-full border border-line bg-ink/40 px-3 py-1 text-xs text-muted"
+                            >
+                              {f}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {preview.includedDeliverables.length > 0 && (
+                      <div className="rounded-3xl border border-line bg-surface/40 p-5">
+                        <p className="mb-3 text-sm font-medium">Entregables incluidos</p>
+                        <ul className="flex flex-col gap-2">
+                          {preview.includedDeliverables.map((d) => (
+                            <li key={d} className="flex items-center gap-2 text-sm text-muted">
+                              <CheckIcon className="h-3.5 w-3.5 shrink-0 text-brand-blue" /> {d}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {preview.mockups.length > 0 && (
+                  <div className="mt-10">
+                    <h2 className="text-center font-display text-2xl font-semibold tracking-tight">
+                      Cómo se vería
+                    </h2>
+                    <p className="mx-auto mt-2 max-w-lg text-center text-sm text-muted">
+                      Una primera visión navegable de la etapa que proponemos arrancar.
+                    </p>
+                    <div className="mt-8 space-y-8">
+                      {preview.mockups.map((m, i) => (
+                        <motion.div
+                          key={`${m.title}-${i}`}
+                          initial={{ opacity: 0, y: 24 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-60px" }}
+                          transition={{ duration: 0.5, ease }}
+                        >
+                          <h3 className="font-display text-lg font-semibold tracking-tight">{m.title}</h3>
+                          <p className="mt-1 text-sm leading-relaxed text-muted">{m.description}</p>
+                          <div className="mt-3 overflow-hidden rounded-2xl border border-line bg-white glow-violet">
+                            <iframe
+                              title={m.title}
+                              sandbox=""
+                              srcDoc={m.html}
+                              className="h-[560px] w-full"
+                              loading="lazy"
+                            />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Disclaimer (solo si hay mockups) */}
+                {preview.mockups.length > 0 && (
+                  <p className="mt-8 rounded-2xl border border-line bg-surface/30 p-4 text-xs leading-relaxed text-faint">
+                    Las imágenes mostradas son representaciones conceptuales generadas mediante
+                    inteligencia artificial para visualizar el resultado esperado. El producto final
+                    podrá sufrir ajustes funcionales, visuales o técnicos durante el proceso de
+                    desarrollo.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {preview.detectedFunctionalities.map((f) => (
-                      <span key={f} className="rounded-full border border-line bg-ink/40 px-3 py-1 text-xs text-muted">
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {preview.includedDeliverables.length > 0 && (
-                <div className="rounded-3xl border border-line bg-surface/40 p-5">
-                  <p className="mb-3 text-sm font-medium">Entregables incluidos</p>
-                  <ul className="flex flex-col gap-2">
-                    {preview.includedDeliverables.map((d) => (
-                      <li key={d} className="flex items-center gap-2 text-sm text-muted">
-                        <CheckIcon className="h-3.5 w-3.5 shrink-0 text-brand-blue" /> {d}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+                )}
+              </>
+            )}
 
-            {/* Mockups */}
-            <div className="mt-8 space-y-8">
-              {preview.mockups.map((m, i) => (
-                <motion.div
-                  key={`${m.title}-${i}`}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.5, ease }}
-                >
-                  <h3 className="font-display text-lg font-semibold tracking-tight">{m.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">{m.description}</p>
-                  <div className="mt-3 overflow-hidden rounded-2xl border border-line bg-white glow-violet">
-                    <iframe
-                      title={m.title}
-                      sandbox=""
-                      srcDoc={m.html}
-                      className="h-[560px] w-full"
-                      loading="lazy"
-                    />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Disclaimer */}
-            <p className="mt-8 rounded-2xl border border-line bg-surface/30 p-4 text-xs leading-relaxed text-faint">
-              Las imágenes mostradas son representaciones conceptuales generadas mediante
-              inteligencia artificial para visualizar el resultado esperado. El producto final
-              podrá sufrir ajustes funcionales, visuales o técnicos durante el proceso de
-              desarrollo.
-            </p>
+            {/* Próximos pasos / contacto */}
+            <NextSteps />
 
             {/* Feedback */}
             <div className="mt-6 rounded-3xl border border-line bg-surface/30 p-6">
@@ -233,23 +279,23 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
   );
 }
 
-/** Bloque que le da tranquilidad al cliente: está todo ok, no tiene que hacer nada más. */
-function Reassurance() {
+/** Próximos pasos: invita a seguir la conversación. Sin presión de pago. */
+function NextSteps() {
   return (
     <div className="mt-8 rounded-3xl border border-brand-cyan/25 bg-brand-cyan/[0.06] p-6">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet text-ink">
-          <CheckIcon className="h-4 w-4" strokeWidth={2.5} />
+          <BoltIcon className="h-4 w-4" strokeWidth={2.5} />
         </span>
         <div>
-          <p className="font-display text-lg font-semibold tracking-tight">¡Listo! Recibimos todo.</p>
+          <p className="font-display text-lg font-semibold tracking-tight">Próximos pasos</p>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Tu proyecto ya está en marcha. <span className="text-fg">No tenés que hacer nada más</span>:
-            nuestro equipo se pone a trabajar y, si necesitamos algo, te contactamos al dato que
-            dejaste.
+            Revisá la propuesta con calma. Cuando quieras, coordinamos para{" "}
+            <span className="text-fg">ajustar lo que haga falta y arrancar con la primera etapa</span>.
+            Cualquier duda, estamos a un mensaje.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            ¿Tenés alguna duda? Escribinos a{" "}
+            Escribinos a{" "}
             <a
               href={`mailto:${SITE.email}`}
               className="inline-flex items-center gap-1.5 font-medium text-brand-cyan hover:underline"
@@ -260,6 +306,17 @@ function Reassurance() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Contact() {
+  return (
+    <div className="mx-auto mt-6 max-w-md text-center text-sm text-muted">
+      ¿Dudas?{" "}
+      <a href={`mailto:${SITE.email}`} className="font-medium text-brand-cyan hover:underline">
+        {SITE.email}
+      </a>
     </div>
   );
 }

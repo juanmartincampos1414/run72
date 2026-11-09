@@ -49,6 +49,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
   const [loading, setLoading] = useState(true);
   const [obs, setObs] = useState("");
   const [busy, setBusy] = useState(false);
+  const [genErr, setGenErr] = useState("");
   const [openVersion, setOpenVersion] = useState<string | null>(null);
 
   async function load() {
@@ -80,7 +81,16 @@ export function LeadDetail({ leadId }: { leadId: string }) {
   async function regenerate() {
     if (!confirm("¿Regenerar el preview? Se guarda como una versión nueva (no borra las anteriores).")) return;
     setBusy(true);
-    await fetch(`/api/admin/leads/${leadId}/regenerate`, { method: "POST" });
+    setGenErr("");
+    try {
+      const r = await fetch(`/api/admin/leads/${leadId}/regenerate`, { method: "POST" });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || d.error) {
+        setGenErr(d.error || `No se pudo generar (${r.status}).`);
+      }
+    } catch (e) {
+      setGenErr(e instanceof Error ? e.message : "No se pudo generar.");
+    }
     await load();
     setBusy(false);
   }
@@ -238,6 +248,11 @@ export function LeadDetail({ leadId }: { leadId: string }) {
             {busy ? "Generando…" : versions.length > 0 ? "Regenerar preview" : "Generar preview"}
           </button>
         </div>
+        {genErr && (
+          <p className="mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+            {genErr}
+          </p>
+        )}
         <ClientLink leadId={leadId} />
 
         {latest && (
