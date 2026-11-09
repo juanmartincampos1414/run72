@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Logo } from "../Logo";
+import { HeroVisual } from "./HeroVisual";
 import { CheckIcon, BoltIcon, MailIcon } from "../icons";
 import { cn } from "@/lib/cn";
 import { SITE } from "@/lib/content";
@@ -92,6 +93,12 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
   const structured = Array.isArray(proposal?.scenarios) && proposal!.scenarios!.length > 0;
   const hasMockups = !!preview && preview.mockups.length > 0;
   const hasRoadmap = !!proposal?.roadmap && (proposal.roadmap.steps?.length ?? 0) > 0;
+  // Seed del visual del hero derivado del lead → patrón único por cliente.
+  const heroSeed = useMemo(() => {
+    let x = 0;
+    for (let i = 0; i < leadId.length; i++) x = (x * 31 + leadId.charCodeAt(i)) % 1000;
+    return x / 160;
+  }, [leadId]);
 
   const nav = [
     proposal?.opportunities?.length ? { id: "oportunidad", label: "Oportunidad" } : null,
@@ -143,8 +150,13 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
         {state === "ready" && proposal && (
           <>
             {/* HERO */}
-            <section className="border-b border-line bg-gradient-to-b from-surface/40 to-transparent">
-              <div className="container-x py-16 md:py-24">
+            <section className="relative overflow-hidden border-b border-line bg-ink">
+              {/* Visual animado futurista (flow field) */}
+              <HeroVisual seed={heroSeed} className="absolute inset-0 h-full w-full opacity-70" />
+              {/* Overlays para legibilidad del texto */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/20" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink to-transparent" />
+              <div className="container-x relative py-20 md:py-28">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
