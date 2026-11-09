@@ -189,7 +189,7 @@ export default function PropuestaPage() {
           <button
             onClick={generate}
             disabled={loading || transcript.trim().length < 30}
-            className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+            className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
           >
             {loading ? "Generando…" : "Generar propuesta"}
           </button>

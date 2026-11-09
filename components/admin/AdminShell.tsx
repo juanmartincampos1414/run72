@@ -39,7 +39,7 @@ export function AdminShell({
   }
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
+    <div className="run-warm-tool min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
       {/* Sidebar */}
       <aside className="border-b border-line lg:border-b-0 lg:border-r lg:min-h-screen">
         <div className="flex items-center justify-between p-5">

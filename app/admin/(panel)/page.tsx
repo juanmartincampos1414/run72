@@ -196,7 +196,7 @@ export default function LeadsPage() {
             <button
               onClick={createLead}
               disabled={creating || (!form.name.trim() && !form.email.trim() && !form.whatsapp.trim())}
-              className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-5 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+              className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-5 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
             >
               {creating ? "Creando…" : "Crear lead"}
             </button>

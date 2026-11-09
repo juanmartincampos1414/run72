@@ -28,7 +28,7 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-5">
+    <div className="run-warm-tool flex min-h-screen items-center justify-center px-5">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <Logo size={40} />

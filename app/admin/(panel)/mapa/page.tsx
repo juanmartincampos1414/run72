@@ -65,7 +65,7 @@ export default function MapaPage() {
           className="w-full rounded-xl border border-line bg-surface/40 px-4 py-3 text-sm outline-none focus:border-brand-violet" />
         <div className="flex items-center gap-3">
           <button onClick={generate} disabled={loading || (transcript.trim().length < 30 && scan.trim().length < 10)}
-            className="rounded-full bg-[linear-gradient(100deg,#38bdf8,#6366f1_48%,#a855f7)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50">
+            className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-6 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50">
             {loading ? "Generando…" : "Generar mapa"}
           </button>
           {error && <span className="text-sm text-rose-400">{error}</span>}
