@@ -200,7 +200,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
             )}
             <Panel
               title="Transcripción + propuesta"
-              hint="Pegá el script de la meet y generá la propuesta. RUN interpreta solo las etapas; no hace falta cargar enfoque."
+              hint="Subí el Word con la transcripción COMPLETA de la meet (no el resumen) y generá la propuesta. RUN interpreta solo las etapas; no hace falta cargar enfoque."
             >
               <TranscriptProposal
                 leadId={leadId}
@@ -618,6 +618,38 @@ function TranscriptProposal({
   const [err, setErr] = useState("");
   const [savedT, setSavedT] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [uploadedName, setUploadedName] = useState("");
+
+  async function handleFile(file: File) {
+    setErr("");
+    setUploadedName("");
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch("/api/admin/transcript/extract", { method: "POST", body: fd });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || !data.text) {
+        setErr(data.error || "No pude leer el archivo.");
+      } else {
+        setTranscript(data.text as string);
+        setUploadedName(`${data.name} · ${(data.chars as number).toLocaleString("es-AR")} caracteres`);
+        void saveTranscript(data.text as string);
+      }
+    } catch {
+      setErr("No pude leer el archivo.");
+    }
+    setUploading(false);
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) void handleFile(file);
+  }
 
   function compiledDiscovery() {
     const ans = discovery ?? {};
@@ -686,13 +718,49 @@ function TranscriptProposal({
   return (
     <div>
       <label className="text-xs text-faint">Transcripción de la reunión</label>
+
+      {/* Drop zone: arrastrá el .docx con la transcripción COMPLETA (no el resumen). */}
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        className={`mt-2 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed px-4 py-5 text-center transition-colors ${
+          dragOver ? "border-[#ff6a2a] bg-[#ff6a2a]/10" : "border-line bg-ink/20 hover:border-[#ff8a4c]/60"
+        }`}
+      >
+        <input
+          type="file"
+          accept=".docx,.txt,.md,.vtt,.srt"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleFile(f);
+            e.target.value = "";
+          }}
+        />
+        <span className="text-sm font-medium text-fg">
+          {uploading ? "Leyendo el archivo…" : "Arrastrá el Word acá o hacé clic para subirlo"}
+        </span>
+        <span className="text-[11px] text-faint">
+          Transcripción completa en .docx (o .txt / .vtt). Reemplaza el texto de abajo.
+        </span>
+        {uploadedName && !uploading && (
+          <span className="mt-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] text-emerald-300">
+            ✓ {uploadedName}
+          </span>
+        )}
+      </label>
+
       <textarea
         value={transcript}
         onChange={(e) => setTranscript(e.target.value)}
         onBlur={() => saveTranscript(transcript)}
         rows={6}
-        placeholder="Pegá acá la transcripción de la call (se guarda sola al salir del campo)…"
-        className="mt-2 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+        placeholder="…o pegá acá la transcripción de la call (se guarda sola al salir del campo)."
+        className="mt-3 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
       />
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
