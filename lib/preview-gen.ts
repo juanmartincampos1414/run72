@@ -134,6 +134,24 @@ function buildPrompt(lead: Record<string, unknown>, docs: Array<{ name?: string 
   const transcript = typeof lead.transcript === "string" ? lead.transcript.trim() : "";
   const summary = typeof lead.conversation_summary === "string" ? lead.conversation_summary.trim() : "";
   const focus = typeof lead.focus === "string" ? lead.focus.trim() : "";
+
+  // La propuesta ya generada (desde la transcripción) encierra la Fase 1
+  // recomendada: la usamos como enfoque automático para los mockups, sin que
+  // nadie tenga que cargar un "enfoque" a mano.
+  const prop =
+    lead.proposal && typeof lead.proposal === "object"
+      ? (lead.proposal as { summary?: string; draft?: string; detectedNeeds?: string[] })
+      : null;
+  const proposalContext = prop
+    ? [
+        prop.summary ? `Resumen de la propuesta: ${prop.summary}` : "",
+        prop.detectedNeeds?.length ? `Necesidades: ${prop.detectedNeeds.join("; ")}` : "",
+        prop.draft ? `Propuesta enviada al cliente (incluye la Fase 1 recomendada):\n${prop.draft.slice(0, 6000)}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : "";
+
   const disc =
     lead.discovery && typeof lead.discovery === "object" ? (lead.discovery as Record<string, string>) : null;
   const discoveryText = disc
@@ -141,13 +159,14 @@ function buildPrompt(lead: Record<string, unknown>, docs: Array<{ name?: string 
         .map((q) => `- ${q.q}: ${disc[q.id]}`)
         .join("\n")
     : "";
-  const fromCall = Boolean(transcript || focus || discoveryText);
+  const fromCall = Boolean(transcript || focus || discoveryText || proposalContext);
 
   return [
     fromCall
-      ? "Generá la vista previa VISUAL del proyecto basándote en la REUNIÓN con el cliente (datos abajo). Los mockups tienen que REFLEJAR lo que se habló. Si hay un ENFOQUE / Fase 1 indicado, mostrá ESA fase (ej: si la Fase 1 es un ecommerce, generá el ecommerce completo del rubro del cliente: Home, Listado, Ficha de producto, Checkout), con datos realistas del negocio."
+      ? "Generá la vista previa VISUAL del proyecto basándote en la REUNIÓN con el cliente y la PROPUESTA ya armada (datos abajo). Los mockups tienen que REFLEJAR la Fase 1 recomendada en la propuesta. Deducí vos la fase de arranque a partir de la propuesta/transcripción (no esperes un enfoque cargado a mano): si la Fase 1 es un ecommerce, generá el ecommerce completo del rubro del cliente (Home, Listado, Ficha de producto, Checkout); si es una landing, el flujo de landing; etc. Siempre con datos realistas del negocio real del cliente."
       : "Generá la vista previa conceptual de este proyecto YA contratado.",
     `Proyecto: ${lead.project_label ?? "a definir"}.`,
+    proposalContext,
     focus ? `ENFOQUE / Fase 1 recomendada por RUN (PRIORIZAR esto en los mockups): ${focus}` : "",
     `Tipo(s) (slugs): ${lead.project_type ?? "—"}.`,
     `Estado de marca: ${lead.brand_status ?? "—"}.`,

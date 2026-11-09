@@ -42,6 +42,8 @@ const EVENT_LABEL: Record<string, string> = {
   lead_created_from_chat: "Lead creado desde chat",
 };
 
+type TabId = "propuesta" | "preview" | "descubrimiento" | "pago" | "entrega" | "actividad";
+
 export function LeadDetail({ leadId }: { leadId: string }) {
   const [lead, setLead] = useState<Lead | null>(null);
   const [versions, setVersions] = useState<Version[]>([]);
@@ -51,6 +53,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
   const [busy, setBusy] = useState(false);
   const [genErr, setGenErr] = useState("");
   const [openVersion, setOpenVersion] = useState<string | null>(null);
+  const [tab, setTab] = useState<TabId>("propuesta");
 
   async function load() {
     const r = await fetch(`/api/admin/leads/${leadId}`);
@@ -100,13 +103,32 @@ export function LeadDetail({ leadId }: { leadId: string }) {
 
   const latest = versions[0]?.preview ?? null;
 
+  const discAnswered = lead.discovery
+    ? DISCOVERY_QUESTIONS.filter((q) => (lead.discovery?.[q.id] ?? "").trim()).length
+    : 0;
+  const hasProposal = Boolean(lead.proposal && Object.keys(lead.proposal).length);
+  const hasComprobante = lead.comprobante_status === "recibido";
+
+  const tabs: { id: TabId; label: string; badge?: React.ReactNode }[] = [
+    { id: "propuesta", label: "Propuesta", badge: hasProposal ? <Dot /> : undefined },
+    { id: "preview", label: "Preview", badge: versions.length > 0 ? <Dot /> : undefined },
+    {
+      id: "descubrimiento",
+      label: "Descubrimiento",
+      badge: discAnswered > 0 ? <TabCount n={discAnswered} /> : undefined,
+    },
+    { id: "pago", label: "Pago", badge: hasComprobante ? <Dot warn /> : undefined },
+    { id: "entrega", label: "Entrega" },
+    { id: "actividad", label: "Actividad" },
+  ];
+
   return (
     <div className="max-w-4xl">
       <Link href="/admin" className="text-sm text-muted hover:text-fg">
         ← Volver a Leads
       </Link>
 
-      {/* Header */}
+      {/* Header (siempre visible) */}
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">{lead.name}</h1>
@@ -140,199 +162,270 @@ export function LeadDetail({ leadId }: { leadId: string }) {
         </div>
       )}
 
-      {/* Resumen conversacional (leads de chat) */}
-      {lead.conversation_summary && (
-        <Section title="Resumen de la conversación">
-          <p className="text-sm leading-relaxed text-muted">{lead.conversation_summary}</p>
-        </Section>
-      )}
+      {/* Tabs */}
+      <div
+        role="tablist"
+        aria-label="Secciones del lead"
+        className="mt-6 flex flex-wrap gap-1 border-b border-line"
+      >
+        {tabs.map((t) => {
+          const active = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => setTab(t.id)}
+              className={`-mb-px flex items-center gap-2 rounded-t-lg border-b-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                active
+                  ? "border-[#ff6a2a] text-fg"
+                  : "border-transparent text-muted hover:text-fg"
+              }`}
+            >
+              {t.label}
+              {t.badge}
+            </button>
+          );
+        })}
+      </div>
 
-      {/* Guía de descubrimiento (primera meet) */}
-      <Section title="Descubrimiento (primera meet)">
-        <DiscoveryGuide leadId={leadId} initial={lead.discovery} />
-      </Section>
-
-      {/* Transcripción + propuesta */}
-      <Section title="Transcripción + propuesta">
-        <TranscriptProposal
-          leadId={leadId}
-          initialTranscript={lead.transcript}
-          initialProposal={lead.proposal}
-          initialFocus={lead.focus}
-          discovery={lead.discovery}
-        />
-      </Section>
-
-      {/* Pago + comprobante */}
-      <Section title="Pago">
-        <div className="flex flex-wrap gap-2">
-          <Badge {...ANTICIPO_LABEL[anticipoState(lead)]} />
-          <Badge {...saldoState(lead)} />
-        </div>
-        {lead.payment_status === "approved" && (
-          <p className="mt-3 text-xs text-emerald-400">
-            ✅ Pago MercadoPago confirmado{lead.payment_id ? ` · #${lead.payment_id}` : ""}
-            {lead.production_started_at ? ` · ${fmt(lead.production_started_at)}` : ""} · {formatARS(lead.deposit_ars)}
-          </p>
+      <div className="mt-5">
+        {/* PROPUESTA */}
+        {tab === "propuesta" && (
+          <div className="space-y-6">
+            {lead.conversation_summary && (
+              <Panel title="Resumen de la conversación">
+                <p className="text-sm leading-relaxed text-muted">{lead.conversation_summary}</p>
+              </Panel>
+            )}
+            <Panel
+              title="Transcripción + propuesta"
+              hint="Pegá el script de la meet y generá la propuesta. RUN interpreta solo las etapas; no hace falta cargar enfoque."
+            >
+              <TranscriptProposal
+                leadId={leadId}
+                initialTranscript={lead.transcript}
+                initialProposal={lead.proposal}
+                discovery={lead.discovery}
+              />
+            </Panel>
+          </div>
         )}
 
-        {lead.comprobante_url ? (
-          <div className="mt-4 rounded-2xl border border-line bg-ink/40 p-4">
-            <p className="mb-2 text-sm font-medium">📎 Comprobante de transferencia</p>
-            <p className="text-xs text-faint">
-              {lead.comprobante_name} · {lead.comprobante_uploaded_at ? fmt(lead.comprobante_uploaded_at) : ""}
-              {lead.comprobante_status ? ` · estado: ${lead.comprobante_status}` : ""}
-            </p>
-            {/\.(png|jpe?g|webp|gif)$/i.test(lead.comprobante_name ?? "") ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={lead.comprobante_url} alt="Comprobante" className="mt-3 max-h-80 rounded-xl border border-line" />
-            ) : (
-              <a href={lead.comprobante_url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-brand-cyan hover:underline">
-                Abrir comprobante (PDF) →
-              </a>
+        {/* PREVIEW */}
+        {tab === "preview" && (
+          <Panel
+            title="Preview visual (lo que ve el cliente)"
+            hint="Mockups que ve el cliente en su link. Se arman solos con la transcripción + la propuesta de arriba — no necesitás cargar nada más."
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-muted">
+                {versions.length > 0
+                  ? `${versions.length} versión(es) · última: ${fmt(versions[0].created_at)} por ${versions[0].created_by ?? "—"}`
+                  : "Todavía no se generó."}
+              </p>
+              <button
+                onClick={regenerate}
+                disabled={busy}
+                className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+              >
+                {busy ? "Generando…" : versions.length > 0 ? "Regenerar preview" : "Generar preview"}
+              </button>
+            </div>
+            {genErr && (
+              <p className="mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                {genErr}
+              </p>
+            )}
+            <ClientLink leadId={leadId} />
+
+            {latest && (
+              <>
+                <p className="mt-4 text-sm leading-relaxed text-muted">{latest.interpretation}</p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {latest.mockups.map((m, i) => (
+                    <div key={i} className="overflow-hidden rounded-xl border border-line bg-white">
+                      <iframe title={m.title} sandbox="" srcDoc={m.html} className="h-72 w-full" loading="lazy" />
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
-            {lead.comprobante_status === "recibido" && (
-              <div className="mt-4">
-                <textarea
-                  value={obs}
-                  onChange={(e) => setObs(e.target.value)}
-                  rows={2}
-                  placeholder="Observaciones (opcional)"
-                  className="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand-blue/60"
-                />
-                <div className="mt-2 flex gap-2">
-                  <button
-                    onClick={() => action("approve_payment")}
-                    disabled={busy}
-                    className="rounded-full bg-emerald-500/15 px-4 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-50"
-                  >
-                    Aprobar pago
-                  </button>
-                  <button
-                    onClick={() => action("reject_payment")}
-                    disabled={busy}
-                    className="rounded-full bg-red-500/15 px-4 py-1.5 text-xs font-medium text-red-300 hover:bg-red-500/25 disabled:opacity-50"
-                  >
-                    Rechazar
-                  </button>
+            {versions.length > 0 && (
+              <div className="mt-5">
+                <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-faint">Historial</p>
+                <div className="space-y-2">
+                  {versions.map((v) => (
+                    <div key={v.id} className="rounded-xl border border-line bg-ink/40">
+                      <button
+                        onClick={() => setOpenVersion(openVersion === v.id ? null : v.id)}
+                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-xs"
+                      >
+                        <span>
+                          {fmt(v.created_at)} · {v.created_by ?? "—"} · {v.preview?.mockups.length ?? 0} mockups
+                        </span>
+                        <span className="text-muted">{openVersion === v.id ? "−" : "+"}</span>
+                      </button>
+                      {openVersion === v.id && (
+                        <div className="border-t border-line px-4 py-3 text-xs text-muted">
+                          <p className="mb-2">{v.response}</p>
+                          <details>
+                            <summary className="cursor-pointer text-faint">Ver prompt utilizado</summary>
+                            <pre className="mt-2 whitespace-pre-wrap break-words text-[11px] text-faint">{v.prompt}</pre>
+                          </details>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-            {lead.comprobante_observaciones && (
-              <p className="mt-3 text-xs text-faint">Obs: {lead.comprobante_observaciones}</p>
-            )}
-          </div>
-        ) : (
-          <p className="mt-3 text-xs text-faint">Sin comprobante adjunto.</p>
+          </Panel>
         )}
-      </Section>
 
-      {/* Preview IA */}
-      <Section title="Preview visual (lo que ve el cliente)">
-        <p className="mb-3 text-xs text-faint">
-          Mockups del proyecto que ve el cliente. Usa la transcripción, el descubrimiento y el enfoque de arriba —
-          generá/regenerá después de cargarlos.
-        </p>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted">
-            {versions.length > 0
-              ? `${versions.length} versión(es) · última: ${fmt(versions[0].created_at)} por ${versions[0].created_by ?? "—"}`
-              : "Todavía no se generó."}
-          </p>
-          <button
-            onClick={regenerate}
-            disabled={busy}
-            className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+        {/* DESCUBRIMIENTO */}
+        {tab === "descubrimiento" && (
+          <Panel
+            title="Descubrimiento (primera meet)"
+            hint="Guía de preguntas para la primera reunión. Tocá cada bloque para abrirlo. Se guarda solo."
           >
-            {busy ? "Generando…" : versions.length > 0 ? "Regenerar preview" : "Generar preview"}
-          </button>
-        </div>
-        {genErr && (
-          <p className="mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-            {genErr}
-          </p>
+            <DiscoveryGuide leadId={leadId} initial={lead.discovery} />
+          </Panel>
         )}
-        <ClientLink leadId={leadId} />
 
-        {latest && (
-          <>
-            <p className="mt-4 text-sm leading-relaxed text-muted">{latest.interpretation}</p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {latest.mockups.map((m, i) => (
-                <div key={i} className="overflow-hidden rounded-xl border border-line bg-white">
-                  <iframe title={m.title} sandbox="" srcDoc={m.html} className="h-72 w-full" loading="lazy" />
-                </div>
-              ))}
+        {/* PAGO */}
+        {tab === "pago" && (
+          <Panel title="Pago">
+            <div className="flex flex-wrap gap-2">
+              <Badge {...ANTICIPO_LABEL[anticipoState(lead)]} />
+              <Badge {...saldoState(lead)} />
             </div>
-          </>
-        )}
+            {lead.payment_status === "approved" && (
+              <p className="mt-3 text-xs text-emerald-400">
+                ✅ Pago MercadoPago confirmado{lead.payment_id ? ` · #${lead.payment_id}` : ""}
+                {lead.production_started_at ? ` · ${fmt(lead.production_started_at)}` : ""} · {formatARS(lead.deposit_ars)}
+              </p>
+            )}
 
-        {/* Historial */}
-        {versions.length > 0 && (
-          <div className="mt-5">
-            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-faint">Historial</p>
-            <div className="space-y-2">
-              {versions.map((v) => (
-                <div key={v.id} className="rounded-xl border border-line bg-ink/40">
-                  <button
-                    onClick={() => setOpenVersion(openVersion === v.id ? null : v.id)}
-                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-xs"
-                  >
-                    <span>
-                      {fmt(v.created_at)} · {v.created_by ?? "—"} · {v.preview?.mockups.length ?? 0} mockups
-                    </span>
-                    <span className="text-muted">{openVersion === v.id ? "−" : "+"}</span>
-                  </button>
-                  {openVersion === v.id && (
-                    <div className="border-t border-line px-4 py-3 text-xs text-muted">
-                      <p className="mb-2">{v.response}</p>
-                      <details>
-                        <summary className="cursor-pointer text-faint">Ver prompt utilizado</summary>
-                        <pre className="mt-2 whitespace-pre-wrap break-words text-[11px] text-faint">{v.prompt}</pre>
-                      </details>
+            {lead.comprobante_url ? (
+              <div className="mt-4 rounded-2xl border border-line bg-ink/40 p-4">
+                <p className="mb-2 text-sm font-medium">📎 Comprobante de transferencia</p>
+                <p className="text-xs text-faint">
+                  {lead.comprobante_name} · {lead.comprobante_uploaded_at ? fmt(lead.comprobante_uploaded_at) : ""}
+                  {lead.comprobante_status ? ` · estado: ${lead.comprobante_status}` : ""}
+                </p>
+                {/\.(png|jpe?g|webp|gif)$/i.test(lead.comprobante_name ?? "") ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={lead.comprobante_url} alt="Comprobante" className="mt-3 max-h-80 rounded-xl border border-line" />
+                ) : (
+                  <a href={lead.comprobante_url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-sm text-brand-cyan hover:underline">
+                    Abrir comprobante (PDF) →
+                  </a>
+                )}
+
+                {lead.comprobante_status === "recibido" && (
+                  <div className="mt-4">
+                    <textarea
+                      value={obs}
+                      onChange={(e) => setObs(e.target.value)}
+                      rows={2}
+                      placeholder="Observaciones (opcional)"
+                      className="w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand-blue/60"
+                    />
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        onClick={() => action("approve_payment")}
+                        disabled={busy}
+                        className="rounded-full bg-emerald-500/15 px-4 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-50"
+                      >
+                        Aprobar pago
+                      </button>
+                      <button
+                        onClick={() => action("reject_payment")}
+                        disabled={busy}
+                        className="rounded-full bg-red-500/15 px-4 py-1.5 text-xs font-medium text-red-300 hover:bg-red-500/25 disabled:opacity-50"
+                      >
+                        Rechazar
+                      </button>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                )}
+                {lead.comprobante_observaciones && (
+                  <p className="mt-3 text-xs text-faint">Obs: {lead.comprobante_observaciones}</p>
+                )}
+              </div>
+            ) : (
+              <p className="mt-3 text-xs text-faint">Sin comprobante adjunto.</p>
+            )}
+          </Panel>
+        )}
+
+        {/* ENTREGA */}
+        {tab === "entrega" && (
+          <Panel title="Documento Final de Entrega">
+            <DeliveryDocEditor lead={lead} leadId={leadId} />
+          </Panel>
+        )}
+
+        {/* ACTIVIDAD */}
+        {tab === "actividad" && (
+          <div className="space-y-6">
+            {lead.intake && Object.keys(lead.intake).length > 0 && (
+              <Panel title="Información del cliente">
+                <IntakeView intake={lead.intake} level={lead.preparation_level} />
+              </Panel>
+            )}
+            <Panel title="Auditoría">
+              {events.length === 0 ? (
+                <p className="text-xs text-faint">Sin eventos registrados.</p>
+              ) : (
+                <ol className="relative space-y-3 border-l border-line pl-5">
+                  {events.map((e, i) => (
+                    <li key={i} className="relative">
+                      <span className="absolute -left-[23px] top-1 h-2 w-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet" />
+                      <p className="text-sm">{EVENT_LABEL[e.event_type] ?? e.event_type}</p>
+                      <p className="text-[11px] text-faint">
+                        {fmt(e.created_at)}
+                        {e.metadata?.actor ? ` · ${String(e.metadata.actor)}` : ""}
+                        {e.metadata?.observaciones ? ` · ${String(e.metadata.observaciones)}` : ""}
+                        {e.metadata?.status ? ` · ${String(e.metadata.status)}` : ""}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </Panel>
           </div>
         )}
-      </Section>
+      </div>
+    </div>
+  );
+}
 
-      {/* Información del cliente (intake) */}
-      {lead.intake && Object.keys(lead.intake).length > 0 && (
-        <Section title="Información del cliente">
-          <IntakeView intake={lead.intake} level={lead.preparation_level} />
-        </Section>
-      )}
+/** Punto indicador en un tab (hay contenido). */
+function Dot({ warn }: { warn?: boolean }) {
+  return (
+    <span className={`h-1.5 w-1.5 rounded-full ${warn ? "bg-amber-400" : "bg-[#ff6a2a]"}`} />
+  );
+}
 
-      {/* Documento Final de Entrega */}
-      <Section title="Documento Final de Entrega">
-        <DeliveryDocEditor lead={lead} leadId={leadId} />
-      </Section>
+function TabCount({ n }: { n: number }) {
+  return (
+    <span className="rounded-full bg-white/[0.08] px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-muted">
+      {n}
+    </span>
+  );
+}
 
-      {/* Auditoría */}
-      <Section title="Auditoría">
-        {events.length === 0 ? (
-          <p className="text-xs text-faint">Sin eventos registrados.</p>
-        ) : (
-          <ol className="relative space-y-3 border-l border-line pl-5">
-            {events.map((e, i) => (
-              <li key={i} className="relative">
-                <span className="absolute -left-[23px] top-1 h-2 w-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet" />
-                <p className="text-sm">{EVENT_LABEL[e.event_type] ?? e.event_type}</p>
-                <p className="text-[11px] text-faint">
-                  {fmt(e.created_at)}
-                  {e.metadata?.actor ? ` · ${String(e.metadata.actor)}` : ""}
-                  {e.metadata?.observaciones ? ` · ${String(e.metadata.observaciones)}` : ""}
-                  {e.metadata?.status ? ` · ${String(e.metadata.status)}` : ""}
-                </p>
-              </li>
-            ))}
-          </ol>
-        )}
-      </Section>
+/** Contenedor de panel dentro de un tab (reemplaza Section en el cuerpo). */
+function Panel({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-3xl border border-line bg-surface/40 p-5 sm:p-6">
+      <h2 className="font-display text-lg font-semibold tracking-tight">{title}</h2>
+      {hint && <p className="mb-4 mt-1 text-xs text-faint">{hint}</p>}
+      {!hint && <div className="mb-4" />}
+      {children}
     </div>
   );
 }
@@ -416,6 +509,12 @@ function DiscoveryGuide({ leadId, initial }: { leadId: string; initial: Record<s
   const total = DISCOVERY_QUESTIONS.length;
   const pending = total - answered;
 
+  // Primera sección sin completar abierta por defecto; si está todo, la primera.
+  const firstIncomplete = DISCOVERY_SECTIONS.find((sec) =>
+    DISCOVERY_QUESTIONS.some((q) => q.section === sec && !(answers[q.id] ?? "").trim()),
+  );
+  const [open, setOpen] = useState<string | null>(firstIncomplete ?? DISCOVERY_SECTIONS[0] ?? null);
+
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
@@ -429,42 +528,66 @@ function DiscoveryGuide({ leadId, initial }: { leadId: string; initial: Record<s
         )}
         {saved && <span className="text-emerald-400">Guardado ✓</span>}
       </div>
-      <div className="space-y-6">
-        {DISCOVERY_SECTIONS.map((sec) => (
-          <div key={sec}>
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">{sec}</p>
-            <div className="space-y-2.5">
-              {DISCOVERY_QUESTIONS.filter((q) => q.section === sec).map((q) => {
-                const done = (answers[q.id] ?? "").trim().length > 0;
-                return (
-                  <div
-                    key={q.id}
-                    className={`rounded-xl border bg-surface/40 p-3 ${done ? "border-emerald-500/30" : "border-amber-500/25"}`}
+
+      {/* Acordeón: una fila apilada por sección, colapsada por defecto */}
+      <div className="space-y-2">
+        {DISCOVERY_SECTIONS.map((sec) => {
+          const qs = DISCOVERY_QUESTIONS.filter((q) => q.section === sec);
+          const secDone = qs.filter((q) => (answers[q.id] ?? "").trim()).length;
+          const complete = secDone === qs.length;
+          const isOpen = open === sec;
+          return (
+            <div key={sec} className="overflow-hidden rounded-xl border border-line bg-ink/30">
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => setOpen(isOpen ? null : sec)}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-white/[0.02]"
+              >
+                <span className="text-sm font-medium text-fg">{sec}</span>
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums ${
+                      complete ? "bg-emerald-500/15 text-emerald-300" : "bg-white/[0.06] text-muted"
+                    }`}
                   >
-                    <div className="flex items-start gap-2 text-sm text-fg">
-                      <span className={done ? "text-emerald-400" : "text-amber-400"}>{done ? "✓" : "•"}</span>
-                      <span>{q.q}</span>
-                    </div>
-                    <textarea
-                      value={answers[q.id] ?? ""}
-                      onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
-                      onBlur={() => setAnswers((a) => { void save(a); return a; })}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          (e.target as HTMLTextAreaElement).blur();
-                        }
-                      }}
-                      rows={1}
-                      placeholder="Escribí la respuesta…  (Enter guarda · Shift+Enter = nueva línea)"
-                      className="mt-2 w-full resize-y rounded-lg border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
-                    />
-                  </div>
-                );
-              })}
+                    {secDone}/{qs.length}
+                  </span>
+                  <span className="text-muted">{isOpen ? "−" : "+"}</span>
+                </span>
+              </button>
+              {isOpen && (
+                <div className="space-y-2.5 border-t border-line px-4 py-3">
+                  {qs.map((q) => {
+                    const done = (answers[q.id] ?? "").trim().length > 0;
+                    return (
+                      <div key={q.id}>
+                        <div className="flex items-start gap-2 text-sm text-fg">
+                          <span className={done ? "text-emerald-400" : "text-amber-400"}>{done ? "✓" : "•"}</span>
+                          <span>{q.q}</span>
+                        </div>
+                        <textarea
+                          value={answers[q.id] ?? ""}
+                          onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
+                          onBlur={() => setAnswers((a) => { void save(a); return a; })}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              (e.target as HTMLTextAreaElement).blur();
+                            }
+                          }}
+                          rows={1}
+                          placeholder="Escribí la respuesta…  (Enter guarda · Shift+Enter = nueva línea)"
+                          className="mt-2 w-full resize-y rounded-lg border border-line bg-surface/60 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -482,34 +605,19 @@ function TranscriptProposal({
   leadId,
   initialTranscript,
   initialProposal,
-  initialFocus,
   discovery,
 }: {
   leadId: string;
   initialTranscript: string | null;
   initialProposal: Record<string, unknown> | null;
-  initialFocus: string | null;
   discovery: Record<string, string> | null;
 }) {
   const [transcript, setTranscript] = useState(initialTranscript ?? "");
-  const [focus, setFocus] = useState(initialFocus ?? "");
   const [proposal, setProposal] = useState<GenProposal | null>((initialProposal as GenProposal) ?? null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [savedT, setSavedT] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  async function saveFocus(text: string) {
-    try {
-      await fetch(`/api/admin/leads/${leadId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ focus: text }),
-      });
-    } catch {
-      /* ignore */
-    }
-  }
 
   function compiledDiscovery() {
     const ans = discovery ?? {};
@@ -545,7 +653,7 @@ function TranscriptProposal({
       const r = await fetch("/api/admin/proposal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: effective, notes: disc, focus }),
+        body: JSON.stringify({ transcript: effective, notes: disc }),
       });
       const data = await r.json();
       if (!r.ok) {
@@ -586,16 +694,6 @@ function TranscriptProposal({
         placeholder="Pegá acá la transcripción de la call (se guarda sola al salir del campo)…"
         className="mt-2 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
       />
-      <label className="mt-4 block text-xs text-faint">
-        Enfoque / recomendación de RUN (opcional — ej: &quot;Fase 1: ecommerce completo&quot;)
-      </label>
-      <input
-        value={focus}
-        onChange={(e) => setFocus(e.target.value)}
-        onBlur={() => saveFocus(focus)}
-        placeholder="Qué proponemos como arranque — guía la propuesta por etapas y el preview visual del cliente"
-        className="mt-2 w-full rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
-      />
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           onClick={generate}
@@ -607,7 +705,10 @@ function TranscriptProposal({
         {savedT && <span className="text-xs text-emerald-400">Transcripción guardada ✓</span>}
         {err && <span className="text-sm text-red-300">{err}</span>}
       </div>
-      <p className="mt-1 text-xs text-faint">Usa la transcripción + las respuestas de descubrimiento de arriba.</p>
+      <p className="mt-1 text-xs text-faint">
+        Usa la transcripción + el descubrimiento. RUN deduce las etapas (ej: arrancar por un ecommerce) sola.
+        Después, en la pestaña <span className="text-muted">Preview</span>, generás los mockups con un clic.
+      </p>
 
       {proposal && (
         <div className="mt-5 space-y-5">
@@ -698,15 +799,6 @@ function ClientLink({ leadId }: { leadId: string }) {
       >
         {copied ? "¡Copiado!" : "Copiar link"}
       </button>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mt-6 rounded-3xl border border-line bg-surface/40 p-5 sm:p-6">
-      <h2 className="mb-4 font-display text-lg font-semibold tracking-tight">{title}</h2>
-      {children}
     </div>
   );
 }
