@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const supabase = getSupabaseAdmin();
   const base: Record<string, unknown> = {
     name: name || "Lead manual",
-    email: email || null,
+    email: email || "",
     whatsapp,
     phone: whatsapp,
     company,

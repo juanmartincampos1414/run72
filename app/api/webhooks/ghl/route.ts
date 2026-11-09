@@ -79,7 +79,7 @@ export async function POST(req: Request) {
 
   const base: Record<string, unknown> = {
     name: nombre || "Lead de pauta",
-    email: email || null,
+    email: email || "",
     whatsapp,
     phone: whatsapp,
     project_label: "Software / IA a medida (pauta)",
