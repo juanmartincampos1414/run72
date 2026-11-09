@@ -23,6 +23,95 @@ type Result = {
 
 const ars = (n: number) => "$" + new Intl.NumberFormat("es-AR").format(n);
 
+// Guía de descubrimiento para la primera meet. Se carga en el campo y se escriben
+// las respuestas bajo cada "→"; después "Generar propuesta" la usa como insumo.
+const GUIA_DESCUBRIMIENTO = `GUÍA DE DESCUBRIMIENTO — PRIMERA MEET
+Escribí la respuesta debajo de cada "→". Después tocá "Generar propuesta".
+
+— 1. CONTEXTO DEL NEGOCIO —
+• ¿A qué se dedican y hace cuánto operan?
+→
+• Tamaño (empleados, clientes, facturación/etapa):
+→
+• ¿Quién decide la inversión y quién va a usar la solución?
+→
+
+— 2. EL PROBLEMA (por qué ahora) —
+• ¿Qué problema puntual quieren resolver?
+→
+• ¿Por qué ahora? ¿Qué pasa si no lo resuelven?
+→
+• ¿Ya intentaron resolverlo? ¿Con qué y por qué no alcanzó?
+→
+
+— 3. PROCESO ACTUAL (lo más importante) —
+• ¿Cómo es el proceso hoy, paso a paso (quién hace qué)?
+→
+• ¿Qué herramientas usan hoy (planillas, WhatsApp, CRM, ERP…)?
+→
+• ¿Dónde se traba / demora / falla?
+→
+• Volumen (casos/día, pedidos, operaciones…):
+→
+• ¿Cuánto tiempo/plata consume hoy? (para el ROI)
+→
+• ¿Qué es repetitivo/manual vs. qué necesita criterio humano?
+→
+
+— 4. SOLUCIÓN IMAGINADA (alcance / MVP) —
+• ¿Cómo se imaginan la solución ideal?
+→
+• Imprescindible para la v1 vs. deseable (después):
+→
+• ¿Software a medida, automatización, IA o mezcla? ¿Web / app / interno?
+→
+• ¿Algo que explícitamente NO quieren?
+→
+
+— 5. DATOS Y SISTEMAS —
+• ¿Qué datos manejan y dónde viven hoy? ¿En qué estado/calidad?
+→
+• ¿Con qué sistemas debe integrarse? (pagos, facturación, WhatsApp, APIs…)
+→
+• ¿Datos sensibles / regulación? (salud, datos personales, legal)
+→
+• ¿Tienen equipo técnico interno?
+→
+
+— 6. OBJETIVOS Y ÉXITO —
+• Si sale perfecto, ¿qué cambia en 3-6 meses?
+→
+• Resultado concreto esperado (horas ahorradas, % más de cierre, menos errores…):
+→
+• ¿Cómo lo van a medir?
+→
+
+— 7. GENTE Y ADOPCIÓN —
+• ¿Quién lo va a usar día a día? ¿Hay resistencia al cambio?
+→
+• Referente/owner del proyecto de su lado:
+→
+
+— 8. TIEMPOS, PRESUPUESTO Y DECISIÓN —
+• ¿Para cuándo lo necesitan? ¿Hay deadline o evento gatillo?
+→
+• Presupuesto que tienen en mente (rango):
+→
+• ¿Cómo deciden? ¿Quién firma? ¿Qué necesitan para avanzar?
+→
+• ¿MVP rápido e iterar o todo de una? ¿Proyecto cerrado / por fases / mantenimiento?
+→
+
+— 9. RIESGOS Y EXPECTATIVAS —
+• ¿Qué les preocupa / qué podría hacer fracasar esto?
+→
+• Malas experiencias previas / qué valoran de un partner:
+→
+
+— PRÓXIMO PASO ACORDADO —
+→
+`;
+
 export default function PropuestaPage() {
   const [transcript, setTranscript] = useState("");
   const [notes, setNotes] = useState("");
@@ -72,6 +161,17 @@ export default function PropuestaPage() {
       </p>
 
       <div className="mt-6 flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            if (!transcript.trim() || confirm("¿Reemplazar el contenido actual con la guía de preguntas?")) {
+              setTranscript(GUIA_DESCUBRIMIENTO);
+            }
+          }}
+          className="self-start rounded-full border border-line px-3.5 py-1.5 text-xs text-muted transition hover:border-brand-violet hover:text-fg"
+        >
+          + Cargar guía de preguntas (primera meet)
+        </button>
         <textarea
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
