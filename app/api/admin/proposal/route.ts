@@ -43,10 +43,12 @@ export async function POST(req: Request) {
 
   let transcript = "";
   let notes = "";
+  let focus = "";
   try {
     const body = await req.json();
     transcript = String(body.transcript ?? "").slice(0, 60000).trim();
     notes = String(body.notes ?? "").slice(0, 4000).trim();
+    focus = String(body.focus ?? "").slice(0, 2000).trim();
   } catch {
     return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
@@ -71,6 +73,7 @@ Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente (y a vece
 1) Interpretar la necesidad REAL del cliente (no solo lo que pide literal).
 2) Elegir qué cotizar usando EXCLUSIVAMENTE los slugs/claves del catálogo de abajo. No inventes servicios ni precios: los precios los calcula el sistema.
 3) Escribir "draft": un borrador de propuesta en español rioplatense (vos), claro y humano, listo para que alguien de RUN lo revise y se lo mande al cliente. Estructura: qué entendimos, qué proponemos y por qué, alcance, y próximos pasos (coordinar la videollamada / arrancar). NO incluyas precios en el draft (van aparte).
+   Si se indica un ENFOQUE / recomendación de RUN (abajo), estructurá la propuesta POR ETAPAS: presentá primero la Fase 1 recomendada (qué incluye y por qué conviene arrancar por ahí), y enumerá las fases siguientes a grandes rasgos. Si no se indica enfoque y el proyecto es grande, sugerí vos un arranque por fases.
 4) En "missing", listar los datos que falten para cerrar bien el presupuesto.
 Si la transcripción es ambigua, igual proponé lo más razonable y marcá los faltantes.
 
@@ -85,7 +88,12 @@ ${buildCatalog(services, micros)}`;
       max_tokens: 3000,
       output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "medium" },
       system,
-      messages: [{ role: "user", content: `Transcripción de la call:\n${transcript}${notes ? `\n\nNotas:\n${notes}` : ""}` }],
+      messages: [
+        {
+          role: "user",
+          content: `Transcripción de la call:\n${transcript}${notes ? `\n\nNotas:\n${notes}` : ""}${focus ? `\n\nENFOQUE / recomendación de RUN (estructurá la propuesta por etapas priorizando esto):\n${focus}` : ""}`,
+        },
+      ],
     });
     const block = response.content.find((b) => b.type === "text");
     const raw = block && "text" in block ? block.text : "{}";

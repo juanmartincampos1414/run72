@@ -148,6 +148,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
           leadId={leadId}
           initialTranscript={lead.transcript}
           initialProposal={lead.proposal}
+          initialFocus={lead.focus}
           discovery={lead.discovery}
         />
       </Section>
@@ -218,21 +219,26 @@ export function LeadDetail({ leadId }: { leadId: string }) {
       </Section>
 
       {/* Preview IA */}
-      <Section title="Preview IA">
+      <Section title="Preview visual (lo que ve el cliente)">
+        <p className="mb-3 text-xs text-faint">
+          Mockups del proyecto que ve el cliente. Usa la transcripción, el descubrimiento y el enfoque de arriba —
+          generá/regenerá después de cargarlos.
+        </p>
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted">
             {versions.length > 0
               ? `${versions.length} versión(es) · última: ${fmt(versions[0].created_at)} por ${versions[0].created_by ?? "—"}`
-              : "Todavía no se generó (se genera tras el pago)."}
+              : "Todavía no se generó."}
           </p>
           <button
             onClick={regenerate}
             disabled={busy}
-            className="rounded-full bg-white px-4 py-1.5 text-xs font-medium text-ink disabled:opacity-50"
+            className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50"
           >
-            {busy ? "Generando…" : "Regenerar Preview"}
+            {busy ? "Generando…" : versions.length > 0 ? "Regenerar preview" : "Generar preview"}
           </button>
         </div>
+        <ClientLink leadId={leadId} />
 
         {latest && (
           <>
@@ -461,19 +467,34 @@ function TranscriptProposal({
   leadId,
   initialTranscript,
   initialProposal,
+  initialFocus,
   discovery,
 }: {
   leadId: string;
   initialTranscript: string | null;
   initialProposal: Record<string, unknown> | null;
+  initialFocus: string | null;
   discovery: Record<string, string> | null;
 }) {
   const [transcript, setTranscript] = useState(initialTranscript ?? "");
+  const [focus, setFocus] = useState(initialFocus ?? "");
   const [proposal, setProposal] = useState<GenProposal | null>((initialProposal as GenProposal) ?? null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [savedT, setSavedT] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  async function saveFocus(text: string) {
+    try {
+      await fetch(`/api/admin/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ focus: text }),
+      });
+    } catch {
+      /* ignore */
+    }
+  }
 
   function compiledDiscovery() {
     const ans = discovery ?? {};
@@ -509,7 +530,7 @@ function TranscriptProposal({
       const r = await fetch("/api/admin/proposal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: effective, notes: disc }),
+        body: JSON.stringify({ transcript: effective, notes: disc, focus }),
       });
       const data = await r.json();
       if (!r.ok) {
@@ -549,6 +570,16 @@ function TranscriptProposal({
         rows={6}
         placeholder="Pegá acá la transcripción de la call (se guarda sola al salir del campo)…"
         className="mt-2 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+      />
+      <label className="mt-4 block text-xs text-faint">
+        Enfoque / recomendación de RUN (opcional — ej: &quot;Fase 1: ecommerce completo&quot;)
+      </label>
+      <input
+        value={focus}
+        onChange={(e) => setFocus(e.target.value)}
+        onBlur={() => saveFocus(focus)}
+        placeholder="Qué proponemos como arranque — guía la propuesta por etapas y el preview visual del cliente"
+        className="mt-2 w-full rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
       />
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
@@ -620,6 +651,38 @@ function TranscriptProposal({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function ClientLink({ leadId }: { leadId: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = typeof window !== "undefined" ? `${window.location.origin}/proyecto/${leadId}` : `/proyecto/${leadId}`;
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-ink/40 px-3 py-2">
+      <span className="text-xs text-faint">Link para el cliente:</span>
+      <a
+        href={`/proyecto/${leadId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="truncate text-xs text-brand-cyan hover:underline"
+      >
+        {url}
+      </a>
+      <button
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          } catch {
+            /* ignore */
+          }
+        }}
+        className="ml-auto rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-brand-violet hover:text-fg"
+      >
+        {copied ? "¡Copiado!" : "Copiar link"}
+      </button>
     </div>
   );
 }

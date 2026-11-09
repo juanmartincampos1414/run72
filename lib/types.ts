@@ -102,6 +102,7 @@ export type Lead = {
   discovery: Record<string, string> | null;
   transcript: string | null;
   proposal: Record<string, unknown> | null;
+  focus: string | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };

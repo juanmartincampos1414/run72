@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ProjectPreview } from "./types";
 import { logEvent } from "./audit";
+import { DISCOVERY_QUESTIONS } from "./discovery";
 
 const SCHEMA = {
   type: "object",
@@ -130,24 +131,42 @@ function buildPrompt(lead: Record<string, unknown>, docs: Array<{ name?: string 
   const micros = Array.isArray(lead.microservices_selected)
     ? (lead.microservices_selected as Array<{ name: string }>).map((m) => m.name)
     : [];
+  const transcript = typeof lead.transcript === "string" ? lead.transcript.trim() : "";
+  const summary = typeof lead.conversation_summary === "string" ? lead.conversation_summary.trim() : "";
+  const focus = typeof lead.focus === "string" ? lead.focus.trim() : "";
+  const disc =
+    lead.discovery && typeof lead.discovery === "object" ? (lead.discovery as Record<string, string>) : null;
+  const discoveryText = disc
+    ? DISCOVERY_QUESTIONS.filter((q) => (disc[q.id] ?? "").trim())
+        .map((q) => `- ${q.q}: ${disc[q.id]}`)
+        .join("\n")
+    : "";
+  const fromCall = Boolean(transcript || focus || discoveryText);
+
   return [
-    "Generá la vista previa conceptual de este proyecto YA contratado.",
+    fromCall
+      ? "Generá la vista previa VISUAL del proyecto basándote en la REUNIÓN con el cliente (datos abajo). Los mockups tienen que REFLEJAR lo que se habló. Si hay un ENFOQUE / Fase 1 indicado, mostrá ESA fase (ej: si la Fase 1 es un ecommerce, generá el ecommerce completo del rubro del cliente: Home, Listado, Ficha de producto, Checkout), con datos realistas del negocio."
+      : "Generá la vista previa conceptual de este proyecto YA contratado.",
     `Proyecto: ${lead.project_label ?? "a definir"}.`,
+    focus ? `ENFOQUE / Fase 1 recomendada por RUN (PRIORIZAR esto en los mockups): ${focus}` : "",
     `Tipo(s) (slugs): ${lead.project_type ?? "—"}.`,
     `Estado de marca: ${lead.brand_status ?? "—"}.`,
     `Objetivo: ${lead.objective ?? "—"}.`,
     `Servicios adicionales: ${addons.join(", ") || "ninguno"}.`,
     `Microservicios: ${micros.join(", ") || "ninguno"}.`,
+    summary ? `Resumen del lead: ${summary}` : "",
     lead.urgency_note ? `Contexto del cliente: ${lead.urgency_note}` : "",
+    discoveryText ? `Respuestas de la reunión de descubrimiento:\n${discoveryText}` : "",
+    transcript ? `Transcripción de la videollamada:\n${transcript.slice(0, 20000)}` : "",
     docs.length ? `Archivos adjuntos (no imágenes): ${docs.map((d) => d.name).join(", ")}.` : "",
     "",
-    "Reglas (generá SOLO mockups relevantes a lo contratado, MÁXIMO 4, priorizando el desarrollo principal; HTML conciso):",
+    "Reglas (generá SOLO mockups relevantes a lo hablado / a la Fase 1, MÁXIMO 4, priorizando el desarrollo principal; HTML conciso):",
     "- Landing → Hero, CTA, Formulario, Vista completa.",
     "- Sitio Web → Home, Vista mobile (~390px), Sección destacada.",
     "- Ecommerce → Home, Listado, Ficha de producto, Checkout.",
     "- Plataforma/CRM → Dashboard, Clientes, Reportes, Navegación.",
     "- Si hay 'Redes sociales' → sumá 1-2: grid de Instagram (9 posts) / perfil / portada.",
-    "Cada mockup: documento HTML completo autocontenido con <style> inline, sin scripts ni imágenes externas. Respetá colores/estilo de las referencias adjuntas.",
+    "Cada mockup: documento HTML completo autocontenido con <style> inline, sin scripts ni imágenes externas. Datos realistas y en español, del rubro del cliente. Respetá colores/estilo de las referencias adjuntas.",
   ]
     .filter(Boolean)
     .join("\n");

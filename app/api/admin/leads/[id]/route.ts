@@ -98,6 +98,13 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   }
 
+  // Guardar el enfoque / recomendación (ej: "Fase 1 — ecommerce")
+  if (typeof body.focus === "string") {
+    const { error } = await supabase.from("leads").update({ focus: body.focus }).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   // Guardar la propuesta generada
   if (body.proposal && typeof body.proposal === "object") {
     const { error } = await supabase.from("leads").update({ proposal: body.proposal }).eq("id", id);
