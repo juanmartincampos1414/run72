@@ -637,6 +637,33 @@ function TranscriptProposal({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [uploadedName, setUploadedName] = useState("");
+  const [pricesSaved, setPricesSaved] = useState(false);
+
+  /** Edita el objeto propuesta en estado local (sin guardar todavía). */
+  function editProposal(mut: (p: GenProposal) => void) {
+    setProposal((prev) => {
+      if (!prev) return prev;
+      const next = structuredClone(prev) as GenProposal;
+      mut(next);
+      return next;
+    });
+  }
+
+  /** Persiste la propuesta editada (precios manuales) en el lead. */
+  async function saveProposal(p: GenProposal | null) {
+    if (!p) return;
+    try {
+      await fetch(`/api/admin/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ proposal: p }),
+      });
+      setPricesSaved(true);
+      setTimeout(() => setPricesSaved(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
 
   async function handleFile(file: File) {
     setErr("");
@@ -895,27 +922,55 @@ function TranscriptProposal({
 
           {proposal.scenarios && proposal.scenarios.length > 0 && (
             <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">Escenarios</p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-wide text-faint">Escenarios · precios editables</p>
+                {pricesSaved && <span className="text-xs text-emerald-400">Guardado ✓</span>}
+              </div>
               <div className="grid gap-2 sm:grid-cols-3">
-                {proposal.scenarios.map((s) => (
+                {proposal.scenarios.map((s, idx) => (
                   <div
                     key={s.key}
                     className={`rounded-xl border p-3 ${s.recommended ? "border-brand-violet/50 bg-brand-violet/[0.06]" : "border-line bg-ink/30"}`}
                   >
                     {s.recommended && <span className="text-[10px] font-semibold uppercase text-brand-violet">Recomendado</span>}
                     <p className="text-sm font-medium text-fg">{s.name}</p>
-                    <p className="font-mono text-sm font-semibold text-fg">{formatARS(s.total)}</p>
+                    <div className="mt-1 flex items-center gap-1">
+                      <span className="text-xs text-faint">$</span>
+                      <input
+                        type="number"
+                        value={s.total}
+                        onChange={(e) => editProposal((p) => { p.scenarios![idx].total = Number(e.target.value) || 0; })}
+                        onBlur={() => saveProposal(proposal)}
+                        className="w-full rounded-md border border-line bg-ink/40 px-2 py-1 font-mono text-sm font-semibold text-fg outline-none focus:border-brand-violet"
+                      />
+                    </div>
                     <p className="mt-1 text-[11px] text-muted">{s.tagline}</p>
                   </div>
                 ))}
               </div>
+              <p className="mt-1.5 text-[11px] text-faint">El precio que ponés acá es el que ve el cliente (con IVA). El anticipo se recalcula solo.</p>
             </div>
           )}
 
           {proposal.options && proposal.options.length > 0 && (
-            <p className="text-xs text-faint">
-              Módulos opcionales que el cliente puede sumar: {proposal.options.map((o) => o.name).join(", ")}.
-            </p>
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-faint">Módulos opcionales · precios editables</p>
+              <div className="space-y-1.5">
+                {proposal.options.map((o, idx) => (
+                  <div key={o.slug} className="flex items-center gap-2 rounded-lg border border-line bg-ink/30 px-3 py-2">
+                    <span className="min-w-0 flex-1 truncate text-sm text-fg">{o.name}</span>
+                    <span className="text-xs text-faint">$</span>
+                    <input
+                      type="number"
+                      value={o.price_ars}
+                      onChange={(e) => editProposal((p) => { p.options![idx].price_ars = Number(e.target.value) || 0; })}
+                      onBlur={() => saveProposal(proposal)}
+                      className="w-28 rounded-md border border-line bg-ink/40 px-2 py-1 text-right font-mono text-sm text-fg outline-none focus:border-brand-violet"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {proposal.missing && proposal.missing.length > 0 && (
