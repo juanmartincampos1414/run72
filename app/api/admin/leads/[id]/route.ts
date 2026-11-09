@@ -91,6 +91,20 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   }
 
+  // Guardar transcripción de la reunión
+  if (typeof body.transcript === "string") {
+    const { error } = await supabase.from("leads").update({ transcript: body.transcript }).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
+  // Guardar la propuesta generada
+  if (body.proposal && typeof body.proposal === "object") {
+    const { error } = await supabase.from("leads").update({ proposal: body.proposal }).eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   if (body.action) {
     if (body.action === "approve_payment") {
       await supabase

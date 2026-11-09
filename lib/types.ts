@@ -100,6 +100,8 @@ export type Lead = {
   source_type: string; // "form" | "chat"
   conversation_summary: string | null;
   discovery: Record<string, string> | null;
+  transcript: string | null;
+  proposal: Record<string, unknown> | null;
 };
 
 export type PreviewMockup = { title: string; description: string; html: string };

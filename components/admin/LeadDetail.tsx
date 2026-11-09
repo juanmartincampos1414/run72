@@ -142,6 +142,16 @@ export function LeadDetail({ leadId }: { leadId: string }) {
         <DiscoveryGuide leadId={leadId} initial={lead.discovery} />
       </Section>
 
+      {/* Transcripción + propuesta */}
+      <Section title="Transcripción + propuesta">
+        <TranscriptProposal
+          leadId={leadId}
+          initialTranscript={lead.transcript}
+          initialProposal={lead.proposal}
+          discovery={lead.discovery}
+        />
+      </Section>
+
       {/* Pago + comprobante */}
       <Section title="Pago">
         <div className="flex flex-wrap gap-2">
@@ -435,6 +445,181 @@ function DiscoveryGuide({ leadId, initial }: { leadId: string; initial: Record<s
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+type GenProposal = {
+  summary?: string;
+  detectedNeeds?: string[];
+  draft?: string;
+  missing?: string[];
+  pricing?: { total: number; deposit: number; lineItems: { name: string; price_ars: number }[] };
+};
+
+function TranscriptProposal({
+  leadId,
+  initialTranscript,
+  initialProposal,
+  discovery,
+}: {
+  leadId: string;
+  initialTranscript: string | null;
+  initialProposal: Record<string, unknown> | null;
+  discovery: Record<string, string> | null;
+}) {
+  const [transcript, setTranscript] = useState(initialTranscript ?? "");
+  const [proposal, setProposal] = useState<GenProposal | null>((initialProposal as GenProposal) ?? null);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [savedT, setSavedT] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  function compiledDiscovery() {
+    const ans = discovery ?? {};
+    return DISCOVERY_QUESTIONS.filter((q) => (ans[q.id] ?? "").trim())
+      .map((q) => `- ${q.q}\n  ${ans[q.id]}`)
+      .join("\n");
+  }
+
+  async function saveTranscript(text: string) {
+    try {
+      await fetch(`/api/admin/leads/${leadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: text }),
+      });
+      setSavedT(true);
+      setTimeout(() => setSavedT(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  async function generate() {
+    setErr("");
+    const disc = compiledDiscovery();
+    const effective = transcript.trim() || disc;
+    if (effective.length < 30) {
+      setErr("Pegá la transcripción o completá respuestas de descubrimiento.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const r = await fetch("/api/admin/proposal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: effective, notes: disc }),
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        setErr(data.error || "No se pudo generar.");
+      } else {
+        setProposal(data as GenProposal);
+        fetch(`/api/admin/leads/${leadId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ proposal: data }),
+        }).catch(() => {});
+      }
+    } catch {
+      setErr("No se pudo generar.");
+    }
+    setLoading(false);
+  }
+
+  async function copyDraft() {
+    if (!proposal?.draft) return;
+    try {
+      await navigator.clipboard.writeText(proposal.draft);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <div>
+      <label className="text-xs text-faint">Transcripción de la reunión</label>
+      <textarea
+        value={transcript}
+        onChange={(e) => setTranscript(e.target.value)}
+        onBlur={() => saveTranscript(transcript)}
+        rows={6}
+        placeholder="Pegá acá la transcripción de la call (se guarda sola al salir del campo)…"
+        className="mt-2 w-full resize-y rounded-xl border border-line bg-ink/40 px-3 py-2 text-sm outline-none focus:border-brand-violet"
+      />
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button
+          onClick={generate}
+          disabled={loading}
+          className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-5 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+        >
+          {loading ? "Generando…" : "Generar propuesta"}
+        </button>
+        {savedT && <span className="text-xs text-emerald-400">Transcripción guardada ✓</span>}
+        {err && <span className="text-sm text-red-300">{err}</span>}
+      </div>
+      <p className="mt-1 text-xs text-faint">Usa la transcripción + las respuestas de descubrimiento de arriba.</p>
+
+      {proposal && (
+        <div className="mt-5 space-y-5">
+          {proposal.summary && (
+            <div>
+              <p className="text-sm font-medium">Necesidad interpretada</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{proposal.summary}</p>
+            </div>
+          )}
+          {proposal.pricing && proposal.pricing.lineItems.length > 0 && (
+            <div>
+              <p className="text-sm font-medium">Presupuesto estimado</p>
+              <div className="mt-2 overflow-hidden rounded-xl border border-line">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {proposal.pricing.lineItems.map((li, i) => (
+                      <tr key={i} className="border-b border-line/60">
+                        <td className="px-3 py-2 text-fg">{li.name}</td>
+                        <td className="px-3 py-2 text-right font-mono text-muted">{formatARS(li.price_ars)}</td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td className="px-3 py-2 font-semibold text-fg">Total</td>
+                      <td className="px-3 py-2 text-right font-mono font-semibold text-fg">{formatARS(proposal.pricing.total)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {proposal.draft && (
+            <div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">Borrador de propuesta</p>
+                <button
+                  onClick={copyDraft}
+                  className="rounded-full border border-line px-3 py-1 text-xs text-muted transition hover:border-brand-violet hover:text-fg"
+                >
+                  {copied ? "¡Copiado!" : "Copiar"}
+                </button>
+              </div>
+              <pre className="mt-2 whitespace-pre-wrap rounded-xl border border-line bg-surface/40 p-3 font-sans text-sm leading-relaxed text-fg">
+                {proposal.draft}
+              </pre>
+            </div>
+          )}
+          {proposal.missing && proposal.missing.length > 0 && (
+            <div>
+              <p className="text-sm font-medium">Datos que faltan para cerrar</p>
+              <ul className="mt-1 list-disc pl-5 text-sm text-muted">
+                {proposal.missing.map((m, i) => (
+                  <li key={i}>{m}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
