@@ -49,12 +49,12 @@ export function HeroVisual({ seed = 0, className }: { seed?: number; className?:
       canvas.height = Math.floor(h * DPR);
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-      const target = Math.round(Math.min(150, Math.max(50, (w * h) / 9000)));
+      const target = Math.round(Math.min(220, Math.max(70, (w * h) / 6000)));
       parts = Array.from({ length: target }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
         c: PALETTE[(Math.random() * PALETTE.length) | 0],
-        sp: 0.5 + Math.random() * 1.1,
+        sp: 0.6 + Math.random() * 1.3,
       }));
       // Fondo inicial (ink) para que las estelas se acumulen sobre negro.
       ctx.fillStyle = "#050505";
@@ -72,9 +72,9 @@ export function HeroVisual({ seed = 0, className }: { seed?: number; className?:
     }
 
     function step(t: number) {
-      // Desvanecer el frame anterior → estelas.
+      // Desvanecer el frame anterior → estelas (fade bajo = estelas largas).
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(5,5,5,0.085)";
+      ctx.fillStyle = "rgba(5,5,5,0.055)";
       ctx.fillRect(0, 0, w, h);
 
       // Dibujar partículas con glow aditivo.
@@ -90,9 +90,15 @@ export function HeroVisual({ seed = 0, className }: { seed?: number; className?:
         else if (p.y > h) p.y -= h;
 
         const [r, g, b] = p.c;
-        ctx.fillStyle = `rgba(${r},${g},${b},0.55)`;
+        // halo suave
+        ctx.fillStyle = `rgba(${r},${g},${b},0.10)`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.1, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+        // núcleo brillante
+        ctx.fillStyle = `rgba(${r},${g},${b},0.7)`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.25, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalCompositeOperation = "source-over";

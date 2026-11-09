@@ -152,9 +152,14 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
             {/* HERO */}
             <section className="relative overflow-hidden border-b border-line bg-ink">
               {/* Visual animado futurista (flow field) */}
-              <HeroVisual seed={heroSeed} className="absolute inset-0 h-full w-full opacity-70" />
+              <HeroVisual seed={heroSeed} className="absolute inset-0 h-full w-full opacity-95" />
+              {/* Glow de marca para dar profundidad */}
+              <div
+                className="pointer-events-none absolute -right-20 top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full opacity-50 blur-3xl"
+                style={{ background: "radial-gradient(circle, rgba(99,102,241,0.35), rgba(168,85,247,0.12) 55%, transparent 70%)" }}
+              />
               {/* Overlays para legibilidad del texto */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/80 to-ink/20" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/75 to-ink/10" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink to-transparent" />
               <div className="container-x relative py-20 md:py-28">
                 <motion.div
