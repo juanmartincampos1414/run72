@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ProjectPreview } from "./types";
 import { logEvent } from "./audit";
 import { DISCOVERY_QUESTIONS } from "./discovery";
+import { PREVIEW_ART_DIRECTION } from "./preview-design";
 
 const SCHEMA = {
   type: "object",
@@ -20,7 +21,8 @@ const SCHEMA = {
           description: { type: "string" },
           html: {
             type: "string",
-            description: "Documento HTML autocontenido (<!doctype html> + <style> inline) sin scripts.",
+            description:
+              "Documento HTML completo autocontenido (<!doctype html> + <style> inline). Permitido <link> a fonts.googleapis.com y <img>. SIN <script>. Diseño premium que deslumbra, nunca cajas grises.",
           },
         },
         required: ["title", "description", "html"],
@@ -78,10 +80,9 @@ export async function generateLeadPreview(
 
   const response = await client.messages.create({
     model: "claude-opus-4-8",
-    max_tokens: 11000,
-    output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "low" },
-    system:
-      "Sos el director de producto y diseño de RUN. Generás una vista previa conceptual con mockups de UI en HTML autocontenido (inline CSS, sin scripts ni recursos externos salvo el logo si se provee). Diseño premium, coherente con la marca del cliente (paleta/estilo de las imágenes adjuntas). Español rioplatense.",
+    max_tokens: 12000,
+    output_config: { format: { type: "json_schema", schema: SCHEMA }, effort: "medium" },
+    system: `${PREVIEW_ART_DIRECTION}\n\nSos el director de producto y diseño de RUN. Devolvés mockups de UI en HTML autocontenido. Español rioplatense, datos realistas del negocio real del cliente.`,
     messages: [{ role: "user", content }],
   });
 
@@ -185,7 +186,7 @@ function buildPrompt(lead: Record<string, unknown>, docs: Array<{ name?: string 
     "- Ecommerce → Home (con catálogo), Ficha de producto, Checkout.",
     "- Plataforma/CRM → Dashboard, Vista de detalle (clientes/reportes).",
     "- Si hay 'Redes sociales' → podés sumar 1 grid de Instagram (9 posts).",
-    "Cada mockup: documento HTML completo autocontenido con <style> inline, sin scripts ni imágenes externas. Mantené el HTML compacto pero prolijo. Datos realistas y en español, del rubro del cliente. Respetá colores/estilo de las referencias adjuntas.",
+    "Cada mockup: documento HTML completo autocontenido con <style> inline (permitido <link> a Google Fonts y <img>, SIN <script>). Imágenes de producto = tiles de GRADIENTE rico + ícono SVG inline del ítem, NUNCA cajas grises. Mantené el HTML compacto pero con detalle visual premium. Datos realistas y en español, del rubro del cliente. Respetá colores/estilo de las referencias adjuntas. Recordá: al abrir, tiene que DESLUMBRAR.",
   ]
     .filter(Boolean)
     .join("\n");
