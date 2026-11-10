@@ -180,11 +180,14 @@ export async function POST(req: Request) {
   }
 
   const supabase = getSupabaseAdmin();
+  // La propuesta es un presupuesto a medida curado por el admin (no el cotizador
+  // self-serve). Por eso incluimos los PROYECTOS BASE aunque estén inactivos en el
+  // catálogo público (ej "plataforma" $2.5M): un software a medida tiene que poder
+  // anclar en su núcleo real. Los addons siguen siendo solo los activos.
   const { data: svc } = await supabase
     .from("services")
-    .select("id, slug, name, category, description, price_ars, type, active, sort_order")
-    .eq("active", true);
-  const services = (svc ?? []) as Service[];
+    .select("id, slug, name, category, description, price_ars, type, active, sort_order");
+  const services = ((svc ?? []) as Service[]).filter((s) => s.active || s.type === "project");
   const { data: mic } = await supabase
     .from("microservices")
     .select("id, service_slug, group_name, slug, name, description, price_ars, active, default_on, sort_order")
@@ -215,6 +218,16 @@ Reglas:
 - Para scenarios y options usá EXCLUSIVAMENTE slugs/claves del catálogo de abajo. No inventes servicios ni precios: los calcula el sistema.
 - Los 3 escenarios son incrementales: esencial ⊂ recomendado ⊂ completo tiene sentido, pero cada uno es un set válido.
 - Español rioplatense. Nada de relleno ni marketing vacío: lectura honesta y concreta.
+
+ANCLAJE DE PRECIO (CRÍTICO — no lo ignores):
+- RUN vende software a medida. Si el cliente necesita una plataforma, una app, un sistema con lógica propia, un portal, o integraciones con sistemas externos (PACS, ERP, HIS, APIs, pasarelas, etc.), CADA uno de los 3 escenarios DEBE anclar en un service type=project real del catálogo ("plataforma" para un sistema a medida, "ecommerce" para una tienda, "sitio" para institucional). Ese proyecto base es el NÚCLEO del presupuesto.
+- Los microservicios y addons SE SUMAN al proyecto base. NUNCA reemplazan al proyecto base. Un presupuesto de software a medida armado solo con microservicios está MAL y sale ridículamente barato: eso no puede pasar.
+- Progresión típica para software a medida:
+  · esencial = proyecto base (ej "plataforma") + las funcionalidades núcleo mínimas para que opere.
+  · recomendado = proyecto base + la integración/automatización clave + funcionalidades que lo hacen sólido en producción.
+  · completo = todo lo anterior + portal multi-actor, pagos diferenciados, automatizaciones, reportes, etc.
+- Sanity check antes de responder: un desarrollo a medida serio (plataforma + integración con un sistema externo) NO puede dar un total irrisorio. Si el escenario recomendado te quedó por debajo de lo que cuesta construir eso en serio (pensá en meses-persona reales de ingeniería), es porque te olvidaste del proyecto base o de funcionalidades: corregilo e incluí el service type=project que corresponde.
+- Solo cuando el pedido es puramente branding/estrategia/marketing (sin software) un escenario puede no tener proyecto base.
 
 Catálogo disponible (usá solo estos slugs/claves):
 ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`;
@@ -248,8 +261,21 @@ ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`
   const depositPercent = config?.deposit_percent ?? 30;
 
   function priceItems(projectTypes: string[], addons: string[], microservices: string[]) {
+    // Guardrail anti-presupuesto-barato: un microservicio SIEMPRE pertenece a un
+    // proyecto (clave "service_slug:slug"). Si el escenario incluye micros de un
+    // proyecto pero omitió el proyecto base, lo inyectamos: no se puede vender
+    // "la integración de la plataforma" sin cobrar la plataforma.
+    const projects = new Set((projectTypes ?? []).filter((s) => bySlug.get(s)?.type === "project"));
+    for (const key of microservices ?? []) {
+      const parent = key.split(":")[0];
+      if (bySlug.get(parent)?.type === "project") projects.add(parent);
+    }
+    const addonSet = (projectTypes ?? [])
+      .filter((s) => bySlug.get(s)?.type === "addon")
+      .concat(addons ?? []);
+
     const items: LineItem[] = [];
-    for (const slug of [...(projectTypes ?? []), ...(addons ?? [])]) {
+    for (const slug of [...projects, ...addonSet]) {
       const s = bySlug.get(slug);
       if (s) items.push({ name: s.name, price_ars: s.price_ars });
     }
