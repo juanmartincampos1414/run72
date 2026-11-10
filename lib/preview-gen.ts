@@ -12,7 +12,7 @@ import { getPlaybook, playbookToPrompt } from "./playbooks";
 const PLAN_SCHEMA = {
   type: "object",
   properties: {
-    interpretation: { type: "string", description: "Interpretación del proyecto (3-4 frases)." },
+    interpretation: { type: "string", description: "Intro breve PARA EL CLIENTE a las pantallas que siguen (3-4 frases): qué va a ver y por qué le sirve, dirigido al cliente (vos/tu negocio). PROHIBIDO jerga interna, hablar de 'vender la idea', de lo que le conviene al proveedor, o describir los mockups como 'premium'; prohibido mencionar competidores o productos de terceros." },
     detectedFunctionalities: { type: "array", items: { type: "string" } },
     includedDeliverables: { type: "array", items: { type: "string" } },
     mockups: {
@@ -109,7 +109,7 @@ export async function generateLeadPreview(
     model: "claude-opus-4-8",
     max_tokens: 3000,
     output_config: { format: { type: "json_schema", schema: PLAN_SCHEMA }, effort: "low" },
-    system: `${PREVIEW_ART_DIRECTION}\n\nSos el director de producto de RUN. Tu trabajo en este paso es PLANIFICAR: elegí las 2-3 pantallas clave de la Fase 1 y escribí un brief claro de cada una (todavía NO el HTML). Español rioplatense, datos realistas del negocio real del cliente.`,
+    system: `${PREVIEW_ART_DIRECTION}\n\nSos el director de producto de RUN. Tu trabajo en este paso es PLANIFICAR: elegí las 2-3 pantallas clave de la Fase 1 y escribí un brief claro de cada una (todavía NO el HTML). Español rioplatense, datos realistas del negocio real del cliente.\n\n⚠️ El campo "interpretation" LO LEE EL CLIENTE FINAL: escribilo dirigido al cliente, sin jerga interna, sin hablar de "vender la idea" ni de lo que le conviene al proveedor, sin llamar "premium" a los mockups y sin mencionar competidores. Los "brief" de cada pantalla son internos (no los ve el cliente).`,
     messages: [{ role: "user", content: [{ type: "text", text: prompt }, ...refImages] }],
   });
   const planBlock = planResp.content.find((b) => b.type === "text");
