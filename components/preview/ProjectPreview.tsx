@@ -256,7 +256,6 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
                 <InvestmentBuilder
                   scenarios={proposal.scenarios!}
                   options={proposal.options ?? []}
-                  depositPercent={proposal.depositPercent ?? 30}
                 />
               </Section>
             )}
@@ -443,11 +442,9 @@ function Timeline({ steps }: { steps: RoadmapStep[] }) {
 function InvestmentBuilder({
   scenarios,
   options,
-  depositPercent,
 }: {
   scenarios: Scenario[];
   options: Option[];
-  depositPercent: number;
 }) {
   const recommended = scenarios.find((s) => s.recommended) ?? scenarios[0];
   const [key, setKey] = useState(recommended?.key ?? scenarios[0]?.key);
@@ -455,12 +452,11 @@ function InvestmentBuilder({
 
   const scenario = scenarios.find((s) => s.key === key) ?? scenarios[0];
 
-  const { total, deposit } = useMemo(() => {
+  const total = useMemo(() => {
     const optSubtotal = options.filter((o) => picked.has(o.slug)).reduce((a, o) => a + o.price_ars, 0);
     const optTotal = Math.round(optSubtotal * (1 + IVA_RATE));
-    const t = (scenario?.total ?? 0) + optTotal;
-    return { total: t, deposit: Math.round((t * depositPercent) / 100) };
-  }, [scenario, options, picked, depositPercent]);
+    return (scenario?.total ?? 0) + optTotal;
+  }, [scenario, options, picked]);
 
   function toggle(slug: string) {
     setPicked((prev) => {
@@ -562,21 +558,21 @@ function InvestmentBuilder({
           <p className="mt-1 font-display text-4xl font-semibold tabular-nums">{formatARS(total)}</p>
           <p className="mt-1 text-sm text-muted">IVA incluido</p>
           <div className="my-5 h-px bg-line" />
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted">Para arrancar ({depositPercent}%)</span>
-            <span className="font-medium tabular-nums text-fg">{formatARS(deposit)}</span>
-          </div>
-          <div className="mt-1.5 flex items-center justify-between text-sm">
-            <span className="text-muted">Saldo a la entrega</span>
-            <span className="font-medium tabular-nums text-fg">{formatARS(total - deposit)}</span>
-          </div>
-          <a
-            href={`mailto:${SITE.email}?subject=Quiero avanzar con mi proyecto`}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-5 py-3 text-sm font-semibold text-ink transition hover:brightness-110"
-          >
-            Quiero avanzar
-          </a>
-          <p className="mt-3 text-center text-xs text-faint">Ajustá el plan arriba — este número se actualiza solo.</p>
+          <ul className="space-y-2.5 text-sm text-muted">
+            <li className="flex items-start gap-2">
+              <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-cyan" />
+              <span>50% al iniciar y 50% contra entrega de las credenciales.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-cyan" />
+              <span>2 meses de garantía incluidos.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-cyan" />
+              <span>Mantenimiento mensual opcional.</span>
+            </li>
+          </ul>
+          <p className="mt-5 text-xs text-faint">Ajustá el plan arriba — este número se actualiza solo.</p>
         </div>
       </div>
     </div>
