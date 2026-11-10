@@ -52,6 +52,7 @@ export type LineItem = { name: string; price_ars: number };
 export type Lead = {
   id: string;
   created_at: string;
+  slug: string | null;
   name: string;
   company: string | null;
   email: string;

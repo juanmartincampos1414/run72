@@ -1,0 +1,242 @@
+[
+  {
+    "archivo": "00_EMPEZAR_AQUI.md",
+    "bytes": 1354,
+    "sha256": "b19099bc0813950023f79e7d55970462833b2d20c079fb28e240dac8c55b37ee"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-blanco.png",
+    "bytes": 40511,
+    "sha256": "40f07cfcac53274a4dc04cac96bf0e0cf1c84149038f821040e2d36cf5340bd0"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-blanco.svg",
+    "bytes": 442,
+    "sha256": "16e462e685c9fe7c590964a50a859974b616ff3b22346a60df4b9a33207644cd"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-crema.png",
+    "bytes": 71753,
+    "sha256": "d645d28087067caa80f1c131b09fe1de4163004edde4a3d5a5a40b2dc9bc3952"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-crema.svg",
+    "bytes": 442,
+    "sha256": "3ff9b71f50ebeeb9eddc3512106ac1d7713a02f01d980027c3d723b1f6fb3f58"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-firma-con-nucleo.png",
+    "bytes": 74105,
+    "sha256": "c63a6557323a3c370eb4e7f767a1ff0ecbacf09822aee7da3e6172c7e3d52b6f"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-firma-con-nucleo.svg",
+    "bytes": 958,
+    "sha256": "60fc38d4c18ac839508145c493d1acfffb5321f8c0257f1a9f3a33d6f30f5605"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-negro.png",
+    "bytes": 63749,
+    "sha256": "4b23cfae33ca9bd50291c690b51440c5eb828d2f89779530ad0849513815613a"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-negro.svg",
+    "bytes": 442,
+    "sha256": "3f8fc611365eff2b8102643be0a3e5113b2a9fcfb02340e98e7ffe6f5ddd8868"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-oscuro.png",
+    "bytes": 72292,
+    "sha256": "c17747027fba2f7987f51d0dc4a0c7aad4a024fc56c14f932097c4e4b5e57677"
+  },
+  {
+    "archivo": "01_Logotipo/RUN-oscuro.svg",
+    "bytes": 442,
+    "sha256": "db1edbd956949c6bf70b1882fb1a6b1c1ea786d883ddf6427a7622ef9de687db"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo-crema.png",
+    "bytes": 27933,
+    "sha256": "eb409e117ec9796dc2392d6372586d3110df2f5b8e9c8ea09f6e3190c923c113"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo-crema.svg",
+    "bytes": 186,
+    "sha256": "d5d26fed07eb01ad913862709b26108783ede79e1a0dd3a845a880c7cfa83fb4"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo-micro.svg",
+    "bytes": 291,
+    "sha256": "067a3e5d78b5dd59df27562a68a6bf07b414051e1c5eff56e176c71a73259019"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo-oscuro.png",
+    "bytes": 28146,
+    "sha256": "7920b11111457662ce42e37ad424bf95ad9cc1c871cedceaa0ed45aa83697057"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo-oscuro.svg",
+    "bytes": 186,
+    "sha256": "71cd5b6412624f7a7fceb6001b827a9f60ba78f500754d90cf04ab91df2cb75b"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo.png",
+    "bytes": 50677,
+    "sha256": "3225e52ea223465a08bef96e450f70ef408f40c87c9702c8a2143cb2b2112c48"
+  },
+  {
+    "archivo": "02_Simbolo/RUN-nucleo.svg",
+    "bytes": 480,
+    "sha256": "832a14f06ec1d7f50661d81889b2bf259c163ac1061ca5d3c439a7cf2017b738"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-16.png",
+    "bytes": 500,
+    "sha256": "614488f6379fb82c3e8abcf9d739987718da89bb702c62ddedfdc05b8ae0a132"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-180.png",
+    "bytes": 3317,
+    "sha256": "f9f9624fee7fd630a3f645d558b1ee75b91a69730243fb3d47a8c6e202646130"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-192.png",
+    "bytes": 3425,
+    "sha256": "f60581d10b03d31ac51eff8331e3088468da8dd3b3ecfeb7426af4c94afe80dd"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-32.png",
+    "bytes": 919,
+    "sha256": "ebe8cbd79beeb033882b748f4ce71ce9e64c6d0a4575beafccf136b40f1b08b7"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-48.png",
+    "bytes": 1259,
+    "sha256": "e6d5764e6fd6d56334bb1c92ad6e3e494a1cfc10691e856f5be0fe5e83b15fb3"
+  },
+  {
+    "archivo": "03_Favicon/RUN-icon-512.png",
+    "bytes": 13440,
+    "sha256": "a5151a31088ec51e90fb6c2fd3981b5d7847d6b3584fd69e01430efb1b668b8b"
+  },
+  {
+    "archivo": "03_Favicon/favicon.ico",
+    "bytes": 2732,
+    "sha256": "f696f2916ac27bd87480ee1ad00f739e9a3750298758a8ea0d370eb5d783bae3"
+  },
+  {
+    "archivo": "03_Favicon/favicon.svg",
+    "bytes": 291,
+    "sha256": "067a3e5d78b5dd59df27562a68a6bf07b414051e1c5eff56e176c71a73259019"
+  },
+  {
+    "archivo": "04_3D/LEEME_3D.md",
+    "bytes": 1317,
+    "sha256": "15abf9286538f9f1229508599d62ae83b805c31b0ed7ec363eea24780b8a6e0c"
+  },
+  {
+    "archivo": "04_3D/RUN_Maestro.blend",
+    "bytes": 613612,
+    "sha256": "654879dcce61a5a18d455f6b175ba028101569338795c94a0b77a50233640c14"
+  },
+  {
+    "archivo": "04_3D/RUN_Marca_Cuadrada.png",
+    "bytes": 2506961,
+    "sha256": "5ea600ab1f0e10243cfcc1748464d93e824a20902e8714dd53782ea93a3c15ae"
+  },
+  {
+    "archivo": "04_3D/RUN_Marca_Horizontal.png",
+    "bytes": 2563709,
+    "sha256": "6afc4e73cf569755c69094828df34c741f181cb1089ca538dcec8bba78b1d53f"
+  },
+  {
+    "archivo": "04_3D/RUN_Marca_Panoramica.png",
+    "bytes": 1366476,
+    "sha256": "135de106dea622f7add27342e1d132e9b3e790bd643d61b7e9873a5345d744e9"
+  },
+  {
+    "archivo": "04_3D/RUN_Nucleo.png",
+    "bytes": 1406815,
+    "sha256": "d34f6bdadd0e8ab063c53ac1b774741bc8500d5fb8782f38ad2daf8cfd33a4ea"
+  },
+  {
+    "archivo": "04_3D/RUN_Nucleo_web.glb",
+    "bytes": 20632,
+    "sha256": "29c0b80bcb042a292431fdb6a339649fe1b1978a9b5cd20a475ca3ecd1be6645"
+  },
+  {
+    "archivo": "04_3D/RUN_Parametros_3D.json",
+    "bytes": 626,
+    "sha256": "330761318c8c8ad17df7e0060f096e7583578720b0f68bc7b299dfeda7bb6fad"
+  },
+  {
+    "archivo": "04_3D/crear_escena.py",
+    "bytes": 13562,
+    "sha256": "1fa7aafab6988141bc363b47014caf7e88f73d4ec99c7ae18bdac40186f139dc"
+  },
+  {
+    "archivo": "04_3D/geometria.json",
+    "bytes": 111908,
+    "sha256": "cc7710e38e99cff39f0714ba5f88a671014766e493d61f40a25fe38d17ce8229"
+  },
+  {
+    "archivo": "05_Manual/RUN_Manual_de_Marca.pdf",
+    "bytes": 5970897,
+    "sha256": "4a2e1973da5a800503d8a228d207bc50cac2468ee1f94555cc0ea81b18c8b11f"
+  },
+  {
+    "archivo": "06_Plantillas/LEEME_PLANTILLAS.txt",
+    "bytes": 582,
+    "sha256": "dbee1feb6fd12fcd1e4b0c209eac97343557ed5f420560a2bc459d19b25909b3"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Horizontal_1200x628.png",
+    "bytes": 233977,
+    "sha256": "5a00005918cae24473a5a6bde52f21324316f7227fbc8a3d514a3815841455f3"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Horizontal_1200x628.svg",
+    "bytes": 3419635,
+    "sha256": "b2b3544aacc87d389f12fbb4e880f7e353ae22a8c3007bdf5133000998ae48db"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Post_1080x1080.png",
+    "bytes": 386100,
+    "sha256": "5ada9f73453f8e83e333f609cdfb9845c1211a40248749539a7e241a22bcecd7"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Post_1080x1080.svg",
+    "bytes": 3419787,
+    "sha256": "35e961c58c921f4fa864cdcf595f777b0e2ddfd3a107671e81e37f6d7fd8149b"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Story_1080x1920.png",
+    "bytes": 572386,
+    "sha256": "ea23ba1a4fcef0635c6ef66210fe11f6669092a770ce9c6a192481ed1d603822"
+  },
+  {
+    "archivo": "06_Plantillas/RUN_Story_1080x1920.svg",
+    "bytes": 3419775,
+    "sha256": "181da8d7e12dc77296d6fec43ae69287860a93f1a9e8d6646f17804526bb6386"
+  },
+  {
+    "archivo": "07_Implementacion/COMPROBAR_INTEGRACION.md",
+    "bytes": 641,
+    "sha256": "5a82ab23e9273d3a4b5e09b899c36ddeb5b9009c3a07220d676eca0a1831318d"
+  },
+  {
+    "archivo": "07_Implementacion/IMPLEMENTAR_RUN.md",
+    "bytes": 1515,
+    "sha256": "ef939d1eb686a2d1ba0ced93c2bc222ec0588708ef155a01952de672074188fd"
+  },
+  {
+    "archivo": "07_Implementacion/RUN-tokens.css",
+    "bytes": 648,
+    "sha256": "a9e37f54b5c0e5c0dafd777c0b3f0044a403581eaa1f1c519ae9c1ee3f4533c7"
+  },
+  {
+    "archivo": "07_Implementacion/RUN-tokens.json",
+    "bytes": 2268,
+    "sha256": "1f15394f22f9ebf94bd67d35c982cebc6b3f36d08e3577c0ccd1cfa630be041c"
+  }
+]

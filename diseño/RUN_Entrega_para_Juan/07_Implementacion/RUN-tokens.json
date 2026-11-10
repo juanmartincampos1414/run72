@@ -1,0 +1,73 @@
+{
+  "brand": "RUN",
+  "version": "2026.10",
+  "status": "Referencia de identidad; no aplicar globalmente a la web actual",
+  "color": {
+    "canvas": "#100904",
+    "surface": "#21150E",
+    "text": "#FFECD5",
+    "textSecondary": "#C3AB96",
+    "accent": "#DC5000",
+    "divider": "#503628"
+  },
+  "typography": {
+    "body": {
+      "family": "Switzer",
+      "weight": 400,
+      "sizeDesktop": "18-20px",
+      "sizeMobile": "16-18px",
+      "lineHeight": "1.45-1.60"
+    },
+    "heading": {
+      "family": "Switzer",
+      "weight": "500-600",
+      "heroDesktop": "64-112px",
+      "heroMobile": "42-64px",
+      "lineHeight": "1.02-1.10"
+    },
+    "metadata": {
+      "family": "Geist Mono",
+      "weight": "400-500",
+      "size": "12-14px"
+    }
+  },
+  "layout": {
+    "sectionGapDesktop": "64-80px",
+    "sectionGapMobile": "40-48px",
+    "headingGapDesktop": "24-32px",
+    "headingGapMobile": "20-24px",
+    "logoClearspace": "1/4 de la altura de las letras, como mínimo"
+  },
+  "motion": {
+    "introMs": [
+      600,
+      900
+    ],
+    "interactionMs": [
+      120,
+      220
+    ],
+    "pointerTiltMaxStartDegrees": 3,
+    "reducedMotion": "Estado ensamblado y quieto",
+    "fallback": "Render con el mismo encuadre; sin recorrido de scroll artificial"
+  },
+  "notes": [
+    "La web actual se conserva, incluido su núcleo 3D, materiales, iluminación, movimiento y composición. Sólo se solicita actualizar el logo superior izquierdo y el RUN del fondo con los originales definitivos, manteniendo su ubicación y jerarquía. El resto son recursos de marca disponibles para futuras piezas, no tareas de implementación web.",
+    "Valores orientativos para nuevas piezas; no constituyen tareas de rediseño."
+  ],
+  "scene3d": {
+    "master": "04_3D/RUN_Maestro.blend",
+    "web": "04_3D/RUN_Nucleo_web.glb",
+    "fallback": "04_3D/RUN_Nucleo.png",
+    "nativeMaterial": {
+      "glassWeight": 0.975,
+      "translucentWeight": 0.025,
+      "roughness": 0.018,
+      "ior": 1.46,
+      "absorptionDensity": 0.12
+    },
+    "institutionalComposition": "Letras delante, núcleo detrás y hacia la derecha de N",
+    "heroComposition": "RUN al fondo, núcleo delante",
+    "usage": "Recursos adicionales, no reemplazar el 3D de la web actual."
+  }
+}

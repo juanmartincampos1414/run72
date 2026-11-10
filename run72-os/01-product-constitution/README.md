@@ -55,7 +55,62 @@ valida el mercado; la retrospectiva valida el sistema que construye productos.
 > promoverse (Artículo 4, Regla del Tres). Se rastrea en
 > [LL-004](../06-knowledge-library/lessons-learned/LL-004-pos-reduces-uncertainty.md) · `[1/3]`.
 
+## Artículo 6 — Los componentes compartidos los exige el producto, no la arquitectura
+
+> **Todo nuevo Shared Component debe justificar explícitamente qué hipótesis del producto ayuda a
+> validar. Si no ayuda a demostrar una hipótesis concreta del producto, espera.**
+
+Una abstracción puede ser perfectamente correcta y aun así adelantarse a la necesidad real del
+producto. El ecosistema **no crece por belleza arquitectónica; crece porque un producto lo obligó a
+crecer.** No es que la abstracción esté mal — es que todavía no es su momento. Este artículo es la
+forma *prescriptiva* del patrón que ya observamos de forma *descriptiva*: los conceptos del ecosistema
+emergen de los productos ([LL-005](../06-knowledge-library/lessons-learned/LL-005-concepts-emerge-from-products.md)).
+
+**Consecuencia operativa:** al proponer un Shared Component —o al promover una abstracción de un
+producto al ecosistema— la propuesta **declara qué hipótesis del producto valida.** Sin esa
+justificación no se construye: se registra como candidato y se observa (Architectural Watch + Regla del
+Tres, Artículo 4). La evidencia del producto manda sobre la elegancia del modelo. La pregunta no es
+*"¿es correcta esta abstracción?"* sino *"¿es este el momento de construirla?"*.
+
+## Artículo 7 — Un sprint no se cierra hasta que un usuario real valida la hipótesis
+
+> **Ningún sprint se considera cerrado hasta que la hipótesis que buscaba demostrar haya sido
+> validada por un usuario real.**
+
+No alcanza con CI en verde, tests pasando, arquitectura correcta ni el dashboard construido. Todo
+eso demuestra que el software funciona — no que el producto **comunica su valor**. La evidencia final
+siempre la produce un usuario, no el equipo. Que nosotros (o un modelo simulando ser el usuario)
+digamos que se entiende **no cuenta**: el gate es una persona real frente al producto.
+
+**Consecuencia operativa:** el "Done" de todo sprint incluye una validación con un usuario real de la
+hipótesis del sprint. Se define de antemano qué se observa y qué cuenta como "sí". Hasta que esa
+validación exista, el sprint está *construido*, no *cerrado*. Este artículo es la contracara de la
+disciplina de altitud (Artículo 6): el Artículo 6 evita construir de más; el Artículo 7 evita dar por
+demostrado lo que todavía no se demostró con un usuario.
+
+## Artículo 8 — No congelamos ideas. Congelamos patrones demostrados.
+
+> **No congelamos ideas. Congelamos patrones demostrados.**
+
+Da igual la capa —arquitectura, dominio, diseño, métricas, experiencia—: el proceso es siempre el
+mismo, nunca al revés:
+
+```
+Construir  →  Convivir  →  Encontrar patrones  →  Congelar
+```
+
+Es el meta-principio que unifica al resto. No se diseñaron el Runtime, Moment, Timeline, Guest ni el
+KPI: **aparecieron** construyendo producto, después se reconoció el patrón, después se congelaron. El
+lenguaje visual sigue la misma ley ([LL-007](../06-knowledge-library/lessons-learned/LL-007-visual-language-is-discovered.md)),
+como los conceptos siguen [LL-005](../06-knowledge-library/lessons-learned/LL-005-concepts-emerge-from-products.md).
+**Este artículo no reemplaza a los anteriores — los explica.** La Regla del Tres (Artículo 4) es su
+**mecanismo** (cómo se descubren los patrones); los Artículos 6 y 7 son sus **aplicaciones** (no
+construir de más, no cerrar sin usuario). **Una decisión que hay que forzar en cada superficie no es un
+patrón — es una preferencia.** Solo cuando una misma solución aparece sola, varias veces, merece
+congelarse. **No existen excepciones** — aplica a arquitectura, dominio, diseño, métricas, experiencia,
+IA y productos.
+
 ---
 
-> **Estado:** Artículo 1 es aporte del Founder (Junio 2026). Artículos 2–5 consolidan reglas ya vigentes
-> y documentadas en el repo. Pendiente revisión del Founder para **FROZEN v1.0**.
+> **Estado:** Artículos 1, 6, 7 y 8 son aporte del Founder (Junio–Julio 2026). Artículos 2–5 consolidan
+> reglas ya vigentes y documentadas en el repo. Pendiente revisión del Founder para **FROZEN v1.0**.

@@ -32,9 +32,9 @@ const SCHEMA = {
         type: "object",
         properties: {
           title: { type: "string", description: "La oportunidad (ej: 'Digitalizar pedidos de la ferretería')." },
-          build: { type: "string", description: "Qué construiríamos / qué venderían." },
-          revenue: { type: "string", description: "Cómo genera ingresos (para el cliente y/o RUN)." },
-          read: { type: "string", description: "Lectura filosa y honesta (ej: 'La más concreta para empezar')." },
+          build: { type: "string", description: "Qué se construye / qué va a poder hacer el cliente." },
+          revenue: { type: "string", description: "Qué resultado de negocio le da al cliente: más ventas, ahorro de tiempo, menos errores, etc. Siempre desde el beneficio del cliente." },
+          read: { type: "string", description: "Por qué conviene y qué la hace valiosa PARA EL CLIENTE (ej: 'La más directa para empezar y ver resultados rápido'). Nada de jerga interna ni de lo que le conviene al proveedor." },
         },
         required: ["title", "build", "revenue", "read"],
         additionalProperties: false,
@@ -43,7 +43,7 @@ const SCHEMA = {
     recommendation: {
       type: "string",
       description:
-        "Recomendación estratégica, voz de asesor tipo Elon Musk: primeros principios, directa, por dónde empezar y por qué. 3-5 frases máximo, sin relleno.",
+        "Recomendación clara dirigida AL CLIENTE: por dónde empezar y por qué conviene, con criterio. 3-5 frases, sin relleno. PROHIBIDO mencionar competidores o productos de terceros (nombres o precios) y hablar de lo que le conviene al proveedor.",
     },
     phase1: {
       type: "object",
@@ -203,12 +203,18 @@ export async function POST(req: Request) {
   const playbook = await getPlaybook(supabase, leadVertical);
   const playbookBlock = playbookToPrompt(playbook);
 
-  const system = `Sos el estratega de RUN, que desarrolla software a medida, agentes de IA e integraciones. Pensás con PRIMEROS PRINCIPIOS, como un buen asesor (estilo Elon Musk): directo, sin relleno, enfocado en la oportunidad real de negocio y en qué conviene construir primero para generar impacto y que el cliente pague.
+  const system = `Sos el estratega de RUN, que desarrolla software a medida, agentes de IA e integraciones. Pensás con PRIMEROS PRINCIPIOS: directo, sin relleno, enfocado en la oportunidad real de negocio y en qué conviene construir primero para generar impacto.
+
+🚨 ESTO LO LEE EL CLIENTE FINAL. Es una propuesta PARA el cliente, no notas internas. Por lo tanto, en TODOS los textos (positioning, opportunities, recommendation, phase1, roadmap, scenarios, options):
+- Escribí SIEMPRE dirigido al cliente (hablale de "tu negocio", "vas a poder"), en tono profesional, concreto y convincente.
+- PROHIBIDO mencionar competidores o productos/herramientas de terceros por nombre o con precios (ej "reemplaza al competidor de $X/mes"). Hablá del valor que gana el cliente, no de contra quién compite.
+- PROHIBIDO hablar en primera persona del proveedor ni de lo que "nos conviene" / "nos deja facturar", y nada de asides internos de venta (ej "no vendamos la NASA", "esto nos da data"). Reformulalo siempre como beneficio del cliente.
+- Nada de jerga interna ni comentarios de pasillo. Que se lea como una propuesta seria que el cliente puede mostrar a su socio.
 
 Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvés una PROPUESTA ESTRUCTURADA (NO un texto largo) con:
 1) "positioning": una frase filosa de la transformación que propone RUN.
 2) "opportunities": lectura de 3-5 oportunidades del negocio (qué construir, cómo genera ingresos, tu lectura honesta de cada una).
-3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio comercial (qué deja facturar y aprender ya, qué validar antes de invertir).
+3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio (qué resultado concreto consigue el cliente primero y qué conviene validar antes de invertir más). Siempre en beneficio del cliente, sin mencionar competidores.
 4) "phase1": la Fase 1 recomendada para arrancar con impacto.
 5) "roadmap": cronograma realista de la Fase 1 (por semanas o meses según el tamaño), 3-6 etapas, cada una con el hito concreto que ve o recibe el cliente. Sé realista con los plazos de un desarrollo a medida.
 6) "scenarios": 3 escenarios de inversión (esencial / recomendado / completo) armados con slugs del catálogo. El recomendado es el del medio.

@@ -6,6 +6,7 @@ import { logEvent } from "@/lib/audit";
 import { deployEnv, writeGuard } from "@/lib/commerce-guard";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { extractPath } from "@/lib/storage";
+import { uniqueLeadSlug } from "@/lib/lead-slug";
 import type { QuoteSubmission, Service, LeadFile } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -173,6 +174,7 @@ export async function POST(req: Request) {
   const sourceType = body.sourceType === "chat" ? "chat" : "form";
   extraRow.source_type = sourceType;
   if (body.conversationSummary) extraRow.conversation_summary = body.conversationSummary;
+  extraRow.slug = await uniqueLeadSlug(supabase, name, email);
 
   // Insert resiliente: si una columna nueva no existe todavía, reintenta sin extras.
   let lead: { id: string } | null = null;

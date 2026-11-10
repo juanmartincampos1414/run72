@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { extractPath, signMany } from "@/lib/storage";
 import { normalizarTelefono } from "@/lib/whatsapp";
 import { logEvent } from "@/lib/audit";
+import { uniqueLeadSlug } from "@/lib/lead-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
     source_type: "manual",
     conversation_summary: resumen,
     intake: { origen: "manual", idea, budget },
+    slug: await uniqueLeadSlug(supabase, name, email),
   };
 
   let lead: { id: string } | null = null;

@@ -3,6 +3,19 @@
 > Capacidades reutilizables del ecosistema RUN72. **Reutilizar antes de construir**
 > (Principio 3 del POS). Antes de crear algo nuevo en cualquier producto, revisar acá.
 
+## Las tres capas del ecosistema (Founder Decision, 2026-07-05)
+
+Tras la consolidación del worker (AD-B027), RUN72 se describe en tres capas:
+
+```
+RUN72
+├── Shared Packages   → capacidades reutilizables (código que los productos consumen). Este doc.
+├── Shared Runtime    → la ejecución del ecosistema. Ver `run72-runtime.md`.
+└── Shared Knowledge  → decisiones, patrones, capability catalog, lessons. Ver `06-knowledge-library`.
+```
+
+El **Runtime** (Event Bus, Worker Runtime, Scheduler, Observabilidad, Timeline/Lifecycle/Knowledge/Analytics Projectors) NO pertenece a ningún producto. Detalle arquitectónico completo en [`run72-runtime.md`](run72-runtime.md).
+
 ## Catálogo (origen Tips+ / Margin)
 
 Componentes ya desarrollados que Stay debe reutilizar antes de construir nuevos:

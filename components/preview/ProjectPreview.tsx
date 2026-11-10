@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Logo } from "../Logo";
 import { HeroVisual } from "./HeroVisual";
@@ -109,12 +108,14 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
   ].filter(Boolean) as { id: string; label: string }[];
 
   return (
-    <div className="min-h-screen">
+    <div id="top" className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-line bg-ink/80 backdrop-blur">
         <div className="container-x flex items-center justify-between py-3.5">
-          <Link href="/" aria-label="RUN — inicio">
+          {/* Esta página la ve el cliente: el logo y "Volver" NO salen al sitio de
+              RUN, se quedan en la propuesta (scroll al inicio). */}
+          <a href="#top" aria-label="Inicio de la propuesta">
             <Logo />
-          </Link>
+          </a>
           {nav.length > 0 && (
             <nav className="hidden items-center gap-5 text-sm text-muted md:flex">
               {nav.map((n) => (
@@ -124,9 +125,9 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
               ))}
             </nav>
           )}
-          <Link href="/" className="text-sm text-muted transition-colors hover:text-fg">
-            Volver
-          </Link>
+          <a href="#top" className="text-sm text-muted transition-colors hover:text-fg">
+            Volver arriba
+          </a>
         </div>
       </header>
 
@@ -282,8 +283,20 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
                     >
                       <h3 className="font-display text-lg font-semibold tracking-tight">{m.title}</h3>
                       <p className="mt-1 text-sm leading-relaxed text-muted">{m.description}</p>
-                      <div className="mt-3 overflow-hidden rounded-2xl border border-line bg-white glow-violet">
-                        <iframe title={m.title} sandbox="" srcDoc={m.html} className="h-[620px] w-full" loading="lazy" />
+                      {/* Los mockups son pantallas ilustrativas (iframe sandbox, sin lógica):
+                          marcamos que son de ejemplo y no interactivas para que nadie
+                          intente "usarlas" y crea que está roto. */}
+                      <div className="relative mt-3 overflow-hidden rounded-2xl border border-line bg-white glow-violet">
+                        <div className="pointer-events-none absolute right-3 top-3 z-10 rounded-full bg-ink/85 px-3 py-1 text-[11px] font-medium text-white shadow-lg backdrop-blur">
+                          ✨ Vista de ejemplo · no interactiva
+                        </div>
+                        <iframe
+                          title={m.title}
+                          sandbox=""
+                          srcDoc={m.html}
+                          className="pointer-events-none h-[620px] w-full select-none"
+                          loading="lazy"
+                        />
                       </div>
                     </motion.div>
                   ))}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 import { enforceRateLimit } from "@/lib/rate-limit";
+import { findLeadByHandle } from "@/lib/lead-slug";
 import type { ProjectPreview } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +33,8 @@ export async function POST(req: Request) {
   if (!leadId) return NextResponse.json({ error: "Falta leadId." }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
-  const { data: lead } = await supabase.from("leads").select("*").eq("id", leadId).maybeSingle();
+  // leadId puede ser el slug legible (ej "emiliano-cocilobo") o el UUID (links viejos).
+  const lead = await findLeadByHandle(supabase, leadId);
   if (!lead) return NextResponse.json({ error: "Proyecto no encontrado." }, { status: 404 });
 
   // La propuesta es visible SIN pago: es la página que el cliente ve para

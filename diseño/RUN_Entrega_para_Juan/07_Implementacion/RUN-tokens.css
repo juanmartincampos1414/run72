@@ -1,0 +1,15 @@
+/* REFERENCIA PARA NUEVAS PIEZAS. No importar globalmente ni cambiar el tema de la web actual. */
+/* RUN 2026.10. Variables para mapear al tema existente. No cambia la página por sí solo. */
+.run-brand {
+  --run-canvas: #100904;
+  --run-surface: #21150e;
+  --run-text: #ffecd5;
+  --run-text-secondary: #c3ab96;
+  --run-accent: #dc5000;
+  --run-divider: #503628;
+  --run-font-body: 'Switzer', sans-serif;
+  --run-font-meta: 'Geist Mono', monospace;
+  --run-duration-ui: 180ms;
+}
+/* El foco debe ser visible; verificar contraste sobre el fondo real de cada componente.
+   No importar ni reemplazar estilos globales sin revisión de regresiones. */

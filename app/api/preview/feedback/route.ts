@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
+import { findLeadByHandle } from "@/lib/lead-slug";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export async function POST(req: Request) {
   if (typeof body.rating === "number") patch.preview_rating = body.rating;
   if (body.comments !== undefined) patch.preview_comments = body.comments.trim() || null;
 
-  await supabase.from("leads").update(patch).eq("id", body.leadId);
+  // leadId puede ser slug o UUID: resolvemos al id real antes de actualizar.
+  const lead = await findLeadByHandle(supabase, body.leadId, "id");
+  if (!lead) return NextResponse.json({ error: "Proyecto no encontrado." }, { status: 404 });
+  await supabase.from("leads").update(patch).eq("id", lead.id as string);
   return NextResponse.json({ ok: true });
 }

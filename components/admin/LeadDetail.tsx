@@ -212,6 +212,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
             >
               <TranscriptProposal
                 leadId={leadId}
+                handle={lead.slug ?? leadId}
                 initialTranscript={lead.transcript}
                 initialProposal={lead.proposal}
                 discovery={lead.discovery}
@@ -245,7 +246,7 @@ export function LeadDetail({ leadId }: { leadId: string }) {
                 {genErr}
               </p>
             )}
-            <ClientLink leadId={leadId} />
+            <ClientLink leadId={lead.slug ?? leadId} />
 
             {latest && (
               <>
@@ -627,11 +628,13 @@ type GenProposal = {
 
 function TranscriptProposal({
   leadId,
+  handle,
   initialTranscript,
   initialProposal,
   discovery,
 }: {
   leadId: string;
+  handle: string;
   initialTranscript: string | null;
   initialProposal: Record<string, unknown> | null;
   discovery: Record<string, string> | null;
@@ -859,7 +862,7 @@ function TranscriptProposal({
               >
                 {copied ? "¡Copiado!" : "Copiar"}
               </button>
-              <ClientLinkInline leadId={leadId} />
+              <ClientLinkInline leadId={handle} />
             </div>
           </div>
 

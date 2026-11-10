@@ -1,0 +1,20 @@
+{
+  "blender": "4.5.9 LTS",
+  "master_reopened": true,
+  "master": "RUN_Maestro.blend",
+  "renderer": "Cycles",
+  "color_transform": "AgX / Medium High Contrast",
+  "external_textures": 0,
+  "core_web": "RUN_Nucleo_web.glb",
+  "web_material": {
+    "baseColor": "#FFF5E8",
+    "transmission": 0.975,
+    "roughness": 0.018,
+    "ior": 1.46,
+    "metalness": 0,
+    "attenuationColor": "#F5B360",
+    "attenuationDistance": 8.33,
+    "thickness": 0.55
+  },
+  "integration": "Recurso adicional. No integrar en la web actual ni sustituir su escena 3D. Parámetros de esta escena institucional; uso futuro sujeto a evaluación."
+}
