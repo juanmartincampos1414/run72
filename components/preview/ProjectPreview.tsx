@@ -7,7 +7,7 @@ import { HeroVisual } from "./HeroVisual";
 import { CheckIcon, BoltIcon, MailIcon } from "../icons";
 import { cn } from "@/lib/cn";
 import { SITE } from "@/lib/content";
-import { formatARS, IVA_RATE } from "@/lib/pricing";
+import { formatARS } from "@/lib/pricing";
 import type { ProjectPreview as Preview } from "@/lib/types";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -24,7 +24,6 @@ type Scenario = {
   deposit: number;
   recommended?: boolean;
 };
-type Option = { slug: string; name: string; detail: string; price_ars: number }; // sin IVA
 type RoadmapStep = { period: string; title: string; detail?: string; milestone: string };
 type Roadmap = { unit: string; steps: RoadmapStep[] };
 type Proposal = {
@@ -36,17 +35,34 @@ type Proposal = {
   nextPhases?: { title: string; detail: string }[];
   roadmap?: Roadmap | null;
   scenarios?: Scenario[];
-  options?: Option[];
   depositPercent?: number;
   // compat formato viejo
   draft?: string;
 };
+
+/** Marca del cliente para tematizar la propuesta (colores + logo). Opcional. */
+type Brand = {
+  name?: string;
+  logoUrl?: string;
+  primary?: string; // acento principal (links, kickers) → --color-brand-cyan
+  mid?: string; //                                       → --color-brand-blue
+  accent?: string; //                                    → --color-brand-violet
+};
+
+/** Convierte "#eb5e21" a "235,94,33" para usar en rgba() del hero/glow. */
+function hexToRgb(hex?: string): [number, number, number] | null {
+  if (!hex) return null;
+  const m = hex.replace("#", "").match(/^([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  if (!m) return null;
+  return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+}
 
 export function ProjectPreview({ leadId }: { leadId: string }) {
   const [state, setState] = useState<State>("loading");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [clientName, setClientName] = useState<string | null>(null);
+  const [brand, setBrand] = useState<Brand | null>(null);
   const [rating, setRating] = useState<number | null>(null);
   const [comments, setComments] = useState("");
   const [saved, setSaved] = useState(false);
@@ -64,6 +80,7 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
         if (!alive) return;
         if (data.proposal) setProposal(data.proposal as Proposal);
         if (data.name) setClientName(data.name as string);
+        if (data.brand) setBrand(data.brand as Brand);
         if (data.preview) setPreview(data.preview as Preview);
         if (data.proposal || data.preview) setState("ready");
         else setState("error");
@@ -99,6 +116,24 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
     return x / 160;
   }, [leadId]);
 
+  // Branding por lead: si el lead tiene marca, sobreescribimos los tokens de color
+  // (--color-brand-*) en el root → toda la propuesta toma la paleta del cliente.
+  const brandStyle = brand
+    ? ({
+        ...(brand.primary ? { "--color-brand-cyan": brand.primary } : {}),
+        ...(brand.mid ? { "--color-brand-blue": brand.mid } : {}),
+        ...(brand.accent ? { "--color-brand-violet": brand.accent } : {}),
+      } as React.CSSProperties)
+    : undefined;
+  // Paleta RGB para el visual del hero (default = cyan/blue/violet de RUN).
+  const heroPalette = useMemo(() => {
+    const p = [hexToRgb(brand?.primary), hexToRgb(brand?.mid), hexToRgb(brand?.accent)].filter(
+      Boolean,
+    ) as [number, number, number][];
+    return p.length >= 2 ? p : undefined;
+  }, [brand]);
+  const glowRgb = heroPalette?.[1] ?? heroPalette?.[0] ?? [99, 102, 241];
+
   const nav = [
     proposal?.opportunities?.length ? { id: "oportunidad", label: "Oportunidad" } : null,
     proposal?.phase1 ? { id: "propuesta", label: "Propuesta" } : null,
@@ -108,13 +143,27 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
   ].filter(Boolean) as { id: string; label: string }[];
 
   return (
-    <div id="top" className="min-h-screen">
+    <div id="top" className="min-h-screen" style={brandStyle}>
       <header className="sticky top-0 z-30 border-b border-line bg-ink/80 backdrop-blur">
         <div className="container-x flex items-center justify-between py-3.5">
           {/* Esta página la ve el cliente: el logo y "Volver" NO salen al sitio de
-              RUN, se quedan en la propuesta (scroll al inicio). */}
-          <a href="#top" aria-label="Inicio de la propuesta">
-            <Logo />
+              RUN, se quedan en la propuesta (scroll al inicio). Si el lead tiene
+              marca, mostramos el logo del cliente (en un chip claro para que lea
+              sobre el fondo oscuro). */}
+          <a href="#top" aria-label="Inicio de la propuesta" className="flex items-center gap-3">
+            {brand?.logoUrl ? (
+              <>
+                <span className="flex items-center rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={brand.logoUrl} alt={brand.name ?? "Cliente"} className="h-7 w-auto" />
+                </span>
+                <span className="hidden text-xs text-faint sm:inline">
+                  por <span className="font-semibold text-muted">RUN</span>
+                </span>
+              </>
+            ) : (
+              <Logo />
+            )}
           </a>
           {nav.length > 0 && (
             <nav className="hidden items-center gap-5 text-sm text-muted md:flex">
@@ -152,12 +201,14 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
           <>
             {/* HERO */}
             <section className="relative overflow-hidden border-b border-line bg-ink">
-              {/* Visual animado futurista (flow field) */}
-              <HeroVisual seed={heroSeed} className="absolute inset-0 h-full w-full opacity-95" />
+              {/* Visual animado médico (ECG / pulso) en la paleta del cliente */}
+              <HeroVisual seed={heroSeed} palette={heroPalette} className="absolute inset-0 h-full w-full opacity-95" />
               {/* Glow de marca para dar profundidad */}
               <div
                 className="pointer-events-none absolute -right-20 top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full opacity-50 blur-3xl"
-                style={{ background: "radial-gradient(circle, rgba(99,102,241,0.35), rgba(168,85,247,0.12) 55%, transparent 70%)" }}
+                style={{
+                  background: `radial-gradient(circle, rgba(${glowRgb[0]},${glowRgb[1]},${glowRgb[2]},0.35), rgba(${glowRgb[0]},${glowRgb[1]},${glowRgb[2]},0.12) 55%, transparent 70%)`,
+                }}
               />
               {/* Overlays para legibilidad del texto */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-ink via-ink/75 to-ink/10" />
@@ -252,11 +303,8 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
 
             {/* 04 · INVERSIÓN (interactivo) */}
             {structured && (
-              <Section id="inversion" index={hasRoadmap ? "04" : "03"} title="La inversión" kicker="Armá tu plan y mirá el número en vivo">
-                <InvestmentBuilder
-                  scenarios={proposal.scenarios!}
-                  options={proposal.options ?? []}
-                />
+              <Section id="inversion" index={hasRoadmap ? "04" : "03"} title="La inversión" kicker="El presupuesto de la Fase 1">
+                <InvestmentBuilder scenarios={proposal.scenarios!} />
               </Section>
             )}
 
@@ -441,31 +489,14 @@ function Timeline({ steps }: { steps: RoadmapStep[] }) {
 /** Constructor de inversión interactivo: escenario + módulos opcionales → recalcula. */
 function InvestmentBuilder({
   scenarios,
-  options,
 }: {
   scenarios: Scenario[];
-  options: Option[];
 }) {
   const recommended = scenarios.find((s) => s.recommended) ?? scenarios[0];
   const [key, setKey] = useState(recommended?.key ?? scenarios[0]?.key);
-  const [picked, setPicked] = useState<Set<string>>(new Set());
 
   const scenario = scenarios.find((s) => s.key === key) ?? scenarios[0];
-
-  const total = useMemo(() => {
-    const optSubtotal = options.filter((o) => picked.has(o.slug)).reduce((a, o) => a + o.price_ars, 0);
-    const optTotal = Math.round(optSubtotal * (1 + IVA_RATE));
-    return (scenario?.total ?? 0) + optTotal;
-  }, [scenario, options, picked]);
-
-  function toggle(slug: string) {
-    setPicked((prev) => {
-      const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug);
-      else next.add(slug);
-      return next;
-    });
-  }
+  const total = scenario?.total ?? 0;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -511,44 +542,6 @@ function InvestmentBuilder({
           </div>
         )}
 
-        {/* Módulos opcionales */}
-        {options.length > 0 && (
-          <div className="mt-5">
-            <p className="mb-3 text-xs font-medium uppercase tracking-[0.16em] text-faint">Sumá lo que quieras</p>
-            <div className="space-y-2">
-              {options.map((o) => {
-                const on = picked.has(o.slug);
-                return (
-                  <button
-                    key={o.slug}
-                    type="button"
-                    onClick={() => toggle(o.slug)}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all",
-                      on ? "border-brand-cyan bg-brand-cyan/[0.06]" : "border-line bg-surface/40 hover:border-line-strong",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border",
-                        on ? "border-transparent bg-gradient-to-br from-brand-cyan to-brand-violet text-ink" : "border-line-strong",
-                      )}
-                    >
-                      {on && <CheckIcon className="h-3.5 w-3.5" strokeWidth={3} />}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-fg">{o.name}</span>
-                      <span className="block text-xs text-muted">{o.detail}</span>
-                    </span>
-                    <span className="shrink-0 text-sm font-medium tabular-nums text-muted">
-                      + {formatARS(Math.round(o.price_ars * (1 + IVA_RATE)))}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Resumen pegajoso */}
@@ -572,7 +565,7 @@ function InvestmentBuilder({
               <span>Mantenimiento mensual opcional.</span>
             </li>
           </ul>
-          <p className="mt-5 text-xs text-faint">Ajustá el plan arriba — este número se actualiza solo.</p>
+          <p className="mt-5 text-xs text-faint">Precio cerrado por la Fase 1. Sin costos ocultos.</p>
         </div>
       </div>
     </div>

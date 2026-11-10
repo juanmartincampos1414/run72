@@ -46,6 +46,8 @@ export async function POST(req: Request) {
     proposal: (lead.proposal as Record<string, unknown>) ?? null,
     name: (lead.name as string) ?? null,
     projectLabel: (lead.project_label as string) ?? null,
+    // Marca del cliente (colores + logo) para tematizar la propuesta. Opcional.
+    brand: (lead.brand as Record<string, unknown>) ?? null,
   };
 
   let preview: ProjectPreview | null = null;

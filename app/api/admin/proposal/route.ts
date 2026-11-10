@@ -111,22 +111,6 @@ const SCHEMA = {
         additionalProperties: false,
       },
     },
-    options: {
-      type: "array",
-      description:
-        "Módulos opcionales que el cliente puede sumar/sacar para jugar con el número. Usá SOLO slugs del catálogo (addons o 'service_slug:slug' de micros).",
-      items: {
-        type: "object",
-        properties: {
-          kind: { type: "string", enum: ["addon", "micro"] },
-          slug: { type: "string", description: "slug del addon, o clave 'service_slug:slug' del micro." },
-          name: { type: "string", description: "Nombre legible del módulo." },
-          detail: { type: "string", description: "1 frase de qué aporta." },
-        },
-        required: ["kind", "slug", "name", "detail"],
-        additionalProperties: false,
-      },
-    },
     missing: { type: "array", items: { type: "string" }, description: "Datos que faltan para cerrar." },
   },
   required: ["positioning", "summary", "opportunities", "recommendation", "phase1", "scenarios"],
@@ -142,7 +126,6 @@ type Scenario = {
   microservices: string[];
   includes: string[];
 };
-type Option = { kind: "addon" | "micro"; slug: string; name: string; detail: string };
 type Output = {
   positioning: string;
   summary: string;
@@ -153,7 +136,6 @@ type Output = {
   nextPhases?: { title: string; detail: string }[];
   roadmap?: { unit: string; steps: { period: string; title: string; detail?: string; milestone: string }[] };
   scenarios: Scenario[];
-  options?: Option[];
   missing?: string[];
 };
 
@@ -196,16 +178,22 @@ export async function POST(req: Request) {
 
   // Motor: si el lead ya tiene rubro, inyectamos el playbook de ese rubro.
   let leadVertical = "";
+  let clientContext = "";
   if (leadId) {
-    const { data: lead } = await supabase.from("leads").select("vertical").eq("id", leadId).maybeSingle();
+    const { data: lead } = await supabase
+      .from("leads")
+      .select("vertical, meeting_notes")
+      .eq("id", leadId)
+      .maybeSingle();
     leadVertical = String(lead?.vertical ?? "").trim();
+    clientContext = String(lead?.meeting_notes ?? "").trim();
   }
   const playbook = await getPlaybook(supabase, leadVertical);
   const playbookBlock = playbookToPrompt(playbook);
 
   const system = `Sos el estratega de RUN, que desarrolla software a medida, agentes de IA e integraciones. Pensás con PRIMEROS PRINCIPIOS: directo, sin relleno, enfocado en la oportunidad real de negocio y en qué conviene construir primero para generar impacto.
 
-🚨 ESTO LO LEE EL CLIENTE FINAL. Es una propuesta PARA el cliente, no notas internas. Por lo tanto, en TODOS los textos (positioning, opportunities, recommendation, phase1, roadmap, scenarios, options):
+🚨 ESTO LO LEE EL CLIENTE FINAL. Es una propuesta PARA el cliente, no notas internas. Por lo tanto, en TODOS los textos (positioning, opportunities, recommendation, phase1, roadmap, scenarios):
 - Escribí SIEMPRE dirigido al cliente (hablale de "tu negocio", "vas a poder"), en tono profesional, concreto y convincente.
 - PROHIBIDO mencionar competidores o productos/herramientas de terceros por nombre o con precios (ej "reemplaza al competidor de $X/mes"). Hablá del valor que gana el cliente, no de contra quién compite.
 - PROHIBIDO hablar en primera persona del proveedor ni de lo que "nos conviene" / "nos deja facturar", y nada de asides internos de venta (ej "no vendamos la NASA", "esto nos da data"). Reformulalo siempre como beneficio del cliente.
@@ -217,13 +205,13 @@ Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvé
 3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio (qué resultado concreto consigue el cliente primero y qué conviene validar antes de invertir más). Siempre en beneficio del cliente, sin mencionar competidores.
 4) "phase1": la Fase 1 recomendada para arrancar con impacto.
 5) "roadmap": cronograma realista de la Fase 1 (por semanas o meses según el tamaño), 3-6 etapas, cada una con el hito concreto que ve o recibe el cliente. Sé realista con los plazos de un desarrollo a medida.
-6) "scenarios": EXACTAMENTE 2 escenarios de inversión armados con slugs del catálogo: 'recomendado' (punto de entrada, marcado como recomendado) y 'completo' (versión integral). NO generes un tercer escenario más económico/básico.
-7) "options": módulos opcionales (slugs del catálogo) para que el cliente sume/saque y vea el precio moverse.
+6) "scenarios": EXACTAMENTE 2 escenarios de inversión armados con slugs del catálogo: 'recomendado' (punto de entrada, marcado como recomendado) y 'completo' (versión integral). NO generes un tercer escenario más económico/básico. NO generes módulos opcionales/adicionales: el cliente elige entre los 2 escenarios y listo.
 
 Reglas:
-- Para scenarios y options usá EXCLUSIVAMENTE slugs/claves del catálogo de abajo. No inventes servicios ni precios: los calcula el sistema.
-- Los 3 escenarios son incrementales: esencial ⊂ recomendado ⊂ completo tiene sentido, pero cada uno es un set válido.
+- Para scenarios usá EXCLUSIVAMENTE slugs/claves del catálogo de abajo. No inventes servicios ni precios: los calcula el sistema.
+- Los 2 escenarios son incrementales: recomendado ⊂ completo.
 - Español rioplatense. Nada de relleno ni marketing vacío: lectura honesta y concreta.
+- Si te paso CONTEXTO DEL CLIENTE (datos de su web / notas), usalo para afinar el diagnóstico: distinguí bien lo que el cliente YA TIENE de lo que le falta, y no propongas como nuevo algo que ya tiene.
 
 ANCLAJE DE PRECIO (CRÍTICO — no lo ignores):
 - RUN vende software a medida. Si el cliente necesita una plataforma, una app, un sistema con lógica propia, un portal, o integraciones con sistemas externos (PACS, ERP, HIS, APIs, pasarelas, etc.), CADA uno de los 3 escenarios DEBE anclar en un service type=project real del catálogo ("plataforma" para un sistema a medida, "ecommerce" para una tienda, "sitio" para institucional). Ese proyecto base es el NÚCLEO del presupuesto.
@@ -249,7 +237,7 @@ ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`
       messages: [
         {
           role: "user",
-          content: `Transcripción de la call:\n${transcript}${notes ? `\n\nNotas:\n${notes}` : ""}`,
+          content: `Transcripción de la call:\n${transcript}${notes ? `\n\nNotas:\n${notes}` : ""}${clientContext ? `\n\nCONTEXTO DEL CLIENTE (datos de su web / notas — para afinar el diagnóstico de lo que YA tiene):\n${clientContext}` : ""}`,
         },
       ],
     });
@@ -306,15 +294,6 @@ ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`
     };
   });
 
-  const options = (parsed.options ?? [])
-    .map((o) => {
-      let price = 0;
-      if (o.kind === "addon") price = bySlug.get(o.slug)?.price_ars ?? 0;
-      else price = microKey.get(o.slug)?.price_ars ?? 0;
-      return price > 0 ? { slug: o.slug, name: o.name, detail: o.detail, price_ars: price } : null;
-    })
-    .filter((o): o is { slug: string; name: string; detail: string; price_ars: number } => o !== null);
-
   // Guardar el rubro clasificado en el lead (si no tenía) para el Motor.
   if (leadId && !leadVertical && parsed.vertical) {
     await supabase
@@ -334,7 +313,6 @@ ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`
     nextPhases: parsed.nextPhases ?? [],
     roadmap: parsed.roadmap ?? null,
     scenarios,
-    options,
     depositPercent,
     missing: parsed.missing ?? [],
   });

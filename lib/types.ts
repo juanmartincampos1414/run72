@@ -53,6 +53,7 @@ export type Lead = {
   id: string;
   created_at: string;
   slug: string | null;
+  brand: { name?: string; logoUrl?: string; primary?: string; mid?: string; accent?: string } | null;
   name: string;
   company: string | null;
   email: string;
