@@ -95,11 +95,11 @@ const SCHEMA = {
     scenarios: {
       type: "array",
       description:
-        "3 escenarios de inversión de la Fase 1: esencial, recomendado y completo. El del medio es el recomendado.",
+        "EXACTAMENTE 2 escenarios de inversión de la Fase 1: 'recomendado' (el punto de entrada, el que marcamos recomendado) y 'completo' (la versión integral). NO incluyas un escenario más básico/económico que esos dos.",
       items: {
         type: "object",
         properties: {
-          key: { type: "string", enum: ["esencial", "recomendado", "completo"] },
+          key: { type: "string", enum: ["recomendado", "completo"] },
           name: { type: "string", description: "Nombre corto (ej: 'Esencial')." },
           tagline: { type: "string", description: "1 frase de para quién es / qué logra." },
           projectTypes: { type: "array", items: { type: "string" }, description: "slugs de tipos de proyecto del catálogo incluidos en este escenario." },
@@ -217,7 +217,7 @@ Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvé
 3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio (qué resultado concreto consigue el cliente primero y qué conviene validar antes de invertir más). Siempre en beneficio del cliente, sin mencionar competidores.
 4) "phase1": la Fase 1 recomendada para arrancar con impacto.
 5) "roadmap": cronograma realista de la Fase 1 (por semanas o meses según el tamaño), 3-6 etapas, cada una con el hito concreto que ve o recibe el cliente. Sé realista con los plazos de un desarrollo a medida.
-6) "scenarios": 3 escenarios de inversión (esencial / recomendado / completo) armados con slugs del catálogo. El recomendado es el del medio.
+6) "scenarios": EXACTAMENTE 2 escenarios de inversión armados con slugs del catálogo: 'recomendado' (punto de entrada, marcado como recomendado) y 'completo' (versión integral). NO generes un tercer escenario más económico/básico.
 7) "options": módulos opcionales (slugs del catálogo) para que el cliente sume/saque y vea el precio moverse.
 
 Reglas:
@@ -228,10 +228,10 @@ Reglas:
 ANCLAJE DE PRECIO (CRÍTICO — no lo ignores):
 - RUN vende software a medida. Si el cliente necesita una plataforma, una app, un sistema con lógica propia, un portal, o integraciones con sistemas externos (PACS, ERP, HIS, APIs, pasarelas, etc.), CADA uno de los 3 escenarios DEBE anclar en un service type=project real del catálogo ("plataforma" para un sistema a medida, "ecommerce" para una tienda, "sitio" para institucional). Ese proyecto base es el NÚCLEO del presupuesto.
 - Los microservicios y addons SE SUMAN al proyecto base. NUNCA reemplazan al proyecto base. Un presupuesto de software a medida armado solo con microservicios está MAL y sale ridículamente barato: eso no puede pasar.
-- Progresión típica para software a medida:
-  · esencial = proyecto base (ej "plataforma") + las funcionalidades núcleo mínimas para que opere.
-  · recomendado = proyecto base + la integración/automatización clave + funcionalidades que lo hacen sólido en producción.
-  · completo = todo lo anterior + portal multi-actor, pagos diferenciados, automatizaciones, reportes, etc.
+- Progresión típica para software a medida (son 2 escenarios, NO 3):
+  · recomendado (punto de entrada) = proyecto base (ej "plataforma") + el núcleo que opera + la integración/automatización clave que lo hace sólido en producción. Es un entregable serio, no una versión recortada.
+  · completo = todo lo del recomendado + portal multi-actor, pagos diferenciados, automatizaciones, reportes, etc.
+- No armes un escenario "económico/básico" por debajo del recomendado: RUN no lowballea; el punto de entrada ya tiene que ser una solución real.
 - Sanity check antes de responder: un desarrollo a medida serio (plataforma + integración con un sistema externo) NO puede dar un total irrisorio. Si el escenario recomendado te quedó por debajo de lo que cuesta construir eso en serio (pensá en meses-persona reales de ingeniería), es porque te olvidaste del proyecto base o de funcionalidades: corregilo e incluí el service type=project que corresponde.
 - Solo cuando el pedido es puramente branding/estrategia/marketing (sin software) un escenario puede no tener proyecto base.
 

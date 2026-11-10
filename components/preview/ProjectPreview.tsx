@@ -474,8 +474,8 @@ function InvestmentBuilder({
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
       <div>
-        {/* Escenarios */}
-        <div className="grid gap-4 sm:grid-cols-3">
+        {/* Escenarios (2 por defecto; se adapta si hubiera más) */}
+        <div className={`grid gap-4 ${scenarios.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
           {scenarios.map((s) => {
             const active = s.key === key;
             return (
