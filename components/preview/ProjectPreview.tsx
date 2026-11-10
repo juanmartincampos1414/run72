@@ -153,10 +153,8 @@ export function ProjectPreview({ leadId }: { leadId: string }) {
           <a href="#top" aria-label="Inicio de la propuesta" className="flex items-center gap-3">
             {brand?.logoUrl ? (
               <>
-                <span className="flex items-center rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={brand.logoUrl} alt={brand.name ?? "Cliente"} className="h-7 w-auto" />
-                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={brand.logoUrl} alt={brand.name ?? "Cliente"} className="h-9 w-auto" />
                 <span className="hidden text-xs text-faint sm:inline">
                   por <span className="font-semibold text-muted">RUN</span>
                 </span>
@@ -486,52 +484,33 @@ function Timeline({ steps }: { steps: RoadmapStep[] }) {
   );
 }
 
-/** Constructor de inversión interactivo: escenario + módulos opcionales → recalcula. */
+/** Una sola propuesta (la más completa): qué incluye + precio neto + IVA. */
 function InvestmentBuilder({
   scenarios,
 }: {
   scenarios: Scenario[];
 }) {
-  const recommended = scenarios.find((s) => s.recommended) ?? scenarios[0];
-  const [key, setKey] = useState(recommended?.key ?? scenarios[0]?.key);
-
-  const scenario = scenarios.find((s) => s.key === key) ?? scenarios[0];
+  // Propuesta única: la más completa (recomendada, o la de mayor total).
+  const scenario =
+    scenarios.find((s) => s.recommended) ??
+    [...scenarios].sort((a, b) => (b.total ?? 0) - (a.total ?? 0))[0];
   const total = scenario?.total ?? 0;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
       <div>
-        {/* Escenarios (2 por defecto; se adapta si hubiera más) */}
-        <div className={`grid gap-4 ${scenarios.length >= 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-          {scenarios.map((s) => {
-            const active = s.key === key;
-            return (
-              <button
-                key={s.key}
-                type="button"
-                onClick={() => setKey(s.key)}
-                className={cn(
-                  "rounded-3xl border p-5 text-left transition-all",
-                  active ? "border-brand-cyan bg-brand-cyan/[0.06] ring-1 ring-brand-cyan/40" : "border-line bg-surface/40 hover:border-line-strong",
-                )}
-              >
-                {s.recommended && (
-                  <span className="mb-2 inline-block rounded-full bg-gradient-to-r from-brand-cyan to-brand-violet px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink">
-                    Recomendado
-                  </span>
-                )}
-                <p className="font-display text-lg font-semibold tracking-tight">{s.name}</p>
-                <p className="mt-1 text-xs text-muted">{s.tagline}</p>
-                <p className="mt-3 font-display text-xl font-semibold tabular-nums">{formatARS(s.total)}</p>
-              </button>
-            );
-          })}
-        </div>
+        {/* Encabezado de la propuesta única */}
+        {scenario && (
+          <div className="rounded-3xl border border-brand-cyan/40 bg-brand-cyan/[0.06] p-5 ring-1 ring-brand-cyan/30">
+            <p className="font-display text-xl font-semibold tracking-tight">{scenario.name}</p>
+            {scenario.tagline && <p className="mt-1 text-sm text-muted">{scenario.tagline}</p>}
+          </div>
+        )}
 
-        {/* Incluye */}
-        {scenario?.includes?.length > 0 && (
+        {/* Incluye todo */}
+        {scenario && scenario.includes?.length ? (
           <div className="mt-5 rounded-2xl border border-line bg-surface/30 p-5">
-            <p className="mb-3 text-sm font-medium">Incluye</p>
+            <p className="mb-3 text-sm font-medium">Incluye todo esto</p>
             <ul className="grid gap-2 sm:grid-cols-2">
               {scenario.includes.map((it) => (
                 <li key={it} className="flex items-start gap-2 text-sm text-muted">
@@ -540,16 +519,15 @@ function InvestmentBuilder({
               ))}
             </ul>
           </div>
-        )}
-
+        ) : null}
       </div>
 
       {/* Resumen pegajoso */}
       <div className="lg:sticky lg:top-24 lg:self-start">
         <div className="rounded-3xl border border-line bg-surface/50 p-6">
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Inversión total</p>
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-faint">Inversión</p>
           <p className="mt-1 font-display text-4xl font-semibold tabular-nums">{formatARS(total)}</p>
-          <p className="mt-1 text-sm text-muted">IVA incluido</p>
+          <p className="mt-1 text-sm text-muted">+ IVA</p>
           <div className="my-5 h-px bg-line" />
           <ul className="space-y-2.5 text-sm text-muted">
             <li className="flex items-start gap-2">

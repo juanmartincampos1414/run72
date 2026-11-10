@@ -95,11 +95,11 @@ const SCHEMA = {
     scenarios: {
       type: "array",
       description:
-        "EXACTAMENTE 2 escenarios de inversión de la Fase 1: 'recomendado' (el punto de entrada, el que marcamos recomendado) y 'completo' (la versión integral). NO incluyas un escenario más básico/económico que esos dos.",
+        "EXACTAMENTE 1 escenario de inversión: 'completo', la propuesta integral que incluye TODO lo necesario para la Fase 1. NO generes escenarios alternativos ni versiones más económicas: es una sola propuesta.",
       items: {
         type: "object",
         properties: {
-          key: { type: "string", enum: ["recomendado", "completo"] },
+          key: { type: "string", enum: ["completo"] },
           name: { type: "string", description: "Nombre corto (ej: 'Esencial')." },
           tagline: { type: "string", description: "1 frase de para quién es / qué logra." },
           projectTypes: { type: "array", items: { type: "string" }, description: "slugs de tipos de proyecto del catálogo incluidos en este escenario." },
@@ -205,23 +205,21 @@ Te paso la TRANSCRIPCIÓN de una videollamada con un potencial cliente. Devolvé
 3) "recommendation": por dónde empezar y por qué, en 3-5 frases, con criterio (qué resultado concreto consigue el cliente primero y qué conviene validar antes de invertir más). Siempre en beneficio del cliente, sin mencionar competidores.
 4) "phase1": la Fase 1 recomendada para arrancar con impacto.
 5) "roadmap": cronograma realista de la Fase 1 (por semanas o meses según el tamaño), 3-6 etapas, cada una con el hito concreto que ve o recibe el cliente. Sé realista con los plazos de un desarrollo a medida.
-6) "scenarios": EXACTAMENTE 2 escenarios de inversión armados con slugs del catálogo: 'recomendado' (punto de entrada, marcado como recomendado) y 'completo' (versión integral). NO generes un tercer escenario más económico/básico. NO generes módulos opcionales/adicionales: el cliente elige entre los 2 escenarios y listo.
+6) "scenarios": EXACTAMENTE 1 escenario ('completo') armado con slugs del catálogo: la propuesta integral que incluye TODO lo necesario para la Fase 1. Es UNA sola propuesta, sin alternativas más económicas ni módulos opcionales.
 
 Reglas:
 - Para scenarios usá EXCLUSIVAMENTE slugs/claves del catálogo de abajo. No inventes servicios ni precios: los calcula el sistema.
-- Los 2 escenarios son incrementales: recomendado ⊂ completo.
+- Es UNA sola propuesta integral (escenario 'completo'): incluí todo lo necesario para una Fase 1 seria, sin dejar un "básico" por separado.
 - Español rioplatense. Nada de relleno ni marketing vacío: lectura honesta y concreta.
 - Si te paso CONTEXTO DEL CLIENTE (datos de su web / notas), usalo para afinar el diagnóstico: distinguí bien lo que el cliente YA TIENE de lo que le falta, y no propongas como nuevo algo que ya tiene.
 
 ANCLAJE DE PRECIO (CRÍTICO — no lo ignores):
-- RUN vende software a medida. Si el cliente necesita una plataforma, una app, un sistema con lógica propia, un portal, o integraciones con sistemas externos (PACS, ERP, HIS, APIs, pasarelas, etc.), CADA uno de los 3 escenarios DEBE anclar en un service type=project real del catálogo ("plataforma" para un sistema a medida, "ecommerce" para una tienda, "sitio" para institucional). Ese proyecto base es el NÚCLEO del presupuesto.
+- RUN vende software a medida. Si el cliente necesita una plataforma, una app, un sistema con lógica propia, un portal, o integraciones con sistemas externos (PACS, ERP, HIS, APIs, pasarelas, etc.), el escenario DEBE anclar en un service type=project real del catálogo ("plataforma" para un sistema a medida, "ecommerce" para una tienda, "sitio" para institucional). Ese proyecto base es el NÚCLEO del presupuesto.
 - Los microservicios y addons SE SUMAN al proyecto base. NUNCA reemplazan al proyecto base. Un presupuesto de software a medida armado solo con microservicios está MAL y sale ridículamente barato: eso no puede pasar.
-- Progresión típica para software a medida (son 2 escenarios, NO 3):
-  · recomendado (punto de entrada) = proyecto base (ej "plataforma") + el núcleo que opera + la integración/automatización clave que lo hace sólido en producción. Es un entregable serio, no una versión recortada.
-  · completo = todo lo del recomendado + portal multi-actor, pagos diferenciados, automatizaciones, reportes, etc.
-- No armes un escenario "económico/básico" por debajo del recomendado: RUN no lowballea; el punto de entrada ya tiene que ser una solución real.
-- Sanity check antes de responder: un desarrollo a medida serio (plataforma + integración con un sistema externo) NO puede dar un total irrisorio. Si el escenario recomendado te quedó por debajo de lo que cuesta construir eso en serio (pensá en meses-persona reales de ingeniería), es porque te olvidaste del proyecto base o de funcionalidades: corregilo e incluí el service type=project que corresponde.
-- Solo cuando el pedido es puramente branding/estrategia/marketing (sin software) un escenario puede no tener proyecto base.
+- La propuesta única ('completo') = proyecto base (ej "plataforma") + el núcleo que opera + TODAS las integraciones/funcionalidades que la vuelven una solución integral (portal multi-actor, pagos/automatizaciones, reportes, etc.). Es la versión más completa, no una recortada.
+- RUN no lowballea: el presupuesto ya tiene que reflejar una solución real y seria.
+- Sanity check antes de responder: un desarrollo a medida serio (plataforma + integración con un sistema externo) NO puede dar un total irrisorio. Si te quedó por debajo de lo que cuesta construir eso en serio (pensá en meses-persona reales de ingeniería), es porque te olvidaste del proyecto base o de funcionalidades: corregilo e incluí el service type=project que corresponde.
+- Solo cuando el pedido es puramente branding/estrategia/marketing (sin software) el escenario puede no tener proyecto base.
 
 Catálogo disponible (usá solo estos slugs/claves):
 ${buildCatalog(services, micros)}${playbookBlock ? `\n\n${playbookBlock}` : ""}`;
