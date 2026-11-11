@@ -207,6 +207,12 @@ export function LeadDetail({ leadId }: { leadId: string }) {
               </Panel>
             )}
             <Panel
+              title="Sumar contexto (WhatsApp / audios)"
+              hint="Todo lo que el cliente va contando por WhatsApp (audios o conversaciones) se suma a la oportunidad. RUN lo resume y lo usa en la propuesta y el diagnóstico."
+            >
+              <ContextAdder leadId={leadId} onAdded={load} />
+            </Panel>
+            <Panel
               title="Transcripción + propuesta"
               hint="Subí el Word con la transcripción COMPLETA de la meet (no el resumen) y generá la propuesta. RUN interpreta solo las etapas; no hace falta cargar enfoque."
             >
@@ -625,6 +631,134 @@ type GenProposal = {
   // compat viejo
   draft?: string;
 };
+
+/**
+ * Suma contexto a la oportunidad desde WhatsApp: audios (se transcriben) o
+ * conversaciones pegadas. Lo resume y lo guarda en las notas del lead, que la
+ * propuesta usa como CONTEXTO DEL CLIENTE.
+ */
+function ContextAdder({ leadId, onAdded }: { leadId: string; onAdded: () => void }) {
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [err, setErr] = useState("");
+  const [added, setAdded] = useState<string[]>([]);
+
+  async function postOne(body: FormData): Promise<boolean> {
+    const r = await fetch("/api/admin/lead-context", { method: "POST", body });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      setErr(d.error || "No se pudo sumar el contexto.");
+      return false;
+    }
+    if (d.added) setAdded((prev) => [...prev, d.added as string]);
+    return true;
+  }
+
+  async function submitText() {
+    if (!text.trim()) return;
+    setBusy(true);
+    setErr("");
+    const fd = new FormData();
+    fd.append("leadId", leadId);
+    fd.append("text", text.trim());
+    const ok = await postOne(fd);
+    setBusy(false);
+    if (ok) {
+      setText("");
+      onAdded();
+    }
+  }
+
+  async function handleFiles(files: FileList | File[]) {
+    const list = Array.from(files).filter((f) => /audio|ogg|mp3|m4a|wav|opus/i.test(f.type + f.name));
+    if (!list.length) {
+      setErr("Subí archivos de audio (ogg, mp3, m4a, opus…).");
+      return;
+    }
+    setBusy(true);
+    setErr("");
+    let any = false;
+    for (const f of list) {
+      const fd = new FormData();
+      fd.append("leadId", leadId);
+      fd.append("file", f, f.name);
+      const ok = await postOne(fd);
+      any = any || ok;
+    }
+    setBusy(false);
+    if (any) onAdded();
+  }
+
+  return (
+    <div className="space-y-3">
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (e.dataTransfer.files?.length) void handleFiles(e.dataTransfer.files);
+        }}
+        className={`rounded-xl border border-dashed px-4 py-5 text-center text-sm transition ${
+          dragOver ? "border-brand-violet bg-brand-violet/5" : "border-line text-muted"
+        }`}
+      >
+        <label className="cursor-pointer">
+          <span className="font-medium text-fg">Arrastrá los audios de WhatsApp acá</span>
+          <span className="block text-xs text-faint">o hacé clic para elegirlos (.ogg .mp3 .m4a .opus). Se transcriben solos.</span>
+          <input
+            type="file"
+            accept="audio/*,.ogg,.opus,.m4a,.mp3,.wav"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.length) void handleFiles(e.target.files);
+            }}
+          />
+        </label>
+      </div>
+
+      <div className="text-center text-xs text-faint">— o pegá la conversación —</div>
+
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Pegá acá el texto de la conversación de WhatsApp o una nota de lo que contó el cliente…"
+        rows={4}
+        className="w-full rounded-xl border border-line bg-ink/40 p-3 text-sm text-fg outline-none placeholder:text-faint focus:border-brand-violet"
+      />
+
+      <div className="flex items-center gap-3">
+        <button
+          onClick={submitText}
+          disabled={busy || !text.trim()}
+          className="rounded-full bg-[linear-gradient(100deg,#ff8a4c,#ff6a2a_50%,#dc5000)] px-4 py-2 text-xs font-medium text-white disabled:opacity-50"
+        >
+          {busy ? "Sumando…" : "Sumar a la oportunidad"}
+        </button>
+        {busy && <span className="text-xs text-muted">Procesando…</span>}
+      </div>
+
+      {err && (
+        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">{err}</p>
+      )}
+
+      {added.length > 0 && (
+        <div className="rounded-xl border border-brand-cyan/25 bg-brand-cyan/[0.05] p-3">
+          <p className="mb-1 text-xs font-medium text-brand-cyan">✓ Sumado a la oportunidad</p>
+          {added.map((a, i) => (
+            <pre key={i} className="whitespace-pre-wrap break-words text-xs leading-relaxed text-muted">{a}</pre>
+          ))}
+          <p className="mt-2 text-xs text-faint">Regenerá la propuesta abajo para que tome este contexto.</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function TranscriptProposal({
   leadId,
