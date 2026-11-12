@@ -134,7 +134,7 @@ const esPlausible = (s: string) => {
 export function telefonoDelEvento(ev: CalendarEvent): string | null {
   const texto = textoDelEvento(ev);
   const etiquetado = texto.match(
-    /(?:whatsapp|whats\s*app|tel[eé]fono|celular|cel)\s*[:：]?\s*(\+?\d[\d\s().-]{7,16}\d)/i,
+    /(?:whatsapp|whats\s*app|phone|tel[eé]fono|celular|cel)\s*[:：-]*\s*(\+?\d[\d\s().-]{7,16}\d)/i,
   );
   if (etiquetado && esPlausible(etiquetado[1])) return etiquetado[1];
   const m = texto.match(NUMERO);
@@ -143,18 +143,22 @@ export function telefonoDelEvento(ev: CalendarEvent): string | null {
 }
 
 const EMAIL_RE = /\S+@\S+\.\S+/;
+const EMAIL_G = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
 
 /**
- * Nombre del invitado. Orden:
- *  1) Línea etiquetada en la descripción (Centrilize deja "Invitado: Nombre Apellido").
- *     Se exige que la etiqueta esté al inicio de línea y que el valor NO sea un email
- *     (así no matchea "Correo electrónico del invitado: foo@bar.com").
- *  2) Un attendee que NO sea el organizador ni el dueño del calendario (el invitado real),
- *     nunca el host (ej. el dueño "Estanislao"). Si no hay displayName, usa el local del email.
- *  3) El título del evento.
+ * Nombre del invitado real. Robusto a los dos formatos de Centrilize/Centralize y
+ * a invitados de más (host, miembros del equipo agregados a la meet). Orden:
+ *  1) Línea etiquetada en la descripción ("Invitado: Nombre", "Nombre:", etc.),
+ *     al inicio de línea y descartando emails (no confundir con "Correo ... del invitado:").
+ *  2) El attendee cuyo EMAIL aparece en la descripción (= quien reservó), nunca el host
+ *     ni el dueño del calendario. Así no saluda a un compañero invitado a la meet.
+ *  3) El título del evento (Centralize suele titularlo con el nombre del invitado).
+ *  4) Cualquier attendee que no sea el host, como último recurso.
  */
 export function nombreDelEvento(ev: CalendarEvent): string {
   const desc = ev.description || "";
+  const atts = ev.attendees ?? [];
+
   const etiqueta = desc.match(
     /^[ \t]*(?:invitad[oa]|nombre(?:\s+y\s+apellido)?|cliente|contacto|reservad[oa]\s+por|a\s+nombre\s+de)\s*[:：]\s*(.+)$/im,
   );
@@ -163,11 +167,19 @@ export function nombreDelEvento(ev: CalendarEvent): string {
     if (val && !EMAIL_RE.test(val)) return val.split(/\s+/)[0];
   }
 
-  const guest = ev.attendees?.find((a) => !a.organizer && !a.self && (a.displayName || a.email));
-  if (guest) return (guest.displayName || guest.email || "").trim().split(/[\s@]+/)[0] || "Hola";
+  const emails = (desc.match(EMAIL_G) ?? []).map((e) => e.toLowerCase());
+  for (const em of emails) {
+    const a = atts.find((x) => x.email?.toLowerCase() === em && !x.organizer && !x.self && x.displayName);
+    if (a?.displayName) return a.displayName.trim().split(/\s+/)[0];
+  }
 
   const sum = (ev.summary || "").trim();
-  return sum.split(/\s+/)[0] || "Hola";
+  if (sum && !EMAIL_RE.test(sum)) return sum.split(/\s+/)[0];
+
+  const guest = atts.find((x) => !x.organizer && !x.self && (x.displayName || x.email));
+  if (guest) return (guest.displayName || guest.email || "").trim().split(/[\s@]+/)[0] || "Hola";
+
+  return "Hola";
 }
 
 export function inicioDelEvento(ev: CalendarEvent): Date | null {

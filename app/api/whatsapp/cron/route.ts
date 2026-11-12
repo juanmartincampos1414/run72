@@ -122,14 +122,6 @@ export async function GET(req: Request) {
   try {
     const nuevos = await eventosNuevosDesde(new Date(ahora.getTime() - CONFIRM_MAX_MIN * MIN));
     for (const ev of nuevos) {
-      // DEBUG TEMPORAL: ver cómo viene el evento para depurar el nombre del invitado.
-      await logEvent(supabase, "meeting_name_debug", null, {
-        id: ev.id,
-        summary: ev.summary ?? null,
-        desc: (ev.description ?? "").slice(0, 300),
-        attendees: (ev.attendees ?? []).map((a) => ({ n: a.displayName ?? null, e: a.email ?? null, org: !!a.organizer, self: !!a.self })),
-        nombre: nombreDelEvento(ev),
-      }).then(() => {}, () => {});
       const d = datos(ev);
       if (!d || !d.created) continue;
       if (d.inicio <= ahora) continue; // la meet ya pasó/empezó
