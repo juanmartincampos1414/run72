@@ -65,7 +65,14 @@ export type CalendarEvent = {
   updated?: string;
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
-  attendees?: { email?: string; displayName?: string; comment?: string }[];
+  attendees?: {
+    email?: string;
+    displayName?: string;
+    comment?: string;
+    organizer?: boolean;
+    self?: boolean;
+    responseStatus?: string;
+  }[];
 };
 
 async function listar(params: Record<string, string>): Promise<CalendarEvent[]> {
@@ -135,12 +142,32 @@ export function telefonoDelEvento(ev: CalendarEvent): string | null {
   return null;
 }
 
-/** Nombre del invitado: etiqueta "Invitado: ...", luego invitado del evento, luego el resumen. */
+const EMAIL_RE = /\S+@\S+\.\S+/;
+
+/**
+ * Nombre del invitado. Orden:
+ *  1) Línea etiquetada en la descripción (Centrilize deja "Invitado: Nombre Apellido").
+ *     Se exige que la etiqueta esté al inicio de línea y que el valor NO sea un email
+ *     (así no matchea "Correo electrónico del invitado: foo@bar.com").
+ *  2) Un attendee que NO sea el organizador ni el dueño del calendario (el invitado real),
+ *     nunca el host (ej. el dueño "Estanislao"). Si no hay displayName, usa el local del email.
+ *  3) El título del evento.
+ */
 export function nombreDelEvento(ev: CalendarEvent): string {
-  const m = (ev.description || "").match(/invitad[oa]\s*[:：]\s*(.+)/i);
-  if (m) return m[1].trim().split(/\s+/)[0];
-  const inv = ev.attendees?.find((a) => a.displayName)?.displayName;
-  return (inv || ev.summary || "").trim().split(/\s+/)[0] || "Hola";
+  const desc = ev.description || "";
+  const etiqueta = desc.match(
+    /^[ \t]*(?:invitad[oa]|nombre(?:\s+y\s+apellido)?|cliente|contacto|reservad[oa]\s+por|a\s+nombre\s+de)\s*[:：]\s*(.+)$/im,
+  );
+  if (etiqueta) {
+    const val = etiqueta[1].trim();
+    if (val && !EMAIL_RE.test(val)) return val.split(/\s+/)[0];
+  }
+
+  const guest = ev.attendees?.find((a) => !a.organizer && !a.self && (a.displayName || a.email));
+  if (guest) return (guest.displayName || guest.email || "").trim().split(/[\s@]+/)[0] || "Hola";
+
+  const sum = (ev.summary || "").trim();
+  return sum.split(/\s+/)[0] || "Hola";
 }
 
 export function inicioDelEvento(ev: CalendarEvent): Date | null {
