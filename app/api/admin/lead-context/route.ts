@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { requireAdmin } from "@/lib/admin/auth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { fechaAR } from "@/lib/fecha";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -110,7 +111,7 @@ export async function POST(req: Request) {
   const { data: lead } = await supabase.from("leads").select("meeting_notes").eq("id", leadId).maybeSingle();
   if (!lead) return NextResponse.json({ error: "Lead no encontrado." }, { status: 404 });
 
-  const stamp = new Date().toLocaleDateString("es-AR");
+  const stamp = fechaAR(new Date());
   const header = kind === "audio" ? `AUDIO DE WHATSAPP (${stamp})` : `CONVERSACIÓN DE WHATSAPP (${stamp})`;
   const block = `${header}:\n${summary}`;
   const prev = String(lead.meeting_notes ?? "").trim();

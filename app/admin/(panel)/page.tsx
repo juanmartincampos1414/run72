@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatARS } from "@/lib/pricing";
+import { fechaAR, fechaHoraAR } from "@/lib/fecha";
 import {
   ANTICIPO_LABEL,
   anticipoState,
@@ -335,10 +336,7 @@ export default function LeadsPage() {
             {sortedLeads?.map((l) => (
               <tr key={l.id} className="border-b border-line/60 align-top">
                 <Td className="whitespace-nowrap text-faint">
-                  {new Date(l.created_at).toLocaleDateString("es-AR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                  })}
+                  {fechaAR(l.created_at)}
                 </Td>
                 <Td>
                   <Link href={`/admin/leads/${l.id}`} className="font-medium text-fg hover:text-brand-cyan">
@@ -417,9 +415,7 @@ export default function LeadsPage() {
                       MP {l.payment_id ? `#${l.payment_id}` : ""}
                       {l.production_started_at && (
                         <span className="block text-faint">
-                          {new Date(l.production_started_at).toLocaleString("es-AR", {
-                            day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit",
-                          })}
+                          {fechaHoraAR(l.production_started_at, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
                         </span>
                       )}
                     </div>
@@ -473,7 +469,7 @@ export default function LeadsPage() {
                         className="text-xs text-brand-cyan hover:underline"
                         title={
                           l.comprobante_uploaded_at
-                            ? new Date(l.comprobante_uploaded_at).toLocaleString("es-AR")
+                            ? fechaHoraAR(l.comprobante_uploaded_at)
                             : undefined
                         }
                       >

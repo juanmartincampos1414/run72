@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatARS } from "@/lib/pricing";
+import { fechaHoraAR } from "@/lib/fecha";
 import { DISCOVERY_QUESTIONS, DISCOVERY_SECTIONS } from "@/lib/discovery";
 import {
   ANTICIPO_LABEL,
@@ -446,9 +447,7 @@ function Panel({ title, hint, children }: { title: string; hint?: string; childr
 }
 
 function fmt(iso: string) {
-  return new Date(iso).toLocaleString("es-AR", {
-    day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit",
-  });
+  return fechaHoraAR(iso);
 }
 
 function DeliveryDocEditor({ lead, leadId }: { lead: Lead; leadId: string }) {
